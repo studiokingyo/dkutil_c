@@ -1,0 +1,174 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+#include "bsdlicence.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// “ú–{Œê resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,9,9,9
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "BSD Licence 1", BSD_LICENCE_PUT1
+            VALUE "BSD Licence 2", BSD_LICENCE_PUT2
+            VALUE "BSD Licence 3", BSD_LICENCE_PUT3
+						VALUE "Comments", DKINGYOUTILITY3_COPYRIGHT(DKUTIL_C_COPYRIGHT_JAPANESE)
+            VALUE "CompanyName", "dKingyo Utility Toolkit Project\0"
+            VALUE "FileDescription", "dKingyoUtility3 is dkutil_c dll stable version. go to http://dkingyoutility.sourceforge.jp/studiokingyonet/dKingyoUtility3.html\0"
+            VALUE "FileVersion", "1, 0, 0, 0\0"
+            VALUE "InternalName", "dKingyoUtility3\0"
+            VALUE "LegalCopyright", "Copyright (C) d‹à‹› 2005\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "dKingyoUtility3.dll\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "dKingyoUtility3\0"
+            VALUE "ProductVersion", "1, 9, 9, 9\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // !_MAC
+
+#endif    // “ú–{Œê resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// ‰pŒê (±ÒØ¶) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,9,9,9
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+						VALUE "BSD Licence 1", BSD_LICENCE_PUT1
+            VALUE "BSD Licence 2", BSD_LICENCE_PUT2
+            VALUE "BSD Licence 3", BSD_LICENCE_PUT3
+						VALUE "Comments", DKINGYOUTILITY3_COPYRIGHT(DKUTIL_C_COPYRIGHT)
+            VALUE "CompanyName", "dKingyo Utility Toolkit Project\0"
+            VALUE "FileDescription", "dKingyoUtility3 is dkutil_c dll stable version. go to http://dkingyoutility.sourceforge.jp/studiokingyonet/dKingyoUtility3.html\0"
+            VALUE "FileVersion", "1, 0, 0, 0\0"
+            VALUE "InternalName", "dKingyoUtility3\0"
+            VALUE "LegalCopyright", "Copyright (C) d.Kingyo 2005\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "dKingyoUtility3.dll\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "dKingyoUtility3\0"
+            VALUE "ProductVersion", "1, 9, 9, 9\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // !_MAC
+
+#endif    // ‰pŒê (±ÒØ¶) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

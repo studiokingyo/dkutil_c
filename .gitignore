@@ -1,0 +1,77 @@
+# ===================
+# Build Output Directories
+# ===================
+Debug/
+DebugMT/
+DebugDLL/
+DebugMTDLL/
+Debug_bcc/
+Release/
+ReleaseMT/
+ReleaseDLL/
+ReleaseMTDLL/
+Release_bcc/
+
+# Visual Studio 6.0 intermediate directories
+dkutil_c___Win32_DebugMT/
+dkutil_c___Win32_ReleaseMT/
+
+# Library output directory
+lib/
+
+# ===================
+# Build Artifacts
+# ===================
+*.obj
+*.o
+*.lib
+*.a
+*.dll
+*.exe
+*.exp
+*.pdb
+*.ilk
+*.idb
+*.pch
+*.sbr
+*.bsc
+*.res
+
+# ===================
+# Visual Studio 6.0
+# ===================
+*.ncb
+*.opt
+*.plg
+*.aps
+*.clw
+*.dep
+*.mak.bak
+
+# ===================
+# Dev-C++ / MinGW
+# ===================
+*.layout
+
+# ===================
+# Doxygen Output
+# ===================
+html/
+latex/
+xml/
+
+# ===================
+# OS Generated Files
+# ===================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# ===================
+# Editor Backup Files
+# ===================
+*~
+*.bak
+*.swp
+*.swo

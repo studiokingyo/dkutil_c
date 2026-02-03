@@ -1,0 +1,128 @@
+/*!
+
+@mainpage dkutil_cstd
+
+@section	summary 概要
+dkutil_cstdライブラリはC言語ランタイムライブラリを使いたくない人用のC言語で実装したライブラリです。<br>
+標準のC言語ランタイムライブラリ（stdlib.h等）が重いんだよぉ！ってときに使ってください。<br>
+不毛な気もしますが＾＾；(いや、すごく不毛です。）<br>
+私自身が受験勉強のストレス解消用に作ったような物です･･･。<br>
+あんまし深く追求しないで下さい。<br>
+なお、CPUの種類によってはバグが発生するかもしれない命令があるかもしれません。<br>
+バグが発生した時は恐れ入りますが教えてくださると助かります。m(_ _)m
+@todo
+C言語で実装できるものは一通り行う
+
+@section history 更新情報
+<ul>
+<li>2006/01/16:Version 0.30<br>
+macro.hやdefine.hにdkutil_cで定義されている要素を追加した。
+osに依存しそうな処理をos.hに書いた。
+<li>2005/09/24:<br>
+memory.hに定義してあるdkcstd_memcpy_FPU64()のバグが取れないのでコメントアウトした。
+どちら様か直せる方がいらっしゃいましたらお願いします。
+バグはコピーするメモリの先頭8byteが上手くコピーできないというバグです。<br>
+
+<li>2005/03/05:version 0.20<br>
+memory.cのFPU系以外のすべてのmemcpy郡のテスト完了。<br>
+多分OK.<br>
+<br>
+x86_optimized_memcpy.hはオフセットとかメモリアラインとかに注意して使うべし。<br>
+<br>
+<li>2005/03/04:<br>
+x86.cの一部を実装 <br>
+stdbool.hの_Bool定義の条件が間違っていたのを修正<br>
+aligned_free_calcの計算が間違っていたのを修正<br>
+before / f = (void *)pb;<br>
+after  / f = (void *)(*pb);<br>
+
+<li>2005/02/22:<br>
+Dev-C++(MinGW)でコンパイルする場合dkutil_cと一緒にコンパイルしなくてはいけないようにした。<br>
+なぜなら、いちいちDev-C++のプロジェクトを作成するのが面倒だから＾＾；スマン。<br>
+string.cにdkcstd_wcsncat() dkcstd_wcsncpy()を追加<br>
+dkcstd_memmove()のC言語版のソースがコンパイルの通らなかったのを改善<br>
+stdbool.hやstddef.h,math.c,math.hを追加<br>
+<br>
+<li>2005/02/20:<br>
+x86_optimized_memcpy.hを追加。<br>
+その時にDKC_INLINEがインライン修飾子に変換されない点を見つけたので変更。<br>
+<PRE>
+Before
+
+#  if _MSC_VER >= 1100 && defined(_inline)
+#    define DKC_INLINE _inline
+#  elif defined(__inline)
+#    define DKC_INLINE __inline
+#  elif defined(inline)
+#    define DKC_INLINE inline
+#  elif USEINLINE
+#    define DKC_INLINE __inline__
+#  else
+#    define DKC_INLINE
+#  endif
+
+After
+
+#  if _MSC_VER >= 1100
+#    define DKC_INLINE __inline
+#  elif USEINLINE
+#    define DKC_INLINE __inline__
+#  else
+#    define DKC_INLINE
+#  endif
+
+</PRE>
+
+
+<li>2005/01/25:<br>
+<PRE>
+  size_t mod_ = count - cnt * sizeof(size_t);
+  と、記述するよりは
+  size_t mod_ = count % sizeof(size_t);
+  と、記述した方がイイコードが生成されらしいので直した。
+</PRE>
+
+
+<li>2005/01/24:mmxやsseを使ったmemcpyを実装 テストコード追加
+<li>2005/01/23:大体いろんなのをテストする。
+<li>2005/01/17:大体いろんなのを暇つぶしに作り上げる。
+</ul>
+
+@section how_to_use 使い方
+
+stdlib.hを読みこむ。
+すべてのソースを自分のプロジェクトに追加するとか、ライブラリにして各自使うとか。
+
+
+
+@section	future	今後の方向性
+
+- C言語で実装できるならば実装
+- アセンブラで記述すると劇的に速くなる？ならば実装
+
+@section	thanks	謝辞
+- memcpy郡やCPUチェック等のソースを「memory copy code benchmark」より流用しています。XELF氏に感謝します。
+
+@section	license	ライセンス
+
+NYSLです。<br>
+- Original http://www.kmonos.net/nysl/
+- English  http://www.kmonos.net/nysl/index.en.html
+
+作者への報告があれば、当然喜びますし、より良いライブラリになるでしょう。<br>
+報告がなくても、商用利用してかまいませんし、改変をしてもかまいません。<br>
+
+@section	author	作者に関して
+
+- author d金魚
+- Project page http://dkingyoutility.sourceforge.jp/
+- Mail Address(スペースを繋げたり、atmarkを@にしたりしてください。) studio kingyo net atmark users.sourceforge.jp
+<br><br>
+
+<b>連絡がつかない場合</b>
+http://www3.to/shisui/
+または、dKingyo Utility Toolkit とか dkutilとかのキーワードで
+ググってみると（Googleで検索すると）出てきます。
+@author d金魚 / dkutil_cstd  Copyright(c) 2005- d金魚 All rights reserved.
+ 
+*/

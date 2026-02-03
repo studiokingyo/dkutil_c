@@ -1,0 +1,156 @@
+NAME dKingyoUtility3.dll
+DESCRIPTION "dKingyoUtility3 dll single thread release version"
+
+EXPORTS
+	; dkutil_c hash function
+	dkcSHA512Init									@00001
+	dkcSHA512Load									@00002
+	dkcSHA512Final								@00003
+	dkcSHA512DigestStr						@00004
+	dkcSHA512Digest								@00005
+	dkcSHA512FinalDigestStr				@00006
+	dkcSHA512FinalDigest					@00007
+	dkcFreeSHA512									@00008
+	dkcAllocSHA512								@00009
+
+	dkcSecureHashCalculateBinaryDigest @00010									 
+	
+	dkcSHA384Init									@00011
+	dkcSHA384Load									@00012
+	dkcSHA384Final								@00013
+	dkcSHA384DigestStr						@00014
+	dkcSHA384Digest								@00015
+	dkcSHA384FinalDigestStr				@00016
+	dkcSHA384FinalDigest					@00017
+	dkcFreeSHA384									@00018
+	dkcAllocSHA384								@00019
+
+	dkcSecureHashCalculateStringDigest	@00020				
+
+	dkcSHA256Init									@00021
+	dkcSHA256Load									@00022
+	dkcSHA256Final								@00023
+	dkcSHA256DigestStr						@00024
+	dkcSHA256Digest								@00025
+	dkcSHA256FinalDigestStr				@00026
+	dkcSHA256FinalDigest					@00027
+	dkcFreeSHA256									@00028
+	dkcAllocSHA256								@00029
+
+	dkcHMACCalculateBinaryDigest	@00030
+
+	dkcSHA1Init									@00031
+	dkcSHA1Load									@00032
+	dkcSHA1Final								@00033
+	dkcSHA1DigestStr						@00034
+	dkcSHA1Digest								@00035
+	dkcSHA1FinalDigestStr				@00036
+	dkcSHA1FinalDigest					@00037
+	dkcFreeSHA1									@00038
+	dkcAllocSHA1								@00039
+
+	dkcHMACHashCalculateStringDigest	@00040
+
+	dkcMD5Init									@00041
+	dkcMD5Load									@00042
+	dkcMD5Final									@00043
+	dkcMD5DigestStr							@00044
+	dkcMD5Digest								@00045
+	dkcMD5FinalDigestStr				@00046
+	dkcMD5FinalDigest						@00047
+	dkcFreeMD5									@00048
+	dkcAllocMD5									@00049
+
+	dkcMD4Init									@00051
+	dkcMD4Load									@00052
+	dkcMD4Final									@00053
+	dkcMD4DigestStr							@00054
+	dkcMD4Digest								@00055
+	dkcMD4FinalDigestStr				@00056
+	dkcMD4FinalDigest						@00057
+	dkcFreeMD4									@00058
+	dkcAllocMD4									@00059
+
+	dkcMD2Init									@00061
+	dkcMD2Load									@00062
+	dkcMD2Final									@00063
+	dkcMD2DigestStr							@00064
+	dkcMD2Digest								@00065
+	dkcMD2FinalDigestStr				@00066
+	dkcMD2FinalDigest						@00067
+	dkcFreeMD2									@00068
+	dkcAllocMD2									@00069
+
+	dkcHMACInit										@00071
+	dkcHMACLoad										@00072
+	dkcHMACFinal									@00073
+	dkcHMACDigestStr							@00074
+	dkcHMACDigest									@00075
+	dkcHMACFinalDigestStr					@00076
+	dkcHMACFinalDigest						@00077
+	dkcFreeHMAC										@00078
+	dkcAllocHMAC									@00079
+
+	;	dkutil_c stream cipher
+	dkcAllocSNOW2									@00140
+	dkcSNOW2Init									@00141
+	dkcFreeSNOW2									@00142
+	dkcSNOW2Process								@00143
+	dkcSNOW2EncryptNoDestDOE			@00144
+	dkcSNOW2EncryptDOE						@00145
+	dkcAllocSNOW2NoLimitKeyLength	@00146
+
+	;bury a rest 
+	dkcEncryptByte								@00148
+	dkcDecryptByte								@00149
+
+	dkcAllocArcfour								@00150
+	dkcFreeArcfour								@00151
+	dkcArcfourProcess							@00152
+	dkcArcfourEncrypt							@00153
+	dkcArcfourEncryptNoDest				@00154
+
+	dkcAllocArcfour2Byte							@00155
+	dkcFreeArcfour2Byte								@00156
+	dkcArcfour2ByteProcess						@00157
+	dkcArcfour2ByteEncrypt						@00158
+	dkcArcfour2ByteEncryptNoDest			@00159
+
+	dkcAllocHC256									@00161
+	dkcAllocHC256Const						@00162
+	dkcFreeHC256									@00163
+	dkcHC256Process								@00164
+	dkcHC256EncryptDOE						@00165
+	dkcHC256EncryptNoDestDOE			@00166
+	dkcAllocHC256NoLimitKeyLength	@00167
+
+
+	;OS independent
+	dkcSaveBinary									@00200
+	dkcLoadBinary									@00201
+	dkcSaveText										@00202
+	dkcLoadText										@00203
+	dkcCreateEmptyFile						@00204
+	dkcIsLittleEndian							@00205
+	dkcIsMMX											@00206
+
+
+
+	;filesystem
+	dkcSetCurrentDirectory				@00230
+	dkcGetCurrentDirectory				@00231
+	dkcCreateDirectory							@00232
+	dkcFileCopy												@00233
+	dkcFileCopyEx										@00234
+	dkcFileRemove										@00235
+	dkcFileRename										@00236
+	dkcFileExist										@00237
+	dkcFileAndFolderExist							@00238
+	dkcFolderExist										@00239
+	dkcFileSize											@00240
+	dkcFileSize64								@00241
+	dkcCreateZeroByteFile				@00242
+	dkcFileBinaryCompare				@00243
+	;routine
+	dkcFileToDCF									@00280
+	dkcDCFToFile									@00281

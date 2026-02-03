@@ -1,0 +1,214 @@
+# Project: dkutil_c
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = devcpp/dkcOSIndependent.o devcpp/dkcMemoryStream.o devcpp/dkcBuffer.o devcpp/dkcSingleList.o devcpp/dkcStdio.o devcpp/dkcStack.o devcpp/dkcCircularMemoryStream.o devcpp/dkc2Tree.o devcpp/dkcArrayOneByOne.o devcpp/dkcDeque.o devcpp/dkcQueue.o devcpp/dkcString.o devcpp/dkcUniqueID.o devcpp/dkcDLL.o devcpp/dkcLZSS.o devcpp/dkcSHA1.o devcpp/dkcSHA256.o devcpp/dkcSHA512.o devcpp/dkcSHA.o devcpp/md5.o devcpp/st.o devcpp/dkcMD5.o devcpp/dkcSJISFileSystem.o devcpp/dkcSafeFileSystem.o devcpp/dkcSHA384.o devcpp/dkcVernam.o devcpp/dkcArcfour.o devcpp/dkcRijndael.o devcpp/dkcStream.o devcpp/dkcSort.o devcpp/dkcTaskEngine.o devcpp/dkcThreadLock.o devcpp/dkcBlowfish.o devcpp/dkcCryptograph.o devcpp/dkcHash.o devcpp/dkcMath.o devcpp/dkcOS.o devcpp/dkcRegex.o devcpp/dkcBlockSort.o devcpp/dkcCRC.o devcpp/dkcLZW.o devcpp/dkcRLE.o devcpp/dkcMemoryPool.o devcpp/rijndael-alg-fst.o devcpp/rijndael-api-fst.o devcpp/dkcHC256.o devcpp/dkcGenericFileSystem.o devcpp/dkcSemiRealRandom.o devcpp/malloc.o devcpp/math.o devcpp/memory.o devcpp/stdlib.o devcpp/string.o devcpp/strings.o devcpp/x86.o devcpp/dkcTelecomConfirmPacket.o devcpp/dkcTelecomConfirmFile.o devcpp/dkcMD2.o devcpp/dkcMD4.o devcpp/dkcHMAC.o devcpp/dkcDCF.o devcpp/dkcDCF01.o $(RES)
+LINKOBJ  = devcpp/dkcOSIndependent.o devcpp/dkcMemoryStream.o devcpp/dkcBuffer.o devcpp/dkcSingleList.o devcpp/dkcStdio.o devcpp/dkcStack.o devcpp/dkcCircularMemoryStream.o devcpp/dkc2Tree.o devcpp/dkcArrayOneByOne.o devcpp/dkcDeque.o devcpp/dkcQueue.o devcpp/dkcString.o devcpp/dkcUniqueID.o devcpp/dkcDLL.o devcpp/dkcLZSS.o devcpp/dkcSHA1.o devcpp/dkcSHA256.o devcpp/dkcSHA512.o devcpp/dkcSHA.o devcpp/md5.o devcpp/st.o devcpp/dkcMD5.o devcpp/dkcSJISFileSystem.o devcpp/dkcSafeFileSystem.o devcpp/dkcSHA384.o devcpp/dkcVernam.o devcpp/dkcArcfour.o devcpp/dkcRijndael.o devcpp/dkcStream.o devcpp/dkcSort.o devcpp/dkcTaskEngine.o devcpp/dkcThreadLock.o devcpp/dkcBlowfish.o devcpp/dkcCryptograph.o devcpp/dkcHash.o devcpp/dkcMath.o devcpp/dkcOS.o devcpp/dkcRegex.o devcpp/dkcBlockSort.o devcpp/dkcCRC.o devcpp/dkcLZW.o devcpp/dkcRLE.o devcpp/dkcMemoryPool.o devcpp/rijndael-alg-fst.o devcpp/rijndael-api-fst.o devcpp/dkcHC256.o devcpp/dkcGenericFileSystem.o devcpp/dkcSemiRealRandom.o devcpp/malloc.o devcpp/math.o devcpp/memory.o devcpp/stdlib.o devcpp/string.o devcpp/strings.o devcpp/x86.o devcpp/dkcTelecomConfirmPacket.o devcpp/dkcTelecomConfirmFile.o devcpp/dkcMD2.o devcpp/dkcMD4.o devcpp/dkcHMAC.o devcpp/dkcDCF.o devcpp/dkcDCF01.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib"  
+INCS =  -I"C:/Dev-Cpp/include"  -I"./" 
+CXXINCS =  -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Dev-Cpp/include/c++/3.4.2"  -I"C:/Dev-Cpp/include"  -I"C:/Dev-Cpp/include/OGRE"  -I"./" 
+BIN  = devcpp/dkutil_c.a
+CXXFLAGS = $(CXXINCS)   -fshort-double -fexpensive-optimizations -O3
+CFLAGS = $(INCS)   -fshort-double -fexpensive-optimizations -O3
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before devcpp/dkutil_c.a all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(LINKOBJ)
+	ar r $(BIN) $(LINKOBJ)
+	ranlib $(BIN)
+
+devcpp/dkcOSIndependent.o: dkcOSIndependent.c
+	$(CC) -c dkcOSIndependent.c -o devcpp/dkcOSIndependent.o $(CFLAGS)
+
+devcpp/dkcMemoryStream.o: dkcMemoryStream.c
+	$(CC) -c dkcMemoryStream.c -o devcpp/dkcMemoryStream.o $(CFLAGS)
+
+devcpp/dkcBuffer.o: dkcBuffer.c
+	$(CC) -c dkcBuffer.c -o devcpp/dkcBuffer.o $(CFLAGS)
+
+devcpp/dkcSingleList.o: dkcSingleList.c
+	$(CC) -c dkcSingleList.c -o devcpp/dkcSingleList.o $(CFLAGS)
+
+devcpp/dkcStdio.o: dkcStdio.c
+	$(CC) -c dkcStdio.c -o devcpp/dkcStdio.o $(CFLAGS)
+
+devcpp/dkcStack.o: dkcStack.c
+	$(CC) -c dkcStack.c -o devcpp/dkcStack.o $(CFLAGS)
+
+devcpp/dkcCircularMemoryStream.o: dkcCircularMemoryStream.c
+	$(CC) -c dkcCircularMemoryStream.c -o devcpp/dkcCircularMemoryStream.o $(CFLAGS)
+
+devcpp/dkc2Tree.o: dkc2Tree.c
+	$(CC) -c dkc2Tree.c -o devcpp/dkc2Tree.o $(CFLAGS)
+
+devcpp/dkcArrayOneByOne.o: dkcArrayOneByOne.c
+	$(CC) -c dkcArrayOneByOne.c -o devcpp/dkcArrayOneByOne.o $(CFLAGS)
+
+devcpp/dkcDeque.o: dkcDeque.c
+	$(CC) -c dkcDeque.c -o devcpp/dkcDeque.o $(CFLAGS)
+
+devcpp/dkcQueue.o: dkcQueue.c
+	$(CC) -c dkcQueue.c -o devcpp/dkcQueue.o $(CFLAGS)
+
+devcpp/dkcString.o: dkcString.c
+	$(CC) -c dkcString.c -o devcpp/dkcString.o $(CFLAGS)
+
+devcpp/dkcUniqueID.o: dkcUniqueID.c
+	$(CC) -c dkcUniqueID.c -o devcpp/dkcUniqueID.o $(CFLAGS)
+
+devcpp/dkcDLL.o: dkcDLL.c
+	$(CC) -c dkcDLL.c -o devcpp/dkcDLL.o $(CFLAGS)
+
+devcpp/dkcLZSS.o: dkcLZSS.c
+	$(CC) -c dkcLZSS.c -o devcpp/dkcLZSS.o $(CFLAGS)
+
+devcpp/dkcSHA1.o: dkcSHA1.c
+	$(CC) -c dkcSHA1.c -o devcpp/dkcSHA1.o $(CFLAGS)
+
+devcpp/dkcSHA256.o: dkcSHA256.c
+	$(CC) -c dkcSHA256.c -o devcpp/dkcSHA256.o $(CFLAGS)
+
+devcpp/dkcSHA512.o: dkcSHA512.c
+	$(CC) -c dkcSHA512.c -o devcpp/dkcSHA512.o $(CFLAGS)
+
+devcpp/dkcSHA.o: dkcSHA.c
+	$(CC) -c dkcSHA.c -o devcpp/dkcSHA.o $(CFLAGS)
+
+devcpp/md5.o: md5.c
+	$(CC) -c md5.c -o devcpp/md5.o $(CFLAGS)
+
+devcpp/st.o: st.c
+	$(CC) -c st.c -o devcpp/st.o $(CFLAGS)
+
+devcpp/dkcMD5.o: dkcMD5.c
+	$(CC) -c dkcMD5.c -o devcpp/dkcMD5.o $(CFLAGS)
+
+devcpp/dkcSJISFileSystem.o: dkcSJISFileSystem.c
+	$(CC) -c dkcSJISFileSystem.c -o devcpp/dkcSJISFileSystem.o $(CFLAGS)
+
+devcpp/dkcSafeFileSystem.o: dkcSafeFileSystem.c
+	$(CC) -c dkcSafeFileSystem.c -o devcpp/dkcSafeFileSystem.o $(CFLAGS)
+
+devcpp/dkcSHA384.o: dkcSHA384.c
+	$(CC) -c dkcSHA384.c -o devcpp/dkcSHA384.o $(CFLAGS)
+
+devcpp/dkcVernam.o: dkcVernam.c
+	$(CC) -c dkcVernam.c -o devcpp/dkcVernam.o $(CFLAGS)
+
+devcpp/dkcArcfour.o: dkcArcfour.c
+	$(CC) -c dkcArcfour.c -o devcpp/dkcArcfour.o $(CFLAGS)
+
+devcpp/dkcRijndael.o: dkcRijndael.c
+	$(CC) -c dkcRijndael.c -o devcpp/dkcRijndael.o $(CFLAGS)
+
+devcpp/dkcStream.o: dkcStream.c
+	$(CC) -c dkcStream.c -o devcpp/dkcStream.o $(CFLAGS)
+
+devcpp/dkcSort.o: dkcSort.c
+	$(CC) -c dkcSort.c -o devcpp/dkcSort.o $(CFLAGS)
+
+devcpp/dkcTaskEngine.o: dkcTaskEngine.c
+	$(CC) -c dkcTaskEngine.c -o devcpp/dkcTaskEngine.o $(CFLAGS)
+
+devcpp/dkcThreadLock.o: dkcThreadLock.c
+	$(CC) -c dkcThreadLock.c -o devcpp/dkcThreadLock.o $(CFLAGS)
+
+devcpp/dkcBlowfish.o: dkcBlowfish.c
+	$(CC) -c dkcBlowfish.c -o devcpp/dkcBlowfish.o $(CFLAGS)
+
+devcpp/dkcCryptograph.o: dkcCryptograph.c
+	$(CC) -c dkcCryptograph.c -o devcpp/dkcCryptograph.o $(CFLAGS)
+
+devcpp/dkcHash.o: dkcHash.c
+	$(CC) -c dkcHash.c -o devcpp/dkcHash.o $(CFLAGS)
+
+devcpp/dkcMath.o: dkcMath.c
+	$(CC) -c dkcMath.c -o devcpp/dkcMath.o $(CFLAGS)
+
+devcpp/dkcOS.o: dkcOS.c
+	$(CC) -c dkcOS.c -o devcpp/dkcOS.o $(CFLAGS)
+
+devcpp/dkcRegex.o: dkcRegex.c
+	$(CC) -c dkcRegex.c -o devcpp/dkcRegex.o $(CFLAGS)
+
+devcpp/dkcBlockSort.o: dkcBlockSort.c
+	$(CC) -c dkcBlockSort.c -o devcpp/dkcBlockSort.o $(CFLAGS)
+
+devcpp/dkcCRC.o: dkcCRC.c
+	$(CC) -c dkcCRC.c -o devcpp/dkcCRC.o $(CFLAGS)
+
+devcpp/dkcLZW.o: dkcLZW.c
+	$(CC) -c dkcLZW.c -o devcpp/dkcLZW.o $(CFLAGS)
+
+devcpp/dkcRLE.o: dkcRLE.c
+	$(CC) -c dkcRLE.c -o devcpp/dkcRLE.o $(CFLAGS)
+
+devcpp/dkcMemoryPool.o: dkcMemoryPool.c
+	$(CC) -c dkcMemoryPool.c -o devcpp/dkcMemoryPool.o $(CFLAGS)
+
+devcpp/rijndael-alg-fst.o: rijndael-alg-fst.c
+	$(CC) -c rijndael-alg-fst.c -o devcpp/rijndael-alg-fst.o $(CFLAGS)
+
+devcpp/rijndael-api-fst.o: rijndael-api-fst.c
+	$(CC) -c rijndael-api-fst.c -o devcpp/rijndael-api-fst.o $(CFLAGS)
+
+devcpp/dkcHC256.o: dkcHC256.c
+	$(CC) -c dkcHC256.c -o devcpp/dkcHC256.o $(CFLAGS)
+
+devcpp/dkcGenericFileSystem.o: dkcGenericFileSystem.c
+	$(CC) -c dkcGenericFileSystem.c -o devcpp/dkcGenericFileSystem.o $(CFLAGS)
+
+devcpp/dkcSemiRealRandom.o: dkcSemiRealRandom.c
+	$(CC) -c dkcSemiRealRandom.c -o devcpp/dkcSemiRealRandom.o $(CFLAGS)
+
+devcpp/malloc.o: dkutil_cstd/malloc.c
+	$(CC) -c dkutil_cstd/malloc.c -o devcpp/malloc.o $(CFLAGS)
+
+devcpp/math.o: dkutil_cstd/math.c
+	$(CC) -c dkutil_cstd/math.c -o devcpp/math.o $(CFLAGS)
+
+devcpp/memory.o: dkutil_cstd/memory.c
+	$(CC) -c dkutil_cstd/memory.c -o devcpp/memory.o $(CFLAGS)
+
+devcpp/stdlib.o: dkutil_cstd/stdlib.c
+	$(CC) -c dkutil_cstd/stdlib.c -o devcpp/stdlib.o $(CFLAGS)
+
+devcpp/string.o: dkutil_cstd/string.c
+	$(CC) -c dkutil_cstd/string.c -o devcpp/string.o $(CFLAGS)
+
+devcpp/strings.o: dkutil_cstd/strings.c
+	$(CC) -c dkutil_cstd/strings.c -o devcpp/strings.o $(CFLAGS)
+
+devcpp/x86.o: dkutil_cstd/x86.c
+	$(CC) -c dkutil_cstd/x86.c -o devcpp/x86.o $(CFLAGS)
+
+devcpp/dkcTelecomConfirmPacket.o: dkcTelecomConfirmPacket.c
+	$(CC) -c dkcTelecomConfirmPacket.c -o devcpp/dkcTelecomConfirmPacket.o $(CFLAGS)
+
+devcpp/dkcTelecomConfirmFile.o: dkcTelecomConfirmFile.c
+	$(CC) -c dkcTelecomConfirmFile.c -o devcpp/dkcTelecomConfirmFile.o $(CFLAGS)
+
+devcpp/dkcMD2.o: dkcMD2.c
+	$(CC) -c dkcMD2.c -o devcpp/dkcMD2.o $(CFLAGS)
+
+devcpp/dkcMD4.o: dkcMD4.c
+	$(CC) -c dkcMD4.c -o devcpp/dkcMD4.o $(CFLAGS)
+
+devcpp/dkcHMAC.o: dkcHMAC.c
+	$(CC) -c dkcHMAC.c -o devcpp/dkcHMAC.o $(CFLAGS)
+
+devcpp/dkcDCF.o: dkcDCF.c
+	$(CC) -c dkcDCF.c -o devcpp/dkcDCF.o $(CFLAGS)
+
+devcpp/dkcDCF01.o: dkcDCF01.c
+	$(CC) -c dkcDCF01.c -o devcpp/dkcDCF01.o $(CFLAGS)

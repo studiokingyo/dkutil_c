@@ -1,0 +1,139 @@
+<html>
+<head>
+<title>dKingyo Utility 3 Page</title>
+
+
+<script language="JavaScript" src="../js/dkjslibrary.js">
+</script>
+<style>
+<!-- 
+	a:link { color: #0099cc }		/* リンク */
+	a:visited { color: #0099ff } 		/* すでに行った事のあるリンク */
+	a:active { color: #993300 } 		/* クリックしたときのリンク */
+	a:hover { color: #ff9933 } 		/* カーソルが上にあるときのリンク */
+	
+
+	body { 
+		color: #333333;			/* 文字色（黒） */
+		
+		background: fixed url("../3d/bg_cg.jpg") white no-repeat 50%
+		
+		scrollbar-base-color : #FFFFFF;
+		scrollbar-face-color : #FFB5DA;
+		scrollbar-arrow-color : #FB0097;
+		scrollbar-3dlight-color: #FFDBED;
+		scrollbar-highlight-color : #FFFFFF;
+		scrollbar-shadow-color : #FF608B;
+		scrollbar-darkshadow-color : #8A0053;
+	}
+
+	pre {line-height: 140% }		/* 空白 */
+.title{ font-family:"Viner Hand ITC","Rage Italic LET","ＭＳ　Ｐ明朝","serif";font-size:40pt;text-align:center;}
+.sub{ font-family:"Rage Italic LET","ＭＳ　Ｐ明朝","serif";font-size:15pt;}
+//-->
+</style>
+</head>
+<BODY>
+
+
+
+<h1 class="title"><font color="#666666">dKingyo Utility 3 </font></h1>
+<script language="JavaScript">
+<!-- 
+SourceForgeLogo();
+//-->
+</script>
+<br>
+<br>
+<hr>
+<br>
+<ul>
+<li><a href-"#gaiyou">概要</a>
+<li><a href="#module">機能 モジュール群</a>
+<li><a href="#licence">ライセンス / Licence</a>
+<li><a href="#howtouse">使い方 / How to use</a>
+<li><a href="dKingyoUtility3_2004.html">旧、dKingyoUtility3のページ</a>
+<li>ダウンロード
+</ul>
+<br>
+<br>
+<hr>
+<br>
+<a name="gaiyou"><h2>概要</h2></a>
+dKingyo Utility 3は<a href="dkutil_c.html">dkutil_c</a>のstable release DLLです。<br>
+基本的にインターフェイスは変えませんし、完全にテストを行ったモジュールだけをエクスポートし、
+しっかり*.defファイルにて関数の順番を定義しているのでバージョンアップが行われても下位互換性が保たれているDLLです。<br>
+C言語でオブジェクト指向風に仕上げてます。<br>
+2004年での計画では
+<a href="dKingyoUtility2.html">dKingyo Utility 2</a>の進化版を予定していましたが、C++のソースコードをいちいちC言語の直すのが面倒なので
+dkutil_cに定義されている自分で十分テストして自分が信頼できるモジュールのみで構成する予定です。
+<h3>特徴</h3>
+<ul>
+<li>よぼどのことがない限りインターフェイスは変えない。
+<li>dkutil_cに定義されている自分で十分テストして自分が信頼できるモジュールのみで構成
+<li>defファイルでDLLのバージョンアップが行われても下位互換性が保たれている。
+<li>glibのようなC言語でオブジェクト指向風
+</ul>
+<br>
+<br>
+<hr>
+<br>
+
+<a name="module"><h2>機能</h2></a>
+<h3>Message Digest / Secure hash algorithm フィンガープリントアルゴリズム系</h3>
+SHA512 , SHA384 , SHA256 , SHA160 , 
+MD5 , MD4 , MD2
+<h3>Cryptograph 暗号化系</h3>
+snow2.0 , arc4 , arc4 2byte extend , HC256
+<h3>ファイル操作系</h3>
+Copy,Exist,Binary/Text Save/Load,Rename,Remove,Compare等
+<h3>ROUTINE ルーチン系</h3>
+<ul>
+<li>dKingyo Cryption File 入出力
+<li>HMAC : Keyed-Hashing for Message Authentication
+</ul>
+詳しくは同梱してあるdefファイルを見てください。
+defファイルに定義してある関数の詳細はdkutil_cの<a href="reference/index.html">
+説明書</a>を見てください。
+なお、コンパイル済みHTMLヘルプ（こちらの説明書だと関数を検索しやすい）は別途ダウンロードしてください。
+<br>
+<br>
+<hr><br>
+
+<a name="licence"><h2>Licence</h2></a>
+dKingyoUtility3は<a href="dkutil_c.html">dkutil_c</a>と同じ<a href="../licence.html#bsd">BSD Licence</a>です。<br>
+しかしながらDLL内にBSD Licenceの文章を表記しているのでdKingyoUtility3.dllを使って作った
+ソフトウェアの説明書にBSD Licenceを表記しなくても使用することが出来ます。<br>
+すなわちBSD Licenceに従う場合に限りdKingyoUtility3.dllの再配布や利用は自由ということです。<br>
+
+<br>
+<br>
+<hr><br>
+<a name="#howtouse"><h2>使い方 / How to use</h2></a>
+<ul>
+<li>dKingyoUtility3\includeのフォルダ内にincludeパスを通してください。
+<li>dKingyoUtility3\Distribute内のライブラリファイルにlibパスを通してください。
+<li>dKingyoUtility3\Distribute内のDLLファイルをパスの通るところにコピーしてください。（プロジェクトファイルの置いてあるところがベター）
+<li>dKingyoUtility3\sample内のsample.cのサンプルのようにご自由にお使いください。
+</ul>
+なお、dKingyoUtility3を使ったソフトウェアはdKingyoUtility3.dllが無いと配布先のパソコンでは動きません。
+なのでdKingyoUtility3.dllもご自分のソフトウェアと一緒に配布してください。
+なお、dKingyoUtility3MT.dllはマルチスレッドバージョンです。
+<br>
+<br>
+<hr><br>
+<br><br><br>
+<h3>ダウンロード</h3>
+ソースコード source code : ほしい方はdkutil_cをダウンロードしてください。
+<a href="../download.html">ダウンロードページへ</a>
+
+<br>
+<br>
+<hr><br>
+
+
+
+
+<a href="http://www3.to/shisui/">d金魚のHPはここです。</a><br>
+</BODY>
+</html>

@@ -1,0 +1,2 @@
+dKingyoUtility3はBSD Licenceです。
+もし改造して公開する場合、オリジナルのdKingyoUtility3とは別の名前を付けて欲しいな。

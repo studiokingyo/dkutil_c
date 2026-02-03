@@ -1,0 +1,615 @@
+/*!
+
+@mainpage dkutil_c
+
+
+@todo
+<br>
+未知のバグをつぶす。(これはすべてのライブラリプログラマーの願い）<br>
+<br>
+<a name="tv0210"><h4>Version 0.210</h4></a><br>
+Version 0.200はリリースし忘れたのでリリースします＾＾
+<a name="tv0200"><h4>Version 0.200</h4></a><br>
+dkcTelecomConfirmFile.c dkcTelecomConfirmPacket.cの実装<br>
+md5.cをデフォルトで使用しないように設定<br>
+各ライブラリのインターフェイスの統一（Message Digest系しか統一できないない。）<br>
+DKC_MD5_ADAPTERの実装を削除<br>
+RedBlack treeとAVL treeをどうにかする。<br>
+一部の穴のありそうな機能を厳しくテストする。<br>
+多種の機能が混在してきたのでライブラリと呼べなくなってきたのでどうにかしたいが、
+各ライブラリがかなり複雑にincludeしまくっているのでどうにもしない予定･･･。
+よってdkcCommonやdkcCompression、dkcCryptograph,dkcFileSystemといったプロジェクトファイルは削除する予定。
+<br>
+<br>
+2005/10/08:Free系関数のポインタチェックは<br>
+@code
+	if(NULL==ptr || NULL==*ptr){return edk_ArgumentException;}
+@endcode
+のようにしなくてはならない。<br>
+<br>
+<a name="tv0199"><h4>Version 0.199</h4></a>
+dkcLZW.c dkcLZSS.c dkcRLE.cの実装を変える。途中で処理を止められるようにインターフェイスの追加。<br>
+<br>
+<br>
+<br>
+<ul>
+<li>2005/09/07:dkcGenericFileSystemは64bit safeを目指していた。が、dkcStreamとかぶるので dkcStreamを64bit safeにしていこうと思う。<br>
+また、wchar_t型の文字列でも生成できるようにしようと思う。<br>
+Version 0.196で宣言していたハッシュ関数の類は実装しないことにした。<br>
+そろそろこの程度に収めたいと思うようになってきた。<br>
+dkcSJISFileSystem.cの実装はじゃじゃ馬なのでどうにかしたいと思うようになってきた。<br>
+<li>2005/08/03:dkcSNOW20.cはdkcSNOW2Process()しか正常に動作していなかった。(TT)直そう。（直した。<br>
+<li>2005/04/17:dkcSNOW20.cの暗号化関数を混ぜて使用すると状態遷移エラーが起こるので直そう。（直した。<br>
+<li>2005/03/27:uri.yはuriのBNFを記述しようと思う。その後dkcPathStringを完全に実装する。<br>
+<li>2005/03/21:dkcGenericFileSystemをdkcStreamに統合しようかどうかを迷う…<br>
+</ul>
+<br>
+<a name="tv0196"><h4>Version 0.196</h4></a>
+dkcAVLTree.c dkcDeque.c dkcTextSave.c を廃止予定
+dkcRegex.cは実装できたら有用だと考えたため作る事にした。
+
+- dkcLZW.c dkcRegex.c dkcBlockSort.cを完全実装したら
+- <s>SHA160</s>((SHA160はSHA-1の事), SHA192, SHA224 ,
+- HAVAL128,HAVAL160, HAVAL192, HAVAL224, HAVAL256,
+- RIPEMD128, RIPEMD256, RIPEMD320,
+- MD4,
+- TIGER, TIGER128, TIGER160,
+- ALDER32,
+- CRC32, CRC32b,
+- WHIRLPOOL,
+- GOST
+を実装,テスト終了したら
+Version1.0を出す予定。先は長い･･･。
+
+- その他のモジュールを完全にテストする。
+- dkc2Tree.cは自信を持ってテストしたので多分OK
+- 
+
+
+<a name="tv0195"><h4>Version 0.195</h4></a>
+以下同
+<a name="tv0194"><h4>Version 0.194</h4></a>
+以下のものはまだ作りかけ
+- dkcUniqueID.c
+- dkcSerialize.c
+- dkcLua.c
+- dkcDeque.c
+- dkc2Tree.c
+- dkcArrayOneByOne.c
+- dkcTextSave.c
+- dkcSafeFileSystem.c
+- dkcLZW.c
+- dkcRegex.c
+- dkcBlockSort.c
+- dkcAVLTree.c
+
+dkcSerialize.c,dkcSafeFileSystem.c,dkcRegex.c,dkcLua.cは廃止にする予定。
+sampleフォルダを削除する予定。
+
+以下のものはまだテストしていない
+- dkcRijndael.c
+
+<a name="tv019"><h4>Version 0.19</h4></a>
+- やはり微妙に使えないところがあるのでそこら変を直す。
+- Serialize系は使いにくいので再考 C++系にするかどうか迷う･･･
+- Rijndael系
+- 細かいバグチェック
+- boost::spiritのようにインクルードするだけで使えるようにする。
+<h4>仕様が変わるかもしれない系</h4>
+- ソート系の比較をqsortの仕様と一緒にする。
+
+<a name="tv017"><h4>Version 0.17</h4></a>
+- 微妙に使えないところがあるのでそこラへんを直す。
+- Serialize ,Deserialize系のテスト。（まだ仕様が固まっていないので使わないどいてください＾＾；
+- Rijndael系
+- 細かい、思わしくない状態遷移の確認
+
+<h4>作りかけ系</h4>
+- dkcUniqueID.c
+- dkcSerialize.c
+- dkcLua.c
+- dkcDeque.c
+- dkc2Tree.c
+- dkcRijndael.c
+- dkcArrayOneByOne.c
+- dkcTextSave.c
+<h4>仕様が変わるかもしれない系</h4>
+- 分布数えソート
+- dkcThreadLock
+- シリアライズの仕様
+- その他、不必要と思われる関数
+
+@section history 更新情報
+<ul>
+<li><a name="hv0210">2006/01/16:<h4>Version 0.210</h4></a><br>
+Version 0.200はリリースし忘れたので今更リリースします。
+なお、今回からDLLバージョンが同梱されます。
+
+<li>2006/01/15:<br>
+dkcRedBlackTree.hを実装。インライン展開による速度UPを見込むためほとんどの実装をヘッダファイルに実装した。
+dkc2Tree.hに定義されているような名前の規則での関数は時期を見て実装する。
+<li>2006/01/14:<br>
+dkcOSIndependent.cの内部構造を少し変えた。dkc_misc.hにインライン関数群を作ってみた。
+<li>2006/01/13:<br>
+dkcArcfour.cのswapの実装を変えた。なのでバグが起こるかもしれない。
+
+<li><a name="hv199">2005/12/31:Version 0.200 公開</a><br>
+dkcThreadLock.cにpthreadでの実装を施した。
+dkcMD4.c dkcMD2.cを追加。
+dkcMD5.cの実装を変更。
+dKingyoUtility3の作業領域が出来た。
+その他、md_misc.hやvc_asm_misc.hが出来た。
+ストリーム暗号系の関数名を一部変えた。
+dKingyo Cryption Fileというファイル形式をサポートするdkcDCF.cというルーチンが出来た。
+その他は忘れてしまった･･･おｒｚ！！！
+追記：sourceforgeにupし忘れた･･･。なので次回バージョンまで公開持ち越し･･･おｒｚ！！
+
+<li>2005/12/28:<br>
+md5_vc_mmx.hの実装、テストが完了。<br>
+
+<li>2005/12/17:<br>
+DKC_MD5_ADAPTERの処理は何かと意味不明なので削除する予定。
+<li>2005/12/16:<br>
+dkcMD4.cおよび.hを追加。しかし上手く動かず･･･
+<li>2005/12/15:<br>
+dkcMD5.hのDKC_MD5の構造体を変えた。よって実装もpublic domainなGNETのmd5.cのソースをオマージュした。
+DKC_MD5_ADAPTERの処理を加えた。
+
+
+<li>2005/11/27:<br>
+dkcULONGLONGToTwoDWORD()のhighとlowが逆になっていたバグを修正。
+dkcDCF.cの実装およびテストが完了。自分でほぼ信頼できるレベルになった。
+dkcOSIndependent.hに#define CRTDBG_MAP_ALLOCを定義してみた。
+
+<li>2005/11/20:<br>
+dkcThread.cおよびdkcThread.hを追加した。
+<li>2005/11/19:<br>
+dkcHC256.cのdkcHC256EncryptNoDestDOE()およびdkcSNOW2.cのdkcSNOW2EncryptNoDestDOE()にて保存してある暗号化用のxorデータが
+64byte以下の時で暗号化するサイズが64byteを超える時に暗号化対象のストリームが1byteずれる不具合を修正。
+かなり致命的だった。前回リリースしたバージョンは非常に恥ずかしい。(泣)
+<li>2005/11/06:<br>
+dkcHC256.cのdkcHC256EncryptNoDestDOE()で64byteより小さいサイズで分割暗号化処理をすると上手く暗号か出来ない不具合を修正。
+多分、dkcSNOW2.cも上手く動いてくれないので修正する予定。
+64byteづつだとうまく動いてくれない。
+<li>2005/10/21:<br>
+dkcOSIndependent.hにdkcmUINT64DEFINE()を追加
+<li>2005/10/08:<br>
+dkcMemoryStream.cにdkcAllocMemoryStreamAdapterCopy()を実装した。
+<li>2005/10/07:<br>
+dkcOSIndependent.cのdkcLONGLONGToTwoLONG()のhighとlowが逆になっていたバグを修正。および実装を変えた。
+<li>2005/09/24:<br>
+dkcFileAndFolderExist()とdkcFolderExist()を追加した。
+<li>2005/09/10:<br>
+dkcLZW.cを改造していたが、前のstableなバージョンのときので0.199をリリースすることにした。
+
+<li>2005/09/07:<br>
+dkcHC256.cでの１バイト単位の暗号化複合化が上手く出来ないことが発覚<br>
+initialize vectorが必要だったことも発覚。よってdkcAllocHC256()の引数を増やした。<br>
+その後,dkcHC256.cはテストを通り実装完了した。<br>
+dkcCryptograph.cにdkcCalculateInitializeVector()とdkcAllocHC256NoLimitKeyLength()を追加。
+
+
+
+dkcSNOW.cのように内部実装を一新した。
+<li>2005/09/06:<br>
+dkcSNOW2.cの内部実装を変えスマート、かつ実行速度を速くした。
+<li>2005/09/05:<br>
+dkcSNOW2.cのテスト完了1バイト単位でも暗号化できるようになった。
+<li>2005/09/03:<br>
+dkcSNOW2.cの512バイト単位で暗号化する関数に<s>バグを発見、退治する。</s>後日バグじゃないことが判明
+
+<li>2005/09/01:<br>
+dkcOSIndependent.hにdkcdMAXPATH_FIXED_SIZEを追加。<br>
+dkcSafeFileSystem.cおよびdkcSafeFileSystem.hを書き換え。<br>
+dkcCryptgraph.cおよびdkcCryptgraph.hにTelecomConfirmPacketを実装。主に通信分野で仕様<br>
+dkcHC256.cにdkcHC256Encrypt()およびdkcHC256Decrypt()を実装。<br>
+
+
+
+<li>2005/08/26:<br>
+dkcStream.cの<br>
+dkcAllocStream内でedkcStreamInitMemoryの時にバッファの先頭にオフセット値が指さない不具合を修正<br>
+dkcStreamTellのswitch部にbreakが無いのを修正<br>
+dkcMemoryStream.hにdkcMemoryStreamAdapter用のマクロを記載<br>
+
+<li>2005/06/14:<br>
+dkcSerialize.c dkcSerialize.hを削除。<br>
+それに伴い、それに準ずる関数を削除。<br>
+
+<li>2005/06/13:<br>
+dkcBit.hのdkcBitMemoryStreamSeekByte()がマクロと関数両方定義されていたのでマクロのほうを削除した。
+<li>2005/08/12:<br>
+dkcLZW.cの実装を大幅更新。それによりdkcLZW.hを大幅書き換え。
+
+<li>2005/04/17:<br>
+dkcNumOfBits()をdkcOSIndependent.hからdkcBit.hに移した。
+<li>2005/04/17:<br>
+dkcLZW.cのTST実装終了<br>
+dkcOSIndependent.hにdkcdLITTLE_ENDIANおよびdkcdBIG_ENDIANを定義した。基本的にWindowsの環境ならばdkcdLITTLE_ENDIANが1となる。<br>
+
+<li>2005/04/16:<br>
+dkcMemoryStreamのdkcMemoryStreamSeekLogic()のedkcMemoryStreamSeekSetで offsetが0の時 意図とした動作にならない<br>
+<li>2005/04/06:<br>
+dkcOSIndependent.cにdkcInitFileFast()とdkcAddLogFile()を追加 dkcAddLogFile()はちと実装に自身無し…orz<br>
+dkcLZW.c dkcLZW.hを弄る。<br>
+edkcSeekCurrent等のシーク指定オプション定義をdkcStream.hからdkcDefined.hに移した。<br>
+
+<li>2005/03/27:<br>
+dkcRedBlackTree.hを追加してみた。dkc2Tree.cのようなコンテナ風ライブラリは作らない予定。<br>
+その代わり、FreeBSDのtree.hのようなマクロ集になるかもしれない。
+<li>2005/03/21:<br>
+EasyGUICompile.exeを追加してみた。どうなんでしょう？
+
+<li>2005/03/14:<br>
+SHA1.hにDKC_SHA1をDKC_SHA160でも使えるようにtypedefした。
+
+<li>2005/03/11:<br>
+dkcRegex.cの実装及びテスト完了。
+多分大丈夫なはず＾＾；
+それから、そろそろ正式リリースしたくなって来たから、まだ未実装の所も多々あるけどそろそろリリースするつもり。
+
+<li>2005/03/10:<br>
+dkcRegex.cはGreenPadの実装(NYSL)を参考にする事にした。
+よってdkcRegex.cも実質上NYSLで･･･。
+
+
+
+<li>2005/03/07:<br>
+dkcFileSystem.dsp,dkcCommon.dsp,dkcCompression.dsp,dkcCryptograph.dspを追加
+<s>dkcOSIndependent.c dkcOSIndependent.h に定義されている内容を大幅変更
+各機能のポリシーに従ってソースの記述するファイルを移した。<br>
+dkcOSIndependent.cのdkcIsMMX()を廃止。これからはdkutil_cstdの方を利用してください。</s><br>
+dkcSHA1.cのstatic DKC_INLINE Generate(DKC_SHA1 *p)のvoid 引数付け忘れを修正。<br>
+dkcHC256.cのstatic DKC_INLINE void step_Bのvoid 引数付け忘れを修正。<br>
+
+
+<li>2005/02/23:<br>
+dkcOSIndependent.cの
+dkcSaveFile() dkcLoadFile()の書きこみ読みこみ挙動を変更<br>
+dkcSwapFast()をエラーチェックが甘い所を変更<br>
+dkcGenericFileSystem.cのオブジェクトポインタ渡しのバグ修正<br>
+free_win32_fs()のメモリリーク箇所修正<br>
+
+
+<li>2005/02/22:Version 0.196としてアーカイブを作成<br>
+hdrand.cを元にdkcSemiRealRandom.cを作って見た<br>
+とつげき東北氏に感謝。<br>
+dkcGenericFileSystem.cが一応コンパイルが通るようになる。
+
+<li>2005/02/21:64bit変数の定義をdkutil_cstdに定義する事にした。<br>
+
+<li>2005/02/20:<s>dkcDLL.cにdkcGetProcWin32()を実装、ぶっちゃけただのラッパー</s> マクロに変更<br>
+dkcGenericFileSystem.c dkcGenericFileSystem.hを追加。
+以後、dkutil_cの安定化の為、新しいファイルとかは追加しないようにする。
+
+<li>2005/02/19:dkc2Tree.cの最終テスト、std::mapとの速度比較終了<br>
+結果、挿入処理の場合、mapの方が圧倒的に速いのでdkcAVLTree.c、dkcAVLTree.hの製作は中止する事にする。<br>
+また、dkc2Tree.cは使用は控え、std::mapを使用する事をお勧めする。<br>
+
+<li>2005/02/15:dkutil_c 2tree compare 20050215 として アーカイブした<br>
+
+<li>2005/02/14:dkc2Tree.cのデバッグが一応完了<br>
+
+
+<li>2005/02/13:dkcStdio.hにdkc_memcpy_zc()を追加<br>
+
+<li>2005/02/11:dkutil_cstdをdkutil_cフォルダ内に納める事にした。<br>
+
+<li>2005/01/23:dkcDefined.hに定義されているedkResult等をdkutil_cstd/define,hに定義する事にした。<br>
+
+<li>2005/01/03:dkutil_c crypt pack 20050103をアーカイブした。<br>
+ dkutil_cのまだテストしていないモジュール郡が存在するので、
+ それらを含まないdkutil_c（主に、暗号化、圧縮関係）をアーカイブした。
+<li>2005/01/02:<br>
+ dkcRLE.cのデバッグ、テスト完了。<br>
+ これにより、前のバージョンの圧縮機構とは違うエンコード方式により、
+ 前のバージョンの圧縮機構のデータと互換性はありません。<br>
+<li>2004/12/31:<br>
+ dkcSNOW20.c,dkcSNOW20.hが完成、テスト完了。<br>
+ 
+<li>2004/12/20:<br>
+ dkcOSIndependent.hにuint8,uint16,uint32の型を定義<br>
+ dkcHC256.c dkcHC256.hを追加<br>
+
+<li>2004/12/13:<br>
+ dkcRLE.cのencode,decodeのバグを発見<br>
+ dkcBlockSort.cやdkcAVLTree.cをいじる<br>
+ dkc2Tree.cを作り始める。<br>
+ 
+<li>2004/12/10:Version 0.195としてアーカイブを作成<br>
+ dkcBlowfish.cのdkcBlowfishEncrypt()に引数チェックをするようにした。
+ 
+<li>2004/12/09:<br>
+ dkcSJISFileSystem.cにdkcFileBinaryCompare()を追加。<br>
+ dkcMemoryPool.cの梃入れをした。速度的にはまぁまぁになった。<br>
+ 両者共に動作テスト済み。<br>
+ MinGWにて、dkcMemoryPool.hのDKC_TREE_ALLOCATOR構造体を上手くコンパイルできない。<br>
+ dkutil_c4911.devファイルを追加（Dev-C++ 4.9.1.1にてコンパイルOK）（このファイルは一時的なもので、いつか消えるかもしれない）
+ dkutil_c.devはそのままOK
+ dkutil_c.bcpを紛失。
+<li>2004/12/08:<br>
+ dkcMemoryPool.c のDKC_SAME_OBJECT_POOL機構の処理速度を改善。<br>
+ 342.852211679438倍も速くなりました。(´Д⊂ｸﾞｽﾝ（当PC比)<br>
+ 
+<li>2004/12/07:Version 0.194 公開<br>
+ dkcMemoryPool.c dkcMemoryPool.hを追加。<br>
+ DKC_SAME_OBJECT_POOLで状態を保存をされるプール機構を作った。<br>
+ 
+<li>2004/12/06:Version 0.193 としてアーカイブを作成<br>
+ dkcMemoryStream.c内にdkcmNOT_ASSERTで囲まれていたmemcpyを直した。<br>
+ このバグの原因はdkcmNOT_ASSERTマクロがデバッグモード時にしか働かないことが原因<br>
+ 
+<li>2004/12/03:Version 0.192 としてアーカイブを作成<br>
+ 一部、実装しない機能をいろいろと見直した。<br>
+
+<li>2004/10/19:2004/10/15:Version 0.191 公開<br>
+ Dev-C++,BCC Developerのプロジェクトファイルを直した。<br>
+ その他細かい所（更新履歴とか)を直した。<br>
+ doxygenのマニュアルをリリース。<br>
+ 
+<li>2004/10/18:<br>
+ boost::spirit風味のインクルードをしようとしたが挫折。出来ないらしい。<br>
+ 二重読みこみ防止の*.hファイルに記述する慣用句 #ifndef ... #define ... #endif の所を
+ DKUTIL_C_ファイル名らしき大文字の文字列_ファイルの拡張子 という形に変更<br>
+ 
+<li><a name="hv019">2004/10/15:Version 0.19 公開</a><br>
+ dkcStreamAdapterという外部メモリをストリーム化するライブラリを作った。<br>
+ dkcRLEPackBitsEncodeの完成<br>
+ 分布可添えソートのバグを修正<br>
+
+<li>2004/10/14:<br>
+ アルファ版として一応、アーカイブする事にした。<br>
+ dkcStreamの初期化関数を追加したり、小さなバグを取ったりした。<br>
+ 
+<li>2004/08/09:<br>
+ boost::crcをdkcCRCに移植完了<br>
+ dkcArrayOneByOneを実装、今の所問題無し<br>
+ dkcRegexを追加　今の所名にも出来ない<br>
+ 
+<li>
+
+<a name="hv017">2004/07/18:Version 0.17 公開</a><br>
+ SHA384実装完了<br>
+ その他、バグチェック完了<br>
+
+<li>2004/07/06: SHA1 SHA256 SHA512 MD5を実装完了 <br>
+ RFC1321-based (RSA-free) MD5 libraryとgeneral purpose hash table package を導入<br>
+ general purpose hash table package はrubyでも使われているpublic domainのソース。<br>
+ 
+<li>2004/05/xx: sort系ライブラリやその他小道具を作る。
+
+<li>2004/04/28: ver 0.12 ちょこっと直す。（どこ直したかは忘れた。）<br>
+ Serialize系実装 サンプル付加
+
+
+<li>2004/4/26: dkutil_c 0.1 公開。結構基本的なコンテナばかりだった。<br>
+ C言語でSTLが目標。<br>
+ dkcStream,dkc2Tree,dkcCircularStream,dkcUniqueIDなど等、一部使えないものがある。 <br>
+</ul>
+
+
+
+@section how_to_use 使い方
+
+その他はこのdkc.hを読み込めばVisualC++ならば普通に使えるはず。
+もちろん、パスの設定はしっかり各自で行ってください＾＾；；；
+
+Dev-C++、およびBCCでもコンパイルできるものはコンパイルできるのでご活用ください。
+
+<ul>
+<li>BCC Developer ( Borland C++ Compiler )<br>
+dkutil_c.bdpを開いてください。<br>
+必要に応じてプロジェクトの設定でインクルードパスを直してください。<br>
+
+<li>Dev-C++ ( MinGW )<br>
+dkutil_c.devを開いてください。<br>
+何も設定しなくてもすぐにコンパイルできるはずです。<br>
+
+<li>VisualC++ 6.0<br>
+上のディレクトリのdkutil.dswを開いてください。<br>
+（ない場合はdkutil_c.dspを開いてください）<br>
+普通にコンパイルできるはずです。<br>
+
+<li>VisualC++.NET<br>
+VisualC++6.0と同じ方法でコンパイルしてみてください。<br>
+それが出来ないのであれば、
+プロジェクトを自分で作ってコンパイルしてください。<br>
+その際、dkutil_cフォルダ内にあるすべての<br>
+ｃファイルおよびｈファイルをプロジェクトに追加してください。<br>
+
+
+@section	strategy	方針
+
+- dkcAlloc機能の名前()という関数でメモリ領域を取得
+- dkc機能の名前 操作名( 取得したメモリ領域へのポインタ , 引数) という形での操作
+- dkcFree機能の名前()と言う関数でメモリ領域を開放 
+- VC,BCC,MinGWすべてでコンパイルできる。
+
+@section	future	今後の方向性
+
+- 暗号化系のライブラリやロジックの追加
+- AVL木
+- すべての機能をコンパイルできるようにする。
+- Block sort
+- その他、OSに依存しない処理など。（ソートアルゴリズムとか圧縮アルゴリズムとか。
+- サンプルソースとか。
+- glibに負けないぞ！ヽ(`Д´)ﾉ（車輪の再発明やだ～)
+
+@section mymemo メモ
+<b>経緯</b>
+
+dkutil_c(以下dkc)ライブラリに似たようなのにglibという老舗ライブラリがあるが、
+ライセンスがLGPLなので、<s>ダイナミックリンクしか出来ない。</s>スタティックリンクもOKだが、何かとねぇ。
+これはちょっと痛いので私の勉強ついでに組んで見たライブラリが
+これである。結構、機能的には汎用性は高いと思う。
+
+<b>関数の命名規則</b>
+- dkcが接頭辞としてつく
+- dkc + コンテナ(または機構)の名前 + コンテナ(または機構)に対する操作の名前
+<b>例外:メモリ確保系の関数は以下のようになる。</b>
+- dkcAlloc コンテナ(または機構)の名前
+- dkcFree コンテナ(または機構)の名前
+<b>プリプロセッサを通す奴は･･･</b>
+^ マクロにはdkcmが接頭辞として付く。（一部例外もある）
+^ #define定義にはdkcdが接頭辞としてつく。
+- 条件分岐用の定義にはDKUTIL_C_USEとかDKUTIL_C_NOT_USEとかが接頭辞として付く。
+- 条件分岐用の定義では1で有効、0で無効となるようにする。
+<b>その他の命名規則</b>
+- 関数のポインタへの型はdkcfpが接頭辞として付く。
+- 公開const変数はdkccvと接頭辞として付く。
+
+<b>関数のWINAPIについて</b>
+VB等でもdkcをDLL化したものを使えるように
+dkcライブラリの関数のほぼすべてをWINAPI修飾子を付けています。
+偶に忘れていることがあるので教えて頂けると幸いです＾＾；
+
+<b>その他のマクロ</b>
+- USE_DKC_INDEPENDENT_INCLUDE / dkutil_c内のヘッダだけをインクルードするだけで機能を使用できる状態にする。<br>
+ しかし、対応していない機能（*.hファイル)も多数ある。これはコンパイルするファイルが他のヘッダファイルをインクルードするためである。
+- USE_DKC_DLL / dkutil_cをDLLとしてコンパイルするとき、指定してください。
+
+
+
+@section tariki 他力本願
+
+BSD Licenceで
+- dkc2TreeをAVL木にしてくださる方
+- dkcDequeをstd::deque見たいにしてくださる方
+ソースコードを募集しています。m(_ _)m
+
+それから、dkutil_cの作者にプログラミングの資料代や生活費を寄付してくれる方、お気持ちで結構ですので、よろしく御願いします。m(_　_)m
+
+@section	env	動作確認環境
+
+- Windows 2000
+- VC++ 6.0 SP5 or SP6
+
+このライブラリは、今の所、Windows専用です。
+LinuxやMacに対応するのは数年先だと思います。（予算の都合上･･･)
+
+@section	license	ライセンス
+dkutil_cはBSD Licenceです。<br>
+以下に日本語訳を示します。<br>
+<br<
+<b>dkutil_c Copyright (c) 2003-2005 , d金魚 All rights reserved.</b>
+<PRE>
+　・もし下記条件が満たされれば、修正の有無に関わらず、
+　　ソースまたはバイナリ形式での再配布および使用を許可します。
+
+　・ソースコードで再配布する場合は、上記の著作権表示、
+　　これらの条項、下記の免責事項を含めること。
+
+　・バイナリ形式で再配布する場合は、上記の著作権表示、これらの条項、
+　　下記の免責事項を、配布物とともに提供される文書および/または他の資料に必ず含めること。
+
+　・本ソフトウェアは無保証です。自己責任で使用してください。
+
+　・特別の許可が無くては、このソフトウェアから派生した製品の推奨や宣伝に、
+　　私の名前やその貢献者の名前を使用してはいけない。
+</PRE>
+The dkutil_c licence
+http://opensource.jp/licenses/bsd-license.html
+http://www.jp.freebsd.org/www.FreeBSD.org/ja/copyright/freebsd-license.html
+
+
+作者への報告があれば、当然喜びますし、より良いライブラリになるでしょう。<br>
+報告がなくても、商用利用してかまいませんし、改変をしてもかまいません。<br>
+
+また、BSD Licenceの元にRFC1321-based (RSA-free) MD5 libraryを使用しています。<br>
+よって、このライブラリを使用した際、説明書やテキストファイル等に以下の内容を記載してください。<br>
+<br>
+ここから<br>
+<PRE>
+dkutil_c Copyright (c) 2003-, by d.Kingyo(d金魚) All rights reserved.
+
+Redistribution and use in source and binary forms,
+ with or without modification, are permitted provided that the following
+ conditions are met:
+
+･Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer. 
+
+･Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the 
+documentation and/or other materials provided with the distribution.
+ 
+･Neither the name of the dKingyo Utility Toolkit Project nor the names of
+ its contributors may be used to endorse or promote products derived from
+ this software without specific prior written permission. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------------------------------------------------------------
+
+RFC1321-based (RSA-free) MD5 library Copyright (C) 1999, 2002 Aladdin Enterprises.  All rights reserved.
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+  L. Peter Deutsch
+  ghost@aladdin.com
+
+------------------------------------------------------------------------
+
+RSA Data Security, Inc. MD5 Message-Digest Algorithm
+</PRE>
+ここまで。<br>
+<br>
+
+@section sankou 参考文献
+
+- C言語によるアルゴリズム辞典（奥村晴彦、技術評論社） 
+
+- ハードウェア乱数生成ルーチンhdrand.c by　とつげき東北 http://www.interq.or.jp/snake/totugeki/hdrand.htm
+
+- とってもごはん by SYN http://www.emit.jp
+
+- Bruce Schneier http://www.schneier.com/
+
+- Brian Gladman's Home Page http://fp.gladman.plus.com/
+
+- RFC1321-based (RSA-free) MD5 library http://sourceforge.net/projects/libmd5-rfc/
+
+- M.Hiroi's Home Page http://www.geocities.co.jp/SiliconValley-Oakland/1680/
+
+- GreenPad http://www.kmonos.net/lib/gp.ja.html
+
+- Crypto++ Library http://www.eskimo.com/~weidai/cryptlib.html
+
+- Python Cryptography Toolkit http://www.amk.ca/python/code/crypto.html
+
+@section	author	作者に関して
+
+- author d金魚
+- Project page http://dkingyoutility.sourceforge.jp/
+- Mail Address(スペースを繋げたり、atmarkを@にしたりしてください。) studio kingyo net atmark users.sourceforge.jp
+<br><br>
+
+<b>連絡がつかない場合</b>
+http://d.hatena.ne.jp/studiokingyo/
+または、dKingyo Utility Toolkit とか dkutilとかのキーワードで
+Googleで検索すると出てきます。
+また、あまりメールチェックしないんでその時はスミマセン。
+*/
