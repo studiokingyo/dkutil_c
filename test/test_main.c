@@ -122,12 +122,17 @@ void Test_Deque(void)
 {
     DKC_DEQUE *deque;
     int value;
+    int result;
+    int i;
 
     TEST_BEGIN("dkcDeque Test");
 
     deque = dkcAllocDeque(10, sizeof(int));
     TEST_ASSERT(deque != NULL, "dkcAllocDeque");
+    TEST_ASSERT(dkcDequeIsEmpty(deque) == TRUE, "New deque is empty");
+    TEST_ASSERT(dkcDequeSize(deque) == 0, "Size is 0");
 
+    /* Basic push/pop */
     value = 1;
     dkcDequePushBack(deque, &value);
     value = 2;
@@ -135,7 +140,30 @@ void Test_Deque(void)
     value = 0;
     dkcDequePushFront(deque, &value);
 
-    /* Should be: 0, 1, 2 */
+    TEST_ASSERT(dkcDequeSize(deque) == 3, "Size is 3");
+    TEST_ASSERT(dkcDequeIsEmpty(deque) == FALSE, "Not empty");
+
+    /* Front/Back peek */
+    dkcDequeFront(deque, &value);
+    TEST_ASSERT(value == 0, "Front is 0");
+    dkcDequeBack(deque, &value);
+    TEST_ASSERT(value == 2, "Back is 2");
+
+    /* Random access: should be [0, 1, 2] */
+    dkcDequeGetPoint(deque, 0, &value, sizeof(int));
+    TEST_ASSERT(value == 0, "GetPoint[0] = 0");
+    dkcDequeGetPoint(deque, 1, &value, sizeof(int));
+    TEST_ASSERT(value == 1, "GetPoint[1] = 1");
+    dkcDequeGetPoint(deque, 2, &value, sizeof(int));
+    TEST_ASSERT(value == 2, "GetPoint[2] = 2");
+
+    /* SetPoint */
+    value = 99;
+    dkcDequeSetPoint(deque, 1, &value, sizeof(int));
+    dkcDequeGetPoint(deque, 1, &value, sizeof(int));
+    TEST_ASSERT(value == 99, "SetPoint[1] = 99");
+
+    /* Pop order: should be 0, 2, 99 */
     dkcDequePopFront(deque, &value);
     TEST_ASSERT(value == 0, "PopFront returns 0");
 
@@ -143,9 +171,388 @@ void Test_Deque(void)
     TEST_ASSERT(value == 2, "PopBack returns 2");
 
     dkcDequePopFront(deque, &value);
-    TEST_ASSERT(value == 1, "PopFront returns 1");
+    TEST_ASSERT(value == 99, "PopFront returns 99");
+
+    TEST_ASSERT(dkcDequeIsEmpty(deque) == TRUE, "Empty after pops");
+
+    /* Pop from empty returns error */
+    result = dkcDequePopFront(deque, &value);
+    TEST_ASSERT(result == edk_FAILED, "PopFront on empty fails");
+    result = dkcDequePopBack(deque, &value);
+    TEST_ASSERT(result == edk_FAILED, "PopBack on empty fails");
+
+    /* Clear test */
+    value = 10;
+    dkcDequePushBack(deque, &value);
+    value = 20;
+    dkcDequePushBack(deque, &value);
+    dkcDequeClear(deque);
+    TEST_ASSERT(dkcDequeSize(deque) == 0, "Clear empties deque");
 
     dkcFreeDeque(&deque);
+
+    /* Dynamic growth test - push more than initial capacity */
+    deque = dkcAllocDeque(4, sizeof(int));
+    TEST_ASSERT(deque != NULL, "Alloc small deque (cap=4)");
+    TEST_ASSERT(dkcDequeCapacity(deque) == 4, "Capacity is 4");
+
+    for (i = 0; i < 20; i++) {
+        value = i;
+        result = dkcDequePushBack(deque, &value);
+        if (result != edk_SUCCEEDED) break;
+    }
+    TEST_ASSERT(dkcDequeSize(deque) == 20, "Grew to 20 elements");
+    TEST_ASSERT(dkcDequeCapacity(deque) >= 20, "Capacity >= 20");
+
+    /* Verify order preserved after growth */
+    for (i = 0; i < 20; i++) {
+        dkcDequeGetPoint(deque, (size_t)i, &value, sizeof(int));
+        if (value != i) break;
+    }
+    TEST_ASSERT(i == 20, "Order preserved after growth");
+
+    dkcFreeDeque(&deque);
+
+    /* Wrap-around test: alternate front/back pushes */
+    deque = dkcAllocDeque(4, sizeof(int));
+
+    value = 3;
+    dkcDequePushBack(deque, &value);  /* [3] */
+    value = 2;
+    dkcDequePushFront(deque, &value); /* [2, 3] */
+    value = 4;
+    dkcDequePushBack(deque, &value);  /* [2, 3, 4] */
+    value = 1;
+    dkcDequePushFront(deque, &value); /* [1, 2, 3, 4] */
+
+    /* Now at capacity, push should trigger growth */
+    value = 5;
+    result = dkcDequePushBack(deque, &value); /* [1, 2, 3, 4, 5] */
+    TEST_ASSERT(result == edk_SUCCEEDED, "Push after wrap+grow");
+
+    value = 0;
+    dkcDequePushFront(deque, &value); /* [0, 1, 2, 3, 4, 5] */
+
+    TEST_ASSERT(dkcDequeSize(deque) == 6, "6 elements after wrap test");
+
+    for (i = 0; i < 6; i++) {
+        dkcDequeGetPoint(deque, (size_t)i, &value, sizeof(int));
+        if (value != i) break;
+    }
+    TEST_ASSERT(i == 6, "Wrap-around order correct [0..5]");
+
+    dkcFreeDeque(&deque);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcHashSet.c
+ */
+static int WINAPIV test_hashset_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return va - vb;
+}
+
+static BOOL WINAPI test_hashset_count_callback(const void *key, void *user)
+{
+    int *count = (int *)user;
+    (void)key;
+    (*count)++;
+    return TRUE;
+}
+
+void Test_HashSet(void)
+{
+    DKC_HASHSET *hs;
+    int key;
+    int i;
+    int count;
+    void *found;
+
+    TEST_BEGIN("dkcHashSet Test");
+
+    /* Alloc/Free basic */
+    hs = dkcAllocHashSet(sizeof(int), 0, NULL, test_hashset_int_compare);
+    TEST_ASSERT(hs != NULL, "dkcAllocHashSet");
+    TEST_ASSERT(dkcHashSetIsEmpty(hs) == TRUE, "New hash set is empty");
+    TEST_ASSERT(dkcHashSetSize(hs) == 0, "Size is 0");
+    TEST_ASSERT(dkcHashSetBucketCount(hs) == 16, "Default bucket count is 16");
+
+    /* Insert */
+    key = 42;
+    TEST_ASSERT(dkcHashSetInsert(hs, &key) == edk_SUCCEEDED, "Insert 42");
+    TEST_ASSERT(dkcHashSetSize(hs) == 1, "Size is 1 after insert");
+    TEST_ASSERT(dkcHashSetIsEmpty(hs) == FALSE, "Not empty after insert");
+
+    /* Duplicate rejection */
+    key = 42;
+    TEST_ASSERT(dkcHashSetInsert(hs, &key) == edk_FAILED, "Duplicate 42 rejected");
+    TEST_ASSERT(dkcHashSetSize(hs) == 1, "Size still 1 after duplicate");
+
+    /* Contains */
+    key = 42;
+    TEST_ASSERT(dkcHashSetContains(hs, &key) == TRUE, "Contains 42");
+    key = 99;
+    TEST_ASSERT(dkcHashSetContains(hs, &key) == FALSE, "Does not contain 99");
+
+    /* Find */
+    key = 42;
+    found = dkcHashSetFind(hs, &key);
+    TEST_ASSERT(found != NULL, "Find 42 returns non-NULL");
+    TEST_ASSERT(*(int *)found == 42, "Find 42 returns correct value");
+    key = 99;
+    found = dkcHashSetFind(hs, &key);
+    TEST_ASSERT(found == NULL, "Find 99 returns NULL");
+
+    /* Insert more */
+    key = 10;
+    dkcHashSetInsert(hs, &key);
+    key = 20;
+    dkcHashSetInsert(hs, &key);
+    key = 30;
+    dkcHashSetInsert(hs, &key);
+    TEST_ASSERT(dkcHashSetSize(hs) == 4, "Size is 4 after inserting 10,20,30");
+
+    /* Erase */
+    key = 20;
+    TEST_ASSERT(dkcHashSetErase(hs, &key) == edk_SUCCEEDED, "Erase 20");
+    TEST_ASSERT(dkcHashSetSize(hs) == 3, "Size is 3 after erase");
+    TEST_ASSERT(dkcHashSetContains(hs, &key) == FALSE, "20 no longer contained");
+
+    /* Erase non-existent */
+    key = 999;
+    TEST_ASSERT(dkcHashSetErase(hs, &key) == edk_Not_Found, "Erase non-existent returns Not_Found");
+
+    /* Foreach */
+    count = 0;
+    dkcHashSetForeach(hs, test_hashset_count_callback, &count);
+    TEST_ASSERT(count == 3, "Foreach visits 3 elements");
+
+    /* Clear */
+    dkcHashSetClear(hs);
+    TEST_ASSERT(dkcHashSetSize(hs) == 0, "Size is 0 after clear");
+    TEST_ASSERT(dkcHashSetIsEmpty(hs) == TRUE, "Empty after clear");
+
+    /* Mass insert to trigger rehash */
+    {
+        size_t initial_buckets = dkcHashSetBucketCount(hs);
+        int all_found = 1;
+        for(i = 0; i < 100; i++){
+            key = i * 7;
+            dkcHashSetInsert(hs, &key);
+        }
+        TEST_ASSERT(dkcHashSetSize(hs) == 100, "100 elements after mass insert");
+        TEST_ASSERT(dkcHashSetBucketCount(hs) > initial_buckets, "Rehash increased bucket count");
+
+        /* verify all elements present */
+        for(i = 0; i < 100; i++){
+            key = i * 7;
+            if(dkcHashSetContains(hs, &key) == FALSE){
+                all_found = 0;
+                break;
+            }
+        }
+        TEST_ASSERT(all_found == 1, "All 100 elements found after rehash");
+
+        /* mass erase */
+        for(i = 0; i < 50; i++){
+            key = i * 7;
+            dkcHashSetErase(hs, &key);
+        }
+        TEST_ASSERT(dkcHashSetSize(hs) == 50, "50 elements after partial erase");
+    }
+
+    /* Error handling */
+    TEST_ASSERT(dkcHashSetInsert(NULL, &key) == edk_FAILED, "Insert NULL ptr fails");
+    TEST_ASSERT(dkcHashSetContains(NULL, &key) == FALSE, "Contains NULL ptr returns FALSE");
+    TEST_ASSERT(dkcAllocHashSet(0, 0, NULL, test_hashset_int_compare) == NULL, "Alloc with key_size=0 fails");
+    TEST_ASSERT(dkcAllocHashSet(sizeof(int), 0, NULL, NULL) == NULL, "Alloc with NULL compare fails");
+
+    dkcFreeHashSet(&hs);
+    TEST_ASSERT(hs == NULL, "Free hash set");
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcHashMap.c
+ */
+static int WINAPIV test_hashmap_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return va - vb;
+}
+
+static BOOL WINAPI test_hashmap_sum_callback(
+    const void *key, void *data, size_t data_size, void *user)
+{
+    int *sum = (int *)user;
+    (void)key;
+    (void)data_size;
+    if(data != NULL){
+        *sum += *(int *)data;
+    }
+    return TRUE;
+}
+
+void Test_HashMap(void)
+{
+    DKC_HASHMAP *hm;
+    int key;
+    int val;
+    int result;
+    int read_val;
+    void *found;
+    size_t found_size;
+    int i;
+    int sum;
+
+    TEST_BEGIN("dkcHashMap Test");
+
+    /* Alloc/Free basic */
+    hm = dkcAllocHashMap(sizeof(int), 0, NULL, test_hashmap_int_compare);
+    TEST_ASSERT(hm != NULL, "dkcAllocHashMap");
+    TEST_ASSERT(dkcHashMapIsEmpty(hm) == TRUE, "New hash map is empty");
+    TEST_ASSERT(dkcHashMapSize(hm) == 0, "Size is 0");
+    TEST_ASSERT(dkcHashMapBucketCount(hm) == 16, "Default bucket count is 16");
+
+    /* Insert key-value pair */
+    key = 1; val = 100;
+    result = dkcHashMapInsert(hm, &key, &val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert key=1 val=100");
+    TEST_ASSERT(dkcHashMapSize(hm) == 1, "Size is 1");
+
+    /* Duplicate rejection */
+    key = 1; val = 999;
+    TEST_ASSERT(dkcHashMapInsert(hm, &key, &val, sizeof(int)) == edk_FAILED,
+        "Duplicate key=1 rejected");
+
+    /* Contains */
+    key = 1;
+    TEST_ASSERT(dkcHashMapContains(hm, &key) == TRUE, "Contains key=1");
+    key = 2;
+    TEST_ASSERT(dkcHashMapContains(hm, &key) == FALSE, "Does not contain key=2");
+
+    /* GetBuffer */
+    key = 1; read_val = 0;
+    result = dkcHashMapGetBuffer(hm, &key, &read_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "GetBuffer key=1 succeeds");
+    TEST_ASSERT(read_val == 100, "GetBuffer returns val=100");
+
+    /* Find */
+    key = 1; found_size = 0;
+    found = dkcHashMapFind(hm, &key, &found_size);
+    TEST_ASSERT(found != NULL, "Find key=1 returns non-NULL");
+    TEST_ASSERT(*(int *)found == 100, "Find returns val=100");
+    TEST_ASSERT(found_size == sizeof(int), "Find returns correct size");
+
+    key = 999;
+    found = dkcHashMapFind(hm, &key, NULL);
+    TEST_ASSERT(found == NULL, "Find non-existent returns NULL");
+
+    /* SetBuffer (overwrite value) */
+    key = 1; val = 200;
+    result = dkcHashMapSetBuffer(hm, &key, &val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "SetBuffer key=1 val=200");
+    read_val = 0;
+    dkcHashMapGetBuffer(hm, &key, &read_val, sizeof(int));
+    TEST_ASSERT(read_val == 200, "After SetBuffer, GetBuffer returns 200");
+
+    /* SetBuffer non-existent */
+    key = 999; val = 0;
+    TEST_ASSERT(dkcHashMapSetBuffer(hm, &key, &val, sizeof(int)) == edk_Not_Found,
+        "SetBuffer non-existent key returns Not_Found");
+
+    /* Insert more pairs */
+    key = 2; val = 20;
+    dkcHashMapInsert(hm, &key, &val, sizeof(int));
+    key = 3; val = 30;
+    dkcHashMapInsert(hm, &key, &val, sizeof(int));
+    key = 4; val = 40;
+    dkcHashMapInsert(hm, &key, &val, sizeof(int));
+    TEST_ASSERT(dkcHashMapSize(hm) == 4, "Size is 4");
+
+    /* Erase */
+    key = 3;
+    TEST_ASSERT(dkcHashMapErase(hm, &key) == edk_SUCCEEDED, "Erase key=3");
+    TEST_ASSERT(dkcHashMapSize(hm) == 3, "Size is 3 after erase");
+    TEST_ASSERT(dkcHashMapContains(hm, &key) == FALSE, "key=3 no longer contained");
+
+    /* Erase non-existent */
+    key = 999;
+    TEST_ASSERT(dkcHashMapErase(hm, &key) == edk_Not_Found, "Erase non-existent");
+
+    /* Foreach - sum values (keys 1,2,4 => vals 200,20,40 => sum 260) */
+    sum = 0;
+    dkcHashMapForeach(hm, test_hashmap_sum_callback, &sum);
+    TEST_ASSERT(sum == 260, "Foreach sum of values is 260");
+
+    /* Clear */
+    dkcHashMapClear(hm);
+    TEST_ASSERT(dkcHashMapSize(hm) == 0, "Size is 0 after clear");
+    TEST_ASSERT(dkcHashMapIsEmpty(hm) == TRUE, "Empty after clear");
+
+    /* Mass insert to trigger rehash */
+    {
+        size_t initial_buckets = dkcHashMapBucketCount(hm);
+        int all_ok = 1;
+        for(i = 0; i < 100; i++){
+            key = i;
+            val = i * 10;
+            dkcHashMapInsert(hm, &key, &val, sizeof(int));
+        }
+        TEST_ASSERT(dkcHashMapSize(hm) == 100, "100 entries after mass insert");
+        TEST_ASSERT(dkcHashMapBucketCount(hm) > initial_buckets, "Rehash increased buckets");
+
+        /* verify all entries */
+        for(i = 0; i < 100; i++){
+            key = i;
+            read_val = -1;
+            if(dkcHashMapGetBuffer(hm, &key, &read_val, sizeof(int)) != edk_SUCCEEDED
+                || read_val != i * 10){
+                all_ok = 0;
+                break;
+            }
+        }
+        TEST_ASSERT(all_ok == 1, "All 100 entries have correct values");
+
+        /* mass erase */
+        for(i = 0; i < 50; i++){
+            key = i;
+            dkcHashMapErase(hm, &key);
+        }
+        TEST_ASSERT(dkcHashMapSize(hm) == 50, "50 entries after partial erase");
+    }
+
+    /* Insert with NULL data */
+    key = 1000;
+    TEST_ASSERT(dkcHashMapInsert(hm, &key, NULL, 0) == edk_SUCCEEDED,
+        "Insert with NULL data succeeds");
+    TEST_ASSERT(dkcHashMapContains(hm, &key) == TRUE, "Contains key with NULL data");
+    found = dkcHashMapFind(hm, &key, &found_size);
+    TEST_ASSERT(found == NULL, "Find NULL-data entry returns NULL data ptr");
+    TEST_ASSERT(found_size == 0, "Find NULL-data entry returns size=0");
+
+    /* GetBuffer on NULL-data entry */
+    read_val = 0;
+    TEST_ASSERT(dkcHashMapGetBuffer(hm, &key, &read_val, sizeof(int)) == edk_NoValueToProcess,
+        "GetBuffer on NULL-data returns NoValueToProcess");
+
+    /* Error handling */
+    TEST_ASSERT(dkcHashMapInsert(NULL, &key, &val, sizeof(int)) == edk_FAILED,
+        "Insert NULL ptr fails");
+    TEST_ASSERT(dkcAllocHashMap(0, 0, NULL, test_hashmap_int_compare) == NULL,
+        "Alloc key_size=0 fails");
+    TEST_ASSERT(dkcAllocHashMap(sizeof(int), 0, NULL, NULL) == NULL,
+        "Alloc NULL compare fails");
+
+    dkcFreeHashMap(&hm);
+    TEST_ASSERT(hm == NULL, "Free hash map");
+
     TEST_END();
 }
 
@@ -716,7 +1123,7 @@ void Test_HC256(void)
  * ======================================== */
 
 /*
- * Compare function for 2Tree (int keys)
+ * Compare function for tree int keys (shared by 2Tree and BTree)
  */
 static int compare_2tree_int(const void *a, const void *b)
 {
@@ -725,6 +1132,194 @@ static int compare_2tree_int(const void *a, const void *b)
     if (va < vb) return -1;
     if (va > vb) return 1;
     return 0;
+}
+
+/*
+ * Foreach callback for BTree: counts calls and verifies sorted order
+ */
+static int g_btree_foreach_prev;
+static int g_btree_foreach_count;
+static int g_btree_foreach_sorted;
+
+static BOOL WINAPI btree_foreach_check_sorted(
+    const void *key, void *data, size_t data_size, void *user)
+{
+    int k = *(const int *)key;
+    (void)data; (void)data_size; (void)user;
+    if (g_btree_foreach_count > 0 && k <= g_btree_foreach_prev) {
+        g_btree_foreach_sorted = 0;
+    }
+    g_btree_foreach_prev = k;
+    g_btree_foreach_count++;
+    return TRUE;
+}
+
+/*
+ * Test: dkcBTree.c (B-Tree)
+ */
+void Test_BTree(void)
+{
+    DKC_BTREE_ROOT *btree;
+    DKC_BTREE_SEARCH_RESULT sr;
+    int key, data_val, read_data;
+    int result;
+    int i;
+    void *found_key;
+
+    TEST_BEGIN("dkcBTree Test");
+
+    /* Basic alloc/free */
+    btree = dkcAllocBTreeRoot(sizeof(int), 2, compare_2tree_int, 0);
+    TEST_ASSERT(btree != NULL, "dkcAllocBTreeRoot (t=2)");
+    TEST_ASSERT(dkcBTreeIsEmpty(btree) == TRUE, "New BTree is empty");
+    TEST_ASSERT(dkcBTreeSize(btree) == 0, "Size is 0");
+
+    /* Invalid params */
+    TEST_ASSERT(dkcAllocBTreeRoot(0, 2, compare_2tree_int, 0) == NULL,
+        "key_size=0 returns NULL");
+    TEST_ASSERT(dkcAllocBTreeRoot(sizeof(int), 1, compare_2tree_int, 0) == NULL,
+        "min_degree=1 returns NULL");
+    TEST_ASSERT(dkcAllocBTreeRoot(sizeof(int), 2, NULL, 0) == NULL,
+        "compare=NULL returns NULL");
+
+    /* Insert several keys */
+    key = 50; data_val = 500;
+    result = dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 50");
+
+    key = 25; data_val = 250;
+    result = dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 25");
+
+    key = 75; data_val = 750;
+    result = dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 75");
+
+    key = 10; data_val = 100;
+    dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+    key = 30; data_val = 300;
+    dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+
+    TEST_ASSERT(dkcBTreeSize(btree) == 5, "Size is 5 after inserts");
+    TEST_ASSERT(dkcBTreeIsEmpty(btree) == FALSE, "BTree is not empty");
+
+    /* Duplicate rejection */
+    key = 50; data_val = 999;
+    result = dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+    TEST_ASSERT(result == edk_FAILED, "Duplicate key 50 rejected");
+    TEST_ASSERT(dkcBTreeSize(btree) == 5, "Size unchanged after dup");
+
+    /* Find */
+    key = 75;
+    sr = dkcBTreeFind(btree, &key);
+    TEST_ASSERT(sr.node != NULL, "Find key 75");
+
+    key = 999;
+    sr = dkcBTreeFind(btree, &key);
+    TEST_ASSERT(sr.node == NULL, "Key 999 not found");
+
+    /* GetBuffer */
+    key = 50;
+    result = dkcBTreeGetBuffer(btree, &key, &read_data, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED && read_data == 500,
+        "GetBuffer key 50 = 500");
+
+    /* SetBuffer */
+    data_val = 5555;
+    result = dkcBTreeSetBuffer(btree, &key, &data_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "SetBuffer key 50");
+    result = dkcBTreeGetBuffer(btree, &key, &read_data, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED && read_data == 5555,
+        "GetBuffer after Set = 5555");
+
+    /* FindMin / FindMax */
+    found_key = dkcBTreeFindMin(btree);
+    TEST_ASSERT(found_key != NULL && *(int *)found_key == 10,
+        "FindMin = 10");
+    found_key = dkcBTreeFindMax(btree);
+    TEST_ASSERT(found_key != NULL && *(int *)found_key == 75,
+        "FindMax = 75");
+
+    /* FindMinimalGreater / FindMaximumLess */
+    key = 25;
+    found_key = dkcBTreeFindMinimalGreater(btree, &key);
+    TEST_ASSERT(found_key != NULL && *(int *)found_key == 30,
+        "FindMinimalGreater(25) = 30");
+
+    found_key = dkcBTreeFindMaximumLess(btree, &key);
+    TEST_ASSERT(found_key != NULL && *(int *)found_key == 10,
+        "FindMaximumLess(25) = 10");
+
+    key = 10;
+    found_key = dkcBTreeFindMaximumLess(btree, &key);
+    TEST_ASSERT(found_key == NULL, "FindMaximumLess(10) = NULL (no smaller)");
+
+    key = 75;
+    found_key = dkcBTreeFindMinimalGreater(btree, &key);
+    TEST_ASSERT(found_key == NULL, "FindMinimalGreater(75) = NULL (no larger)");
+
+    /* Delete */
+    key = 25;
+    result = dkcBTreeErase(btree, &key);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Erase key 25");
+    TEST_ASSERT(dkcBTreeSize(btree) == 4, "Size is 4 after erase");
+
+    sr = dkcBTreeFind(btree, &key);
+    TEST_ASSERT(sr.node == NULL, "Key 25 not found after erase");
+
+    key = 999;
+    result = dkcBTreeErase(btree, &key);
+    TEST_ASSERT(result == edk_Not_Found, "Erase non-existent key");
+
+    dkcFreeBTreeRoot(&btree);
+    TEST_ASSERT(btree == NULL, "Free BTree");
+
+    /* Mass insert test (triggers splits) */
+    btree = dkcAllocBTreeRoot(sizeof(int), 3, compare_2tree_int, 0);
+    TEST_ASSERT(btree != NULL, "Alloc BTree (t=3) for mass test");
+
+    for (i = 0; i < 100; i++) {
+        key = i;
+        data_val = i * 10;
+        result = dkcBTreeInsert(btree, &key, &data_val, sizeof(int));
+        if (result != edk_SUCCEEDED) break;
+    }
+    TEST_ASSERT(dkcBTreeSize(btree) == 100, "Mass insert 100 keys");
+
+    /* Verify all keys findable */
+    for (i = 0; i < 100; i++) {
+        key = i;
+        sr = dkcBTreeFind(btree, &key);
+        if (sr.node == NULL) break;
+    }
+    TEST_ASSERT(i == 100, "All 100 keys found");
+
+    /* Foreach - verify sorted order */
+    g_btree_foreach_count = 0;
+    g_btree_foreach_sorted = 1;
+    g_btree_foreach_prev = -1;
+    dkcBTreeForeach(btree, btree_foreach_check_sorted, NULL);
+    TEST_ASSERT(g_btree_foreach_count == 100, "Foreach visits 100 keys");
+    TEST_ASSERT(g_btree_foreach_sorted == 1, "Foreach in sorted order");
+
+    /* Mass delete */
+    for (i = 0; i < 50; i++) {
+        key = i * 2; /* delete even numbers */
+        dkcBTreeErase(btree, &key);
+    }
+    TEST_ASSERT(dkcBTreeSize(btree) == 50, "50 keys after mass delete");
+
+    /* Verify remaining keys */
+    g_btree_foreach_count = 0;
+    g_btree_foreach_sorted = 1;
+    g_btree_foreach_prev = -1;
+    dkcBTreeForeach(btree, btree_foreach_check_sorted, NULL);
+    TEST_ASSERT(g_btree_foreach_count == 50, "Foreach visits 50 remaining");
+    TEST_ASSERT(g_btree_foreach_sorted == 1, "Remaining still sorted");
+
+    dkcFreeBTreeRoot(&btree);
+
+    TEST_END();
 }
 
 /*
@@ -1256,6 +1851,8 @@ int main(int argc, char *argv[])
     Test_Stack();
     Test_Queue();
     Test_Deque();
+    Test_HashSet();
+    Test_HashMap();
     Test_SingleList();
     Test_MemoryStream();
     Test_CircularMemoryStream();
@@ -1263,6 +1860,7 @@ int main(int argc, char *argv[])
     Test_MemoryPool();
 
     /* Tree Tests */
+    Test_BTree();
     Test_2Tree();
     Test_RedBlackTree();
 

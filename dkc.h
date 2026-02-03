@@ -1,40 +1,40 @@
 /*!
 @file dkc.h
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @since 2004/03/03
-@brief ‚±‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚ðŽg‚¤ê‡‚Í‚±‚ê‚ðƒCƒ“ƒNƒ‹[ƒh‚·‚é‚×‚µ
+@brief ï¿½ï¿½ï¿½Ìƒï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ê‡ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½×‚ï¿½
 @note
-<h1>dkutil_c‚Ì‚¨‚¢‚µ‚¢Žg‚¢•û</h2>
+<h1>dkutil_cï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½</h2>
 
-’è‹`ŒS
-uint8 / 8bit‚ÌunsignedŒ^
-uint16 / 16bit‚ÌunsignedŒ^
-uint32 / 32bit‚ÌunsignedŒ^
+ï¿½ï¿½`ï¿½S
+uint8 / 8bitï¿½ï¿½unsignedï¿½^
+uint16 / 16bitï¿½ï¿½unsignedï¿½^
+uint32 / 32bitï¿½ï¿½unsignedï¿½^
 
-ULONGLONG / 64bit‚ÌunsignedŒ^
-LONGLONG / 64bit‚ÌsignedŒ^
-uint64 / ULONGLONG‚Æ“¯‚¶
+ULONGLONG / 64bitï¿½ï¿½unsignedï¿½^
+LONGLONG / 64bitï¿½ï¿½signedï¿½^
+uint64 / ULONGLONGï¿½Æ“ï¿½ï¿½ï¿½
 
--# ƒoƒCƒgƒI[ƒ_[‚ÌÝ’è
-ŸŽè‚ÉƒoƒCƒgƒI[ƒ_[‚ðÝ’è‚µ‚Ä‚­‚ê‚Ü‚·B
+-# ï¿½oï¿½Cï¿½gï¿½Iï¿½[ï¿½_ï¿½[ï¿½ÌÝ’ï¿½
+ï¿½ï¿½ï¿½ï¿½Éƒoï¿½Cï¿½gï¿½Iï¿½[ï¿½_ï¿½[ï¿½ï¿½Ý’è‚µï¿½Ä‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 
-ORDER_DCBA‚Ålittle endian
+ORDER_DCBAï¿½ï¿½little endian
 
--# ƒ†[ƒU[‚ªÝ’è‚Å‚«‚éŽ–
+-# ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½ï¿½ï¿½Ý’ï¿½Å‚ï¿½ï¿½éŽ–
 
 #define DKUTIL_C_USE_DKUTIL_CSTD
-‚±‚ê‚ð’è‹`‚·‚é‚ÆAŽ©‘O‚ÌCƒ‰ƒ“ƒ^ƒCƒ€ƒ‰ƒCƒuƒ‰ƒŠ(•sŠ®‘S)‚ðŽg‚¤‚æ‚¤‚É‚È‚è‚Ü‚·B
-(‚Ü‚¾A–¢ŽÀ‘•¥¥¥)
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ÆAï¿½ï¿½ï¿½Oï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½^ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½(ï¿½sï¿½ï¿½ï¿½S)ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½æ‚¤ï¿½É‚È‚ï¿½Ü‚ï¿½ï¿½B
+(ï¿½Ü‚ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
 
 
 #define DKUTIL_C_2TREE_FAST_IMPL
-dkc2Tree.c dkc2Tree.h‚Ì“ñ•ª–Ø‚Ìˆê•”‚Ìˆ—‚Ì‘¬‚¢ŽÀ‘••ûŽ®iÄƒRƒ“ƒpƒCƒ‹Œã—LŒøj
-Ú‚µ‚­‚Ídkc2Tree.h‚É‚ÄB
+dkc2Tree.c dkc2Tree.hï¿½Ì“ñ•ª–Ø‚Ìˆê•”ï¿½Ìï¿½ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ÄƒRï¿½ï¿½ï¿½pï¿½Cï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½j
+ï¿½Ú‚ï¿½ï¿½ï¿½ï¿½ï¿½dkc2Tree.hï¿½É‚ÄB
 
 #define DKUTIL_C_USE_BIT_TABLE
-‚±‚ê‚ð1‚Æ‚µ‚Ä’è‹`‚·‚é‚ÆAƒrƒbƒg‰‰ŽZƒe[ƒuƒ‹‚ðŽg‚¤‚æ‚¤‚É‚È‚è‚Ü‚·B
-—á‚¦‚ÎA(1 << n)‚ðtable32[n] ‚Ì—l‚É‚·‚é‚Æ‚©B
+ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½Æ‚ï¿½ï¿½Ä’ï¿½`ï¿½ï¿½ï¿½ï¿½ÆAï¿½rï¿½bï¿½gï¿½ï¿½ï¿½Zï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½æ‚¤ï¿½É‚È‚ï¿½Ü‚ï¿½ï¿½B
+ï¿½á‚¦ï¿½ÎA(1 << n)ï¿½ï¿½table32[n] ï¿½Ì—lï¿½É‚ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½B
 */
 
 #ifndef DKUTIL_C_DKC_H
@@ -51,12 +51,16 @@ dkc2Tree.c dkc2Tree.h‚Ì“ñ•ª–Ø‚Ìˆê•”‚Ìˆ—‚Ì‘¬‚¢ŽÀ‘••ûŽ®iÄƒRƒ“ƒpƒCƒ‹Œã—LŒøj
 #include "dkcSingleList.h"
 #include "dkcStack.h"
 #include "dkcQueue.h"
+#include "dkcDeque.h"
 #include "dkc2Tree.h"
+#include "dkcBTree.h"
 #include "dkcRedBlackTree.h"
 #include "dkcMemoryStream.h"
 
 #include "dkcCircularMemoryStream.h"
 #include "dkcArrayOneByOne.h"
+#include "dkcHashSet.h"
+#include "dkcHashMap.h"
 
 /* generic interface */
 #include "dkcCircularStream.h"
