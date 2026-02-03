@@ -1,6 +1,6 @@
 /*!
 @file dkcCryptograph.h
-@brief ˆÃ†‰»Œn‚·‚×‚Äinclude
+@brief ï¿½Ãï¿½ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½×‚ï¿½include
 @note
 INCLUDE CRYPTOGRAPH ALGORITHM ALL
 @since 2004/07/11
@@ -13,6 +13,7 @@ INCLUDE CRYPTOGRAPH ALGORITHM ALL
 #include "dkcVernam.h"
 
 #include "dkcArcfour.h"
+#include "dkcCamellia.h"
 #include "dkcHC256.h"
 #include "dkcSNOW20.h"
 
@@ -23,10 +24,10 @@ INCLUDE CRYPTOGRAPH ALGORITHM ALL
 //**********************************************************
 //helper
 
-///1ƒoƒCƒg‚ðˆÃ†‰»‚·‚éB@memo ŽÀ‘•‚ÍEncrypt Decrypt‹¤‚É•Ï‚¦‚È‚¢
+///1ï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½Ãï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B@memo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Encrypt Decryptï¿½ï¿½ï¿½É•Ï‚ï¿½ï¿½È‚ï¿½
 DKC_EXTERN BYTE WINAPI dkcEncryptByte(BYTE src,BYTE x);
 
-///dkcEncryptByte()‚ÅˆÃ†‰»‚³‚ê‚½ƒf[ƒ^‚ð•¡‡‰»‚·‚éB
+///dkcEncryptByte()ï¿½ÅˆÃï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½fï¿½[ï¿½^ï¿½ð•¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 ///@see dkcEncryptByte()
 DKC_EXTERN BYTE WINAPI dkcDecryptByte(BYTE src,BYTE x);
 
@@ -37,7 +38,7 @@ DKC_EXTERN DKC_SNOW2 *WINAPI dkcAllocSNOW2NoLimitKeyLength(const void *key,size_
 
 DKC_EXTERN DKC_HC256 *WINAPI dkcAllocHC256NoLimitKeyLength(const void *key,size_t keysize);
 
-///@note ‚æ‚Ù‚Ç‚Ì–â‘è‚ª–³‚¢ŒÀ‚èŽÀ‘•‚Í•Ï‚¦‚È‚¢‚±‚Æ‚É‚·‚éB
+///@note ï¿½ï¿½Ù‚Ç‚Ì–ï¿½è‚ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í•Ï‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½Æ‚É‚ï¿½ï¿½ï¿½B
 DKC_EXTERN int WINAPI dkcCalculateInitializeVector(void *dest,size_t destsize_and_generate_iv_size,const void *key,size_t keysize);
 
 //**********************************************************

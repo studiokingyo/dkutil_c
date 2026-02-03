@@ -98,10 +98,10 @@ Open `test/test_dkutil_c.dsw` in VC6, build dkutil_c first, then build test_dkut
 | **Containers** | Stack, Queue, Deque, SingleList, MemoryStream, CircularMemoryStream, Buffer, MemoryPool |
 | **Trees** | 2Tree (Binary Tree), RedBlackTree |
 | **Hash/Digest** | CRC32, CRC-CCITT, MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512, HMAC-MD5, HMAC-SHA1 |
-| **Ciphers** | Arcfour (RC4), Blowfish, Rijndael (AES), SNOW 2.0, HC256, Vernam |
+| **Ciphers** | Arcfour (RC4), Blowfish, Rijndael (AES), Camellia, SNOW 2.0, HC256, Vernam |
 | **Compression** | LZSS, LZW, RLE (PackBits) |
 | **Regex** | Regular Expression matching and search |
 | **Utilities** | Memory allocation, Sort (Shell/Comb/Bubble), Bit operations, XorShift RNG, SJIS String |
 
 ### Notes on Untested Modules
-- **dkcCamellia**: Not implemented (code is `#if 0`)
+- All major modules are covered by the test suite.

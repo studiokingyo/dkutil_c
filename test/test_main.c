@@ -1005,6 +1005,84 @@ static int vernam_rng_callback(ULONG *seed, ULONG max)
 /*
  * Test: dkcVernam.c (Vernam Cipher)
  */
+/*
+ * Test: dkcCamellia.c
+ */
+void Test_Camellia(void)
+{
+    DKC_CAMELLIA *cam;
+    unsigned char key128[16] = {0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF,
+                                0xFE,0xDC,0xBA,0x98,0x76,0x54,0x32,0x10};
+    unsigned char key256[32] = {0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF,
+                                0xFE,0xDC,0xBA,0x98,0x76,0x54,0x32,0x10,
+                                0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
+                                0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF};
+    unsigned char plaintext[32];
+    unsigned char ciphertext[32];
+    unsigned char decrypted[32];
+    unsigned char inplace[32];
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcCamellia Test");
+
+    /* Fill plaintext with test data */
+    for (i = 0; i < 32; i++) {
+        plaintext[i] = (unsigned char)i;
+    }
+
+    /* --- 128-bit key test --- */
+    cam = dkcAllocCamellia(key128, 16);
+    TEST_ASSERT(cam != NULL, "dkcAllocCamellia (128-bit key)");
+
+    result = dkcCamelliaEncrypt(cam, ciphertext, 32, plaintext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encrypt 128-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, ciphertext, 32) != 0, "Ciphertext differs from plaintext (128-bit)");
+
+    result = dkcCamelliaDecrypt(cam, decrypted, 32, ciphertext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decrypt 128-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, decrypted, 32) == 0, "Decrypt matches original (128-bit)");
+
+    /* In-place encrypt/decrypt */
+    memcpy(inplace, plaintext, 32);
+    dkcCamelliaEncryptNoDest(cam, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, ciphertext, 32) == 0, "In-place encrypt matches (128-bit)");
+    dkcCamelliaDecryptNoDest(cam, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, plaintext, 32) == 0, "In-place decrypt matches (128-bit)");
+
+    dkcFreeCamellia(&cam);
+    TEST_ASSERT(cam == NULL, "Free camellia (128-bit)");
+
+    /* --- 256-bit key test --- */
+    cam = dkcAllocCamellia(key256, 32);
+    TEST_ASSERT(cam != NULL, "dkcAllocCamellia (256-bit key)");
+
+    result = dkcCamelliaEncrypt(cam, ciphertext, 32, plaintext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encrypt 256-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, ciphertext, 32) != 0, "Ciphertext differs from plaintext (256-bit)");
+
+    result = dkcCamelliaDecrypt(cam, decrypted, 32, ciphertext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decrypt 256-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, decrypted, 32) == 0, "Decrypt matches original (256-bit)");
+
+    dkcFreeCamellia(&cam);
+
+    /* --- Invalid key size test --- */
+    cam = dkcAllocCamellia(key128, 15);
+    TEST_ASSERT(cam == NULL, "Invalid key size (15) returns NULL");
+
+    /* --- Size not multiple of 16 test --- */
+    cam = dkcAllocCamellia(key128, 16);
+    result = dkcCamelliaEncrypt(cam, ciphertext, 32, plaintext, 17);
+    TEST_ASSERT(result == edk_ArgumentException, "Non-block-aligned size rejected");
+    dkcFreeCamellia(&cam);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcVernam.c
+ */
 void Test_Vernam(void)
 {
     BYTE plaintext[32];
@@ -1210,6 +1288,8 @@ int main(int argc, char *argv[])
     Test_LZSS();
     Test_LZW();
     Test_RLE_PackBits();
+
+    Test_Camellia();
 
     /* Cipher Tests (additional) */
     Test_Vernam();

@@ -1,63 +1,82 @@
 /*!
 @file dkcCamellia.h
-@brief 政府が推奨している国産暗号Camellia
+@brief Camellia block cipher algorithm (128/192/256-bit key, 128-bit block)
+@note
+Camellia is a symmetric key block cipher developed jointly by
+Mitsubishi Electric and NTT of Japan.
+RFC 3713, ISO/IEC 18033-3
 */
 #ifndef  DKUTIL_C_CAMELLIA_H
 #define  DKUTIL_C_CAMELLIA_H
 
-#include "dkutil_c/dkcOSIndependent.h"
+#include "dkcOSIndependent.h"
 
+///Camellia block size in bytes (128 bits)
+#define dkcd_CAMELLIA_BLOCK_SIZE 16
 
-///arcfour algprithm state (RC4互換のアルゴリズム
+///Camellia max expanded key size in bytes (for 192/256-bit key: 34 subkeys * 8 bytes)
+#define dkcd_CAMELLIA_MAX_EKEY_SIZE 272
+
+///Camellia cipher state
 typedef struct dkc_Camellia{
-	unsigned char mi;
-	unsigned char mj;
-	unsigned char msbox[256];
+	int keyBits;
+	unsigned char ekey[dkcd_CAMELLIA_MAX_EKEY_SIZE];
 }DKC_CAMELLIA;
 
-#if 0
 /*!
-@param key[in] keyへのポインタ
-@param keylen[in] keyのサイズ
-@return DKC_CAMELLIA_STATE 構造体へのポインタ
+@param key[in] key pointer
+@param keylen[in] key size in bytes (16, 24, or 32)
+@return DKC_CAMELLIA pointer (NULL on failure)
 @note
-使い終わったらdkcFreeCamelliaを使いましょう。
+Call dkcFreeCamellia() to release.
 */
-DKC_EXTERN DKC_CAMELLIA_STATE * WINAPI dkcAllocCamellia(const unsigned char *key,size_t keylen);
+DKC_EXTERN DKC_CAMELLIA * WINAPI dkcAllocCamellia(const unsigned char *key,size_t keylen);
 
 /*!
-@param dkcAllocCamelliaで確保した領域へのポインタへのポインタ
-@return edk_SUCCEEDEDで成功
+@param p[in] pointer to pointer allocated by dkcAllocCamellia
+@return edk_SUCCEEDED on success
 */
-DKC_EXTERN int WINAPI dkcFreeCamellia(DKC_CAMELLIA_STATE **p);
+DKC_EXTERN int WINAPI dkcFreeCamellia(DKC_CAMELLIA **p);
 
 /*!
-@param p[in][out] dkcAllocCamellia()で確保した領域へのポインタ
-@return XORすべき値
+@param p[in] DKC_CAMELLIA pointer allocated by dkcAllocCamellia()
+@param dest[out] output buffer pointer
+@param destsize[in] dest buffer size in bytes
+@param src[in] input buffer pointer
+@param srcsize[in] src size in bytes (must be multiple of 16)
+@return edk_SUCCEEDED on success
 */
-DKC_EXTERN unsigned char WINAPI dkcCamelliaByte(DKC_CAMELLIA_STATE *p);
-/*!
-@param p[in] dkcAllocCamellia()で確保した領域へのポインタ
-@param dest[in] 出力バッファへのポインタ
-@param destsize[in] destのサイズ
-@param src[in] 入力バッファへのポインタ
-@param srcsize[in] srcのサイズ
-@return edk_SUCCEEDED で成功
-*/
-DKC_EXTERN int WINAPI dkcCamelliaEncrypt(DKC_CAMELLIA_STATE *p,
+DKC_EXTERN int WINAPI dkcCamelliaEncrypt(DKC_CAMELLIA *p,
 	unsigned char *dest,size_t destsize,
 	const unsigned char *src,size_t srcsize);
 
-DKC_EXTERN void WINAPI dkcCamelliaEncryptNoDest(DKC_CAMELLIA_STATE *p,
-	unsigned char *dest_and_src,size_t dest_and_srcsize);	
+/*!
+@param p[in] DKC_CAMELLIA pointer allocated by dkcAllocCamellia()
+@param dest[out] output buffer pointer
+@param destsize[in] dest buffer size in bytes
+@param src[in] input buffer pointer
+@param srcsize[in] src size in bytes (must be multiple of 16)
+@return edk_SUCCEEDED on success
+*/
+DKC_EXTERN int WINAPI dkcCamelliaDecrypt(DKC_CAMELLIA *p,
+	unsigned char *dest,size_t destsize,
+	const unsigned char *src,size_t srcsize);
 
-#define dkcCamelliaDecrypt(p,dest,destsize,src,srcsize) \
-	dkcCamelliaEncrypt(p,dest,destsize,src,srcsize)
+/*!
+@param p[in] DKC_CAMELLIA pointer allocated by dkcAllocCamellia()
+@param dest_and_src[in][out] in-place buffer pointer
+@param dest_and_srcsize[in] buffer size in bytes (must be multiple of 16)
+*/
+DKC_EXTERN void WINAPI dkcCamelliaEncryptNoDest(DKC_CAMELLIA *p,
+	unsigned char *dest_and_src,size_t dest_and_srcsize);
 
-#define dkcCamelliaDecryptNoDest(p,dest_and_src,dest_and_srcsize) \
-	dkcCamelliaEncryptNoDest(p,dest_and_src,dest_and_srcsize)
-
-#endif
+/*!
+@param p[in] DKC_CAMELLIA pointer allocated by dkcAllocCamellia()
+@param dest_and_src[in][out] in-place buffer pointer
+@param dest_and_srcsize[in] buffer size in bytes (must be multiple of 16)
+*/
+DKC_EXTERN void WINAPI dkcCamelliaDecryptNoDest(DKC_CAMELLIA *p,
+	unsigned char *dest_and_src,size_t dest_and_srcsize);
 
 
 #if !defined( DKUTIL_C_CAMELLIA_C ) &&  defined(USE_DKC_INDEPENDENT_INCLUDE)
