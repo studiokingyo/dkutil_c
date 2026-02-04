@@ -63,6 +63,8 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcHashMap.h"
 #include "dkcHashMultiSet.h"
 #include "dkcHashMultiMap.h"
+#include "dkcDoubleList.h"
+#include "dkcNaryTree.h"
 
 /* generic interface */
 #include "dkcCircularStream.h"
@@ -96,6 +98,7 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 
 /* cryptograph */
 #include "dkcCryptoGraph.h"
+#include "dkcBase64.h"
 
 
 /* gemerate signature */

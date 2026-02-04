@@ -2513,6 +2513,288 @@ void Test_String(void)
 }
 
 /* ========================================
+ * DOUBLE LIST TESTS
+ * ======================================== */
+
+/*
+ * Test: dkcDoubleList.c
+ */
+void Test_DoubleList(void)
+{
+    DKC_DOUBLELIST_OBJECT *obj;
+    DKC_DOUBLELIST *it;
+    int val;
+    int result;
+    size_t sz;
+
+    TEST_BEGIN("dkcDoubleList Test");
+
+    /* Alloc object with initial value */
+    val = 10;
+    obj = dkcAllocDoubleListObject(&val, sizeof(int));
+    TEST_ASSERT(obj != NULL, "dkcAllocDoubleListObject");
+
+    /* push_back x 2 */
+    val = 20;
+    obj->push_back(obj, &val, sizeof(int));
+    val = 30;
+    obj->push_back(obj, &val, sizeof(int));
+
+    /* size should be 3 */
+    sz = obj->size(obj);
+    TEST_ASSERT(sz == 3, "Size is 3 after push_back x2");
+
+    /* push_front */
+    val = 5;
+    obj->push_front(obj, &val, sizeof(int));
+    sz = obj->size(obj);
+    TEST_ASSERT(sz == 4, "Size is 4 after push_front");
+
+    /* begin should have value 5 */
+    it = obj->begin(obj);
+    TEST_ASSERT(it != NULL, "begin() not null");
+    result = 0;
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 5, "begin data is 5 (push_front)");
+
+    /* forward traversal: 5 -> 10 -> 20 -> 30 */
+    it = obj->next(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 10, "Second element is 10");
+
+    it = obj->next(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 20, "Third element is 20");
+
+    it = obj->next(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 30, "Fourth element is 30");
+
+    /* reverse traversal: tail -> prev -> ... -> begin */
+    it = obj->tail(obj);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 30, "Tail data is 30");
+
+    it = obj->prev(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 20, "Prev of tail is 20");
+
+    it = obj->prev(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 10, "Prev-prev of tail is 10");
+
+    /* erase middle element (value 10) */
+    obj->erase(obj, it);
+    sz = obj->size(obj);
+    TEST_ASSERT(sz == 3, "Size is 3 after erase middle");
+
+    /* verify link integrity: 5 -> 20 -> 30 */
+    it = obj->begin(obj);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 5, "After erase: begin is 5");
+
+    it = obj->next(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 20, "After erase: second is 20");
+
+    it = obj->next(it);
+    obj->getbuffer(it, &result, sizeof(int));
+    TEST_ASSERT(result == 30, "After erase: third is 30");
+
+    TEST_ASSERT(obj->end(obj->next(it)), "Next of tail is end");
+
+    /* Free */
+    dkcFreeDoubleListObject(&obj);
+    TEST_ASSERT(obj == NULL, "Free double list object");
+
+    TEST_END();
+}
+
+/* ========================================
+ * NARY TREE TESTS
+ * ======================================== */
+
+static BOOL WINAPI test_nary_preorder_callback(DKC_NARYTREE_NODE *node, void *user)
+{
+    int *counter = (int *)user;
+    (*counter)++;
+    return TRUE;
+}
+
+/*
+ * Test: dkcNaryTree.c
+ */
+void Test_NaryTree(void)
+{
+    DKC_NARYTREE_NODE *root;
+    DKC_NARYTREE_NODE *child1;
+    DKC_NARYTREE_NODE *child2;
+    DKC_NARYTREE_NODE *child3;
+    DKC_NARYTREE_NODE *grandchild;
+    DKC_NARYTREE_NODE *found_root;
+    int val;
+    int result;
+    int counter;
+    size_t num;
+
+    TEST_BEGIN("dkcNaryTree Test");
+
+    /* create root */
+    val = 100;
+    root = dkcAllocNaryTreeNode(&val, sizeof(int));
+    TEST_ASSERT(root != NULL, "AllocNaryTreeNode root");
+    TEST_ASSERT(dkcNaryTreeIsRoot(root) == TRUE, "Root is root");
+    TEST_ASSERT(dkcNaryTreeIsLeaf(root) == TRUE, "Root with no children is leaf");
+
+    /* append 3 children */
+    val = 200;
+    child1 = dkcAllocNaryTreeNode(&val, sizeof(int));
+    val = 300;
+    child2 = dkcAllocNaryTreeNode(&val, sizeof(int));
+    val = 400;
+    child3 = dkcAllocNaryTreeNode(&val, sizeof(int));
+
+    dkcNaryTreeAppendChild(root, child1);
+    dkcNaryTreeAppendChild(root, child2);
+    dkcNaryTreeAppendChild(root, child3);
+
+    TEST_ASSERT(dkcNaryTreeNumChildren(root) == 3, "Root has 3 children");
+    TEST_ASSERT(dkcNaryTreeIsLeaf(root) == FALSE, "Root with children is not leaf");
+    TEST_ASSERT(dkcNaryTreeIsRoot(child1) == FALSE, "Child1 is not root");
+
+    /* add grandchild to child1 */
+    val = 210;
+    grandchild = dkcAllocNaryTreeNode(&val, sizeof(int));
+    dkcNaryTreeAppendChild(child1, grandchild);
+
+    /* NumNodes */
+    num = dkcNaryTreeNumNodes(root);
+    TEST_ASSERT(num == 5, "Total nodes is 5");
+
+    /* Depth */
+    TEST_ASSERT(dkcNaryTreeDepth(root) == 0, "Root depth is 0");
+    TEST_ASSERT(dkcNaryTreeDepth(child1) == 1, "Child1 depth is 1");
+    TEST_ASSERT(dkcNaryTreeDepth(grandchild) == 2, "Grandchild depth is 2");
+
+    /* IsLeaf */
+    TEST_ASSERT(dkcNaryTreeIsLeaf(child2) == TRUE, "Child2 is leaf");
+    TEST_ASSERT(dkcNaryTreeIsLeaf(child1) == FALSE, "Child1 is not leaf");
+
+    /* GetRoot from grandchild */
+    found_root = dkcNaryTreeGetRoot(grandchild);
+    TEST_ASSERT(found_root == root, "GetRoot from grandchild returns root");
+
+    /* GetBuffer */
+    result = 0;
+    dkcNaryTreeGetBuffer(grandchild, &result, sizeof(int));
+    TEST_ASSERT(result == 210, "Grandchild data is 210");
+
+    /* SetBuffer */
+    val = 999;
+    dkcNaryTreeSetBuffer(child2, &val, sizeof(int));
+    result = 0;
+    dkcNaryTreeGetBuffer(child2, &result, sizeof(int));
+    TEST_ASSERT(result == 999, "SetBuffer/GetBuffer roundtrip");
+
+    /* Foreach PreOrder */
+    counter = 0;
+    dkcNaryTreeForeach(root, edkcNaryPreOrder, test_nary_preorder_callback, &counter);
+    TEST_ASSERT(counter == 5, "PreOrder visits all 5 nodes");
+
+    /* Foreach PostOrder */
+    counter = 0;
+    dkcNaryTreeForeach(root, edkcNaryPostOrder, test_nary_preorder_callback, &counter);
+    TEST_ASSERT(counter == 5, "PostOrder visits all 5 nodes");
+
+    /* Unlink child2 (subtree detach) */
+    dkcNaryTreeUnlink(child2);
+    num = dkcNaryTreeNumNodes(root);
+    TEST_ASSERT(num == 4, "After unlink child2, total nodes is 4");
+    TEST_ASSERT(dkcNaryTreeNumChildren(root) == 2, "Root has 2 children after unlink");
+    TEST_ASSERT(dkcNaryTreeIsRoot(child2) == TRUE, "Unlinked child2 is now root");
+
+    /* free unlinked node separately */
+    dkcFreeNaryTreeNode(&child2);
+    TEST_ASSERT(child2 == NULL, "Free unlinked child2");
+
+    /* FreeAll */
+    dkcFreeNaryTreeAll(&root);
+    TEST_ASSERT(root == NULL, "FreeNaryTreeAll");
+
+    TEST_END();
+}
+
+/* ========================================
+ * BASE64 TESTS
+ * ======================================== */
+
+/*
+ * Test: dkcBase64.c
+ */
+void Test_Base64(void)
+{
+    char enc_buf[256];
+    BYTE dec_buf[256];
+    size_t out_len;
+    int result;
+    /* test data */
+    const BYTE *hello = (const BYTE *)"Hello";
+    const BYTE *hi = (const BYTE *)"Hi";
+    const BYTE *abc = (const BYTE *)"abc";
+
+    TEST_BEGIN("dkcBase64 Test");
+
+    /* empty input */
+    result = dkcBase64Encode(enc_buf, sizeof(enc_buf), NULL, 0, &out_len);
+    TEST_ASSERT(result == edk_SUCCEEDED && out_len == 0, "Encode empty input");
+
+    /* "Hello" -> "SGVsbG8=" */
+    result = dkcBase64Encode(enc_buf, sizeof(enc_buf), hello, 5, &out_len);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encode Hello succeeded");
+    TEST_ASSERT(strcmp(enc_buf, "SGVsbG8=") == 0, "Encode Hello = SGVsbG8=");
+    TEST_ASSERT(out_len == 8, "Encode Hello length is 8");
+
+    /* "Hi" -> "SGk=" (padding 2) */
+    result = dkcBase64Encode(enc_buf, sizeof(enc_buf), hi, 2, &out_len);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encode Hi succeeded");
+    TEST_ASSERT(strcmp(enc_buf, "SGk=") == 0, "Encode Hi = SGk=");
+
+    /* "abc" -> "YWJj" (no padding) */
+    result = dkcBase64Encode(enc_buf, sizeof(enc_buf), abc, 3, &out_len);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encode abc succeeded");
+    TEST_ASSERT(strcmp(enc_buf, "YWJj") == 0, "Encode abc = YWJj");
+
+    /* Decode "SGVsbG8=" -> "Hello" */
+    memset(dec_buf, 0, sizeof(dec_buf));
+    result = dkcBase64Decode(dec_buf, sizeof(dec_buf), "SGVsbG8=", 8, &out_len);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decode SGVsbG8= succeeded");
+    TEST_ASSERT(out_len == 5, "Decode length is 5");
+    TEST_ASSERT(memcmp(dec_buf, "Hello", 5) == 0, "Decode result is Hello");
+
+    /* Roundtrip: encode -> decode -> compare */
+    {
+        const BYTE test_data[] = {0x00, 0x01, 0x02, 0xFF, 0xFE, 0x80, 0x7F};
+        BYTE rt_dec[16];
+        size_t enc_len;
+        size_t dec_len;
+
+        dkcBase64Encode(enc_buf, sizeof(enc_buf), test_data, sizeof(test_data), &enc_len);
+        dkcBase64Decode(rt_dec, sizeof(rt_dec), enc_buf, enc_len, &dec_len);
+        TEST_ASSERT(dec_len == sizeof(test_data), "Roundtrip: decoded size matches");
+        TEST_ASSERT(memcmp(rt_dec, test_data, sizeof(test_data)) == 0, "Roundtrip: data matches");
+    }
+
+    /* Buffer overflow */
+    result = dkcBase64Encode(enc_buf, 1, hello, 5, &out_len);
+    TEST_ASSERT(result == edk_BufferOverFlow, "Encode buffer overflow detected");
+
+    result = dkcBase64Decode(dec_buf, 1, "SGVsbG8=", 8, &out_len);
+    TEST_ASSERT(result == edk_BufferOverFlow, "Decode buffer overflow detected");
+
+    TEST_END();
+}
+
+/* ========================================
  * MAIN
  * ======================================== */
 
@@ -2534,6 +2816,7 @@ int main(int argc, char *argv[])
     Test_HashMultiSet();
     Test_HashMultiMap();
     Test_SingleList();
+    Test_DoubleList();
     Test_MemoryStream();
     Test_CircularMemoryStream();
     Test_Buffer();
@@ -2543,6 +2826,7 @@ int main(int argc, char *argv[])
     Test_BTree();
     Test_2Tree();
     Test_RedBlackTree();
+    Test_NaryTree();
 
     /* Hash/Digest Tests */
     Test_CRC();
@@ -2578,6 +2862,9 @@ int main(int argc, char *argv[])
 
     /* Cipher Tests (additional) */
     Test_Vernam();
+
+    /* Base64 Test */
+    Test_Base64();
 
     /* Regex Tests */
     Test_Regex();
