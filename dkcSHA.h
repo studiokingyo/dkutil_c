@@ -12,6 +12,11 @@ INCLUDE SHA ALGORITHM ALL
 #include "dkcSHA256.h"
 #include "dkcSHA384.h"
 #include "dkcSHA512.h"
+#include "dkcSHA3.h"
+#include "dkcBLAKE256.h"
+#include "dkcBLAKE512.h"
+#include "dkcBLAKE2.h"
+#include "dkcBLAKE3.h"
 
 /*
 #include "dkcSHA1.h"

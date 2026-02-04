@@ -1,9 +1,9 @@
 /*!
 @file dkcSort.h
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @since 2004/04/28
 @note
-sortŒn‚Ì‚à‚Ì‚½‚­‚³‚ñB
+sortï¿½nï¿½Ì‚ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 @brief sort utility... qsort() like
 */
 
@@ -17,51 +17,75 @@ typedef DKC_COMPARE_TYPE DKC_SORT_COMPARE_TYPE;
 //typedef int (WINAPIV *DKC_SORT_COMPARE_TYPE)(const void *elem1, const void *elem2);
 
 /*!
-‚¢‚í‚¢‚éƒVƒFƒ‹ƒ\[ƒg‚ð‚·‚éB
+ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½Vï¿½Fï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcShellSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
 /*!
-‚¢‚í‚¢‚éƒRƒ€ƒ\[ƒg‚ð‚·‚éB
+ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcCombSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
 /*!
-‚¢‚í‚ä‚éƒoƒuƒ‹ƒ\[ƒg‚ð‚·‚éB
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½uï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcBubbleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
 /*!
-‚¢‚í‚¢‚éƒoƒCƒgƒjƒbƒNƒ\[ƒg‚ð‚·‚éB
-@todo ŽÀ‘•‚Å‚«‚È‚¢‚©‚à‚µ‚ê‚È‚¢B
+ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½oï¿½Cï¿½gï¿½jï¿½bï¿½Nï¿½\ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+@todo ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcBitonicSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
 /*!
-‚¢‚í‚¢‚éƒNƒCƒbƒNƒ\[ƒg‚ð‚·‚éB(qsort‚ðŽg‚¢‚Ü‚µ‚å‚¤OOG
-@todo qsort‚Ìƒ‰ƒbƒp[‚ÉI‚í‚é‚©‚à‚µ‚ê‚È‚¢B
+ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½Nï¿½Cï¿½bï¿½Nï¿½\ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B(qsortï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ü‚ï¿½ï¿½å‚¤ï¿½Oï¿½Oï¿½G
+@todo qsortï¿½Ìƒï¿½ï¿½bï¿½pï¿½[ï¿½ÉIï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcQuickSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 /*!
-‚¢‚í‚¢‚éƒ}ƒ‹ƒ`ƒp[ƒe[ƒVƒ‡ƒ“ƒ\[ƒgi‘½d•ªŠ„ƒ\[ƒgj
+ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½}ï¿½ï¿½ï¿½`ï¿½pï¿½[ï¿½eï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½dï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½j
 @author http://www.tokuyama.ac.jp/home/~kawamura/
-@todo ŽÀ‘•‚Å‚«‚È‚¢‚©‚à‚µ‚ê‚È‚¢B
+@todo ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcMultiPartitionSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
+DKC_EXTERN void WINAPI dkcInsertionSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
+DKC_EXTERN void WINAPI dkcSelectionSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcMergeSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcHeapSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcCocktailSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcGnomeSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcOddEvenSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcPancakeSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcCycleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcIntroSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN void WINAPI dkcTimSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+DKC_EXTERN int WINAPI dkcRadixSortInt(size_t num, int *data);
+
+DKC_EXTERN int WINAPI dkcRadixSortUInt(size_t num, unsigned int *data);
 
 
 /*!
 Distribution count sort
-•ª•z”‚¦ƒ\[ƒgB‘å—Ê‚Ì‹L‰¯—Ìˆæ‚ðŽg‚¤‚ªO(n)‚Å‹É‘¬I
-‚µ‚©‚µA‰¼‘z‹L‰¯ã‚Å‚Í‚Ù‚ÚˆÓ–¡–³‚µ‚©IH
+ï¿½ï¿½ï¿½zï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½[ï¿½gï¿½Bï¿½ï¿½Ê‚Ì‹Lï¿½ï¿½ï¿½Ìˆï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½O(n)ï¿½Å‹É‘ï¿½ï¿½I
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½zï¿½Lï¿½ï¿½ï¿½ï¿½Å‚Í‚Ù‚ÚˆÓ–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½H
 @note
-- dkcDistCountSortShort()‚âdkcDistCountSortChar()‚Í’x‚¢‚ÆŽv‚¢‚Ü‚·B
-- Min_ ‚Æ Max_ ‚Ì·‚ª‘å‚«‚¢‚Ù‚Ç@ƒƒ‚ƒŠ‚ðŽg‚¢‚Ü‚·B sizeof(type) * (abs(Max_) + abs(Min_) + 1 )ƒoƒCƒg‚Ù‚ÇŽg‚¢‚Ü‚·BÚ‚µ‚­‚Íƒ\[ƒX‚ðŒ©‚Ä‚­‚¾‚³‚¢B
+- dkcDistCountSortShort()ï¿½ï¿½dkcDistCountSortChar()ï¿½Í’xï¿½ï¿½ï¿½ÆŽvï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
+- Min_ ï¿½ï¿½ Max_ ï¿½Ìï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Ù‚Ç@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B sizeof(type) * (abs(Max_) + abs(Min_) + 1 )ï¿½oï¿½Cï¿½gï¿½Ù‚ÇŽgï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½Ú‚ï¿½ï¿½ï¿½ï¿½Íƒ\ï¿½[ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 
-<s>‚O`USHRT_MAX‚Ü‚Å‚Ì’l‚µ‚©Žg‚¦‚Ü‚¹‚ñBR(`„DL)É³Ü§Ý</s>
-@return edk_SUCCEEDED‚Å¬Œ÷
+<s>ï¿½Oï¿½`USHRT_MAXï¿½Ü‚Å‚Ì’lï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Bï¿½R(`ï¿½Dï¿½L)É³Ü§ï¿½</s>
+@return edk_SUCCEEDEDï¿½Åï¿½ï¿½ï¿½
 */
 //DKC_EXTERN void WINAPI dkcDistCountSort(USHORT *input_,USHORT *output_,size_t size);
 

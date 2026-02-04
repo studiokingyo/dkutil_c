@@ -557,6 +557,237 @@ void Test_HashMap(void)
 }
 
 /*
+ * Test: dkcHashMultiSet.c
+ */
+static int WINAPIV test_hmset_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return va - vb;
+}
+
+void Test_HashMultiSet(void)
+{
+    DKC_HASHMULTISET *hms;
+    int key;
+    int i;
+    size_t removed;
+
+    TEST_BEGIN("dkcHashMultiSet Test");
+
+    hms = dkcAllocHashMultiSet(sizeof(int), 0, NULL, test_hmset_int_compare);
+    TEST_ASSERT(hms != NULL, "dkcAllocHashMultiSet");
+    TEST_ASSERT(dkcHashMultiSetIsEmpty(hms) == TRUE, "New multi-set is empty");
+
+    /* Insert duplicates allowed */
+    key = 10;
+    TEST_ASSERT(dkcHashMultiSetInsert(hms, &key) == edk_SUCCEEDED, "Insert 10 first");
+    TEST_ASSERT(dkcHashMultiSetInsert(hms, &key) == edk_SUCCEEDED, "Insert 10 second (dup ok)");
+    TEST_ASSERT(dkcHashMultiSetInsert(hms, &key) == edk_SUCCEEDED, "Insert 10 third (dup ok)");
+    TEST_ASSERT(dkcHashMultiSetSize(hms) == 3, "Size is 3 after 3 inserts of same key");
+
+    /* Count */
+    TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 3, "Count(10) is 3");
+    key = 99;
+    TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 0, "Count(99) is 0");
+
+    /* Contains */
+    key = 10;
+    TEST_ASSERT(dkcHashMultiSetContains(hms, &key) == TRUE, "Contains 10");
+    key = 99;
+    TEST_ASSERT(dkcHashMultiSetContains(hms, &key) == FALSE, "Does not contain 99");
+
+    /* Erase one */
+    key = 10;
+    TEST_ASSERT(dkcHashMultiSetErase(hms, &key) == edk_SUCCEEDED, "Erase one 10");
+    TEST_ASSERT(dkcHashMultiSetSize(hms) == 2, "Size is 2 after erase one");
+    TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 2, "Count(10) is 2");
+
+    /* EraseAll */
+    removed = dkcHashMultiSetEraseAll(hms, &key);
+    TEST_ASSERT(removed == 2, "EraseAll(10) removed 2");
+    TEST_ASSERT(dkcHashMultiSetSize(hms) == 0, "Size is 0 after EraseAll");
+    TEST_ASSERT(dkcHashMultiSetContains(hms, &key) == FALSE, "10 gone after EraseAll");
+
+    /* EraseAll on non-existent */
+    key = 999;
+    removed = dkcHashMultiSetEraseAll(hms, &key);
+    TEST_ASSERT(removed == 0, "EraseAll non-existent returns 0");
+
+    /* Mixed keys with duplicates */
+    key = 1; dkcHashMultiSetInsert(hms, &key);
+    key = 2; dkcHashMultiSetInsert(hms, &key);
+    key = 2; dkcHashMultiSetInsert(hms, &key);
+    key = 3; dkcHashMultiSetInsert(hms, &key);
+    key = 3; dkcHashMultiSetInsert(hms, &key);
+    key = 3; dkcHashMultiSetInsert(hms, &key);
+    TEST_ASSERT(dkcHashMultiSetSize(hms) == 6, "Size is 6 (1+2+3)");
+    key = 1; TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 1, "Count(1)=1");
+    key = 2; TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 2, "Count(2)=2");
+    key = 3; TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 3, "Count(3)=3");
+
+    /* Mass insert to trigger rehash */
+    dkcHashMultiSetClear(hms);
+    {
+        size_t initial_buckets = dkcHashMultiSetBucketCount(hms);
+        for(i = 0; i < 50; i++){
+            key = i % 10;
+            dkcHashMultiSetInsert(hms, &key);
+        }
+        TEST_ASSERT(dkcHashMultiSetSize(hms) == 50, "50 elements after mass insert");
+        TEST_ASSERT(dkcHashMultiSetBucketCount(hms) > initial_buckets, "Rehash occurred");
+        key = 0;
+        TEST_ASSERT(dkcHashMultiSetCount(hms, &key) == 5, "Count(0)=5 after mass insert");
+    }
+
+    /* Clear */
+    dkcHashMultiSetClear(hms);
+    TEST_ASSERT(dkcHashMultiSetSize(hms) == 0, "Size 0 after clear");
+    TEST_ASSERT(dkcHashMultiSetIsEmpty(hms) == TRUE, "Empty after clear");
+
+    dkcFreeHashMultiSet(&hms);
+    TEST_ASSERT(hms == NULL, "Free multi-set");
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcHashMultiMap.c
+ */
+static int WINAPIV test_hmmap_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return va - vb;
+}
+
+static BOOL WINAPI test_hmmap_collect_callback(
+    const void *key, void *data, size_t data_size, void *user)
+{
+    int *sum = (int *)user;
+    (void)key;
+    (void)data_size;
+    if(data != NULL){
+        *sum += *(int *)data;
+    }
+    return TRUE;
+}
+
+void Test_HashMultiMap(void)
+{
+    DKC_HASHMULTIMAP *hmm;
+    int key;
+    int val;
+    int read_val;
+    int result;
+    size_t removed;
+    void *found;
+    size_t found_size;
+    int sum;
+    int i;
+
+    TEST_BEGIN("dkcHashMultiMap Test");
+
+    hmm = dkcAllocHashMultiMap(sizeof(int), 0, NULL, test_hmmap_int_compare);
+    TEST_ASSERT(hmm != NULL, "dkcAllocHashMultiMap");
+    TEST_ASSERT(dkcHashMultiMapIsEmpty(hmm) == TRUE, "New multi-map is empty");
+
+    /* Insert duplicates allowed */
+    key = 1; val = 100;
+    TEST_ASSERT(dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int)) == edk_SUCCEEDED,
+        "Insert key=1 val=100");
+    key = 1; val = 200;
+    TEST_ASSERT(dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int)) == edk_SUCCEEDED,
+        "Insert key=1 val=200 (dup ok)");
+    key = 1; val = 300;
+    TEST_ASSERT(dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int)) == edk_SUCCEEDED,
+        "Insert key=1 val=300 (dup ok)");
+    TEST_ASSERT(dkcHashMultiMapSize(hmm) == 3, "Size is 3");
+
+    /* Count */
+    key = 1;
+    TEST_ASSERT(dkcHashMultiMapCount(hmm, &key) == 3, "Count(1) is 3");
+    key = 99;
+    TEST_ASSERT(dkcHashMultiMapCount(hmm, &key) == 0, "Count(99) is 0");
+
+    /* Contains */
+    key = 1;
+    TEST_ASSERT(dkcHashMultiMapContains(hmm, &key) == TRUE, "Contains key=1");
+
+    /* Find (returns first match) */
+    key = 1;
+    found = dkcHashMultiMapFind(hmm, &key, &found_size);
+    TEST_ASSERT(found != NULL, "Find key=1 non-NULL");
+    TEST_ASSERT(found_size == sizeof(int), "Find returns correct size");
+
+    /* GetBuffer (returns first match) */
+    key = 1; read_val = 0;
+    result = dkcHashMultiMapGetBuffer(hmm, &key, &read_val, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "GetBuffer key=1 succeeds");
+
+    /* Erase one */
+    key = 1;
+    TEST_ASSERT(dkcHashMultiMapErase(hmm, &key) == edk_SUCCEEDED, "Erase one key=1");
+    TEST_ASSERT(dkcHashMultiMapSize(hmm) == 2, "Size is 2 after erase one");
+    TEST_ASSERT(dkcHashMultiMapCount(hmm, &key) == 2, "Count(1) is 2");
+
+    /* EraseAll */
+    removed = dkcHashMultiMapEraseAll(hmm, &key);
+    TEST_ASSERT(removed == 2, "EraseAll(1) removed 2");
+    TEST_ASSERT(dkcHashMultiMapSize(hmm) == 0, "Size 0 after EraseAll");
+
+    /* Foreach with mixed keys */
+    key = 10; val = 1;
+    dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int));
+    key = 10; val = 2;
+    dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int));
+    key = 20; val = 10;
+    dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int));
+    /* sum = 1 + 2 + 10 = 13 */
+    sum = 0;
+    dkcHashMultiMapForeach(hmm, test_hmmap_collect_callback, &sum);
+    TEST_ASSERT(sum == 13, "Foreach sum is 13");
+
+    /* Mass insert to trigger rehash */
+    dkcHashMultiMapClear(hmm);
+    {
+        size_t initial_buckets = dkcHashMultiMapBucketCount(hmm);
+        int all_ok = 1;
+        for(i = 0; i < 50; i++){
+            key = i % 10;
+            val = i;
+            dkcHashMultiMapInsert(hmm, &key, &val, sizeof(int));
+        }
+        TEST_ASSERT(dkcHashMultiMapSize(hmm) == 50, "50 entries after mass insert");
+        TEST_ASSERT(dkcHashMultiMapBucketCount(hmm) > initial_buckets, "Rehash occurred");
+        key = 0;
+        TEST_ASSERT(dkcHashMultiMapCount(hmm, &key) == 5, "Count(0)=5");
+
+        /* verify EraseAll works after rehash */
+        removed = dkcHashMultiMapEraseAll(hmm, &key);
+        TEST_ASSERT(removed == 5, "EraseAll(0) removed 5 after rehash");
+        TEST_ASSERT(dkcHashMultiMapSize(hmm) == 45, "45 entries remain");
+    }
+
+    /* Clear */
+    dkcHashMultiMapClear(hmm);
+    TEST_ASSERT(dkcHashMultiMapIsEmpty(hmm) == TRUE, "Empty after clear");
+
+    /* Error handling */
+    TEST_ASSERT(dkcHashMultiMapInsert(NULL, &key, &val, sizeof(int)) == edk_FAILED,
+        "Insert NULL ptr fails");
+    TEST_ASSERT(dkcAllocHashMultiMap(0, 0, NULL, test_hmmap_int_compare) == NULL,
+        "Alloc key_size=0 fails");
+    TEST_ASSERT(dkcAllocHashMultiMap(sizeof(int), 0, NULL, NULL) == NULL,
+        "Alloc NULL compare fails");
+
+    dkcFreeHashMultiMap(&hmm);
+    TEST_ASSERT(hmm == NULL, "Free multi-map");
+
+    TEST_END();
+}
+
+/*
  * Test: dkcSingleList.c
  */
 void Test_SingleList(void)
@@ -938,6 +1169,308 @@ void Test_HMAC(void)
     TEST_ASSERT(strcmp(digest, "b617318655057264e28bc0b6fb378c8ef146be00") == 0,
                 "HMAC-SHA1 test vector");
     dkcFreeHMAC(&hmac);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcSHA3.c (SHA3-224/256/384/512)
+ */
+void Test_SHA3(void)
+{
+    DKC_SHA3_256 *sha3_256;
+    DKC_SHA3_512 *sha3_512;
+    DKC_SHA3_224 *sha3_224;
+    DKC_SECURE_HASH_OBJECT *sho;
+    char digest256[SHA3_256_STR_BUFFER_SIZE];
+    char digest512[SHA3_512_STR_BUFFER_SIZE];
+    char digest224[SHA3_224_STR_BUFFER_SIZE];
+    char sho_digest[SHA3_256_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("dkcSHA3 Test");
+
+    /* SHA3-256("abc") - NIST FIPS 202 test vector */
+    sha3_256 = dkcAllocSHA3_256();
+    TEST_ASSERT(sha3_256 != NULL, "dkcAllocSHA3_256");
+    dkcSHA3_256Load(sha3_256, (const BYTE*)"abc", 3);
+    dkcSHA3_256FinalDigestStr(sha3_256, digest256, sizeof(digest256));
+    TEST_ASSERT(strcmp(digest256, "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532") == 0,
+                "SHA3-256('abc') correct");
+    dkcFreeSHA3_256(&sha3_256);
+    TEST_ASSERT(sha3_256 == NULL, "Free SHA3-256 sets NULL");
+
+    /* SHA3-512("abc") - NIST FIPS 202 test vector */
+    sha3_512 = dkcAllocSHA3_512();
+    TEST_ASSERT(sha3_512 != NULL, "dkcAllocSHA3_512");
+    dkcSHA3_512Load(sha3_512, (const BYTE*)"abc", 3);
+    dkcSHA3_512FinalDigestStr(sha3_512, digest512, sizeof(digest512));
+    TEST_ASSERT(strcmp(digest512, "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0") == 0,
+                "SHA3-512('abc') correct");
+    dkcFreeSHA3_512(&sha3_512);
+
+    /* SHA3-224("abc") - NIST FIPS 202 test vector */
+    sha3_224 = dkcAllocSHA3_224();
+    TEST_ASSERT(sha3_224 != NULL, "dkcAllocSHA3_224");
+    dkcSHA3_224Load(sha3_224, (const BYTE*)"abc", 3);
+    dkcSHA3_224FinalDigestStr(sha3_224, digest224, sizeof(digest224));
+    TEST_ASSERT(strcmp(digest224, "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf") == 0,
+                "SHA3-224('abc') correct");
+    dkcFreeSHA3_224(&sha3_224);
+
+    /* SHA3-256 via SHO interface */
+    sho = dkcAllocSHO(edkcSH_SHA3_256);
+    TEST_ASSERT(sho != NULL, "dkcAllocSHO(SHA3-256)");
+    dkcSHOInit(sho);
+    dkcSHOLoad(sho, (const BYTE*)"abc", 3);
+    dkcSHOFinal(sho);
+    dkcSHODigestStr(sho, sho_digest, sizeof(sho_digest));
+    TEST_ASSERT(strcmp(sho_digest, "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532") == 0,
+                "SHA3-256 via SHO correct");
+    dkcFreeSHO(&sho);
+
+    /* SHA3-256 empty string */
+    sha3_256 = dkcAllocSHA3_256();
+    dkcSHA3_256Load(sha3_256, (const BYTE*)"", 0);
+    dkcSHA3_256FinalDigestStr(sha3_256, digest256, sizeof(digest256));
+    TEST_ASSERT(strcmp(digest256, "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a") == 0,
+                "SHA3-256('') correct");
+    dkcFreeSHA3_256(&sha3_256);
+
+    /* SHA3-256 split input (multiple Load calls) */
+    sha3_256 = dkcAllocSHA3_256();
+    dkcSHA3_256Load(sha3_256, (const BYTE*)"a", 1);
+    dkcSHA3_256Load(sha3_256, (const BYTE*)"b", 1);
+    dkcSHA3_256Load(sha3_256, (const BYTE*)"c", 1);
+    dkcSHA3_256FinalDigestStr(sha3_256, digest256, sizeof(digest256));
+    TEST_ASSERT(strcmp(digest256, "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532") == 0,
+                "SHA3-256 split input matches");
+    dkcFreeSHA3_256(&sha3_256);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcBLAKE256.c (BLAKE-256 / BLAKE-224)
+ */
+void Test_BLAKE256(void)
+{
+    DKC_BLAKE256 *b256;
+    DKC_BLAKE224 *b224;
+    char digest[BLAKE256_STR_BUFFER_SIZE];
+    char digest224[BLAKE224_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("dkcBLAKE256 Test");
+
+    /* BLAKE-256("") */
+    b256 = dkcAllocBLAKE256();
+    TEST_ASSERT(b256 != NULL, "dkcAllocBLAKE256");
+    dkcBLAKE256Load(b256, (const BYTE*)"", 0);
+    dkcBLAKE256FinalDigestStr(b256, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "716f6e863f744b9ac22c97ec7b76ea5f5908bc5b2f67c61510bfc4751384ea7a") == 0,
+                "BLAKE-256('') correct");
+    dkcFreeBLAKE256(&b256);
+
+    /* BLAKE-256("abc") */
+    b256 = dkcAllocBLAKE256();
+    dkcBLAKE256Load(b256, (const BYTE*)"abc", 3);
+    dkcBLAKE256FinalDigestStr(b256, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "1833a9fa7cf4086bd5fda73da32e5a1d75b4c3f89d5c436369f9d78bb2da5c28") == 0,
+                "BLAKE-256('abc') correct");
+    dkcFreeBLAKE256(&b256);
+
+    /* BLAKE-256 split input */
+    b256 = dkcAllocBLAKE256();
+    dkcBLAKE256Load(b256, (const BYTE*)"a", 1);
+    dkcBLAKE256Load(b256, (const BYTE*)"b", 1);
+    dkcBLAKE256Load(b256, (const BYTE*)"c", 1);
+    dkcBLAKE256FinalDigestStr(b256, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "1833a9fa7cf4086bd5fda73da32e5a1d75b4c3f89d5c436369f9d78bb2da5c28") == 0,
+                "BLAKE-256 split input matches");
+    dkcFreeBLAKE256(&b256);
+
+    /* BLAKE-224("") */
+    b224 = dkcAllocBLAKE224();
+    TEST_ASSERT(b224 != NULL, "dkcAllocBLAKE224");
+    dkcBLAKE224Load(b224, (const BYTE*)"", 0);
+    dkcBLAKE224FinalDigestStr(b224, digest224, sizeof(digest224));
+    TEST_ASSERT(strlen(digest224) == 56, "BLAKE-224 digest is 56 hex chars");
+    dkcFreeBLAKE224(&b224);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcBLAKE512.c (BLAKE-512 / BLAKE-384)
+ */
+void Test_BLAKE512(void)
+{
+    DKC_BLAKE512 *b512;
+    DKC_BLAKE384 *b384;
+    char digest[BLAKE512_STR_BUFFER_SIZE];
+    char digest384[BLAKE384_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("dkcBLAKE512 Test");
+
+    /* BLAKE-512("") - verify prefix */
+    b512 = dkcAllocBLAKE512();
+    TEST_ASSERT(b512 != NULL, "dkcAllocBLAKE512");
+    dkcBLAKE512Load(b512, (const BYTE*)"", 0);
+    dkcBLAKE512FinalDigestStr(b512, digest, sizeof(digest));
+    TEST_ASSERT(strncmp(digest, "a8cfbbd73726062d", 16) == 0,
+                "BLAKE-512('') prefix correct");
+    TEST_ASSERT(strlen(digest) == 128, "BLAKE-512 digest is 128 hex chars");
+    dkcFreeBLAKE512(&b512);
+
+    /* BLAKE-384("") */
+    b384 = dkcAllocBLAKE384();
+    TEST_ASSERT(b384 != NULL, "dkcAllocBLAKE384");
+    dkcBLAKE384Load(b384, (const BYTE*)"", 0);
+    dkcBLAKE384FinalDigestStr(b384, digest384, sizeof(digest384));
+    TEST_ASSERT(strlen(digest384) == 96, "BLAKE-384 digest is 96 hex chars");
+    dkcFreeBLAKE384(&b384);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcBLAKE2.c (BLAKE2b / BLAKE2s)
+ */
+void Test_BLAKE2(void)
+{
+    DKC_BLAKE2B *b2b;
+    DKC_BLAKE2S *b2s;
+    char digest_b[BLAKE2B_STR_BUFFER_SIZE];
+    char digest_s[BLAKE2S_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("dkcBLAKE2 Test");
+
+    /* BLAKE2b-512("") */
+    b2b = dkcAllocBLAKE2b();
+    TEST_ASSERT(b2b != NULL, "dkcAllocBLAKE2b");
+    dkcBLAKE2bLoad(b2b, (const BYTE*)"", 0);
+    dkcBLAKE2bFinalDigestStr(b2b, digest_b, sizeof(digest_b));
+    TEST_ASSERT(strcmp(digest_b, "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce") == 0,
+                "BLAKE2b-512('') correct");
+    dkcFreeBLAKE2b(&b2b);
+
+    /* BLAKE2b-512("abc") - verify non-empty */
+    b2b = dkcAllocBLAKE2b();
+    dkcBLAKE2bLoad(b2b, (const BYTE*)"abc", 3);
+    dkcBLAKE2bFinalDigestStr(b2b, digest_b, sizeof(digest_b));
+    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6886a7e7907d2e2e7104f9f7ee592e723f044eef62cef1ee0b29649e2b5e72c6816e8ef1e2") == 0,
+                "BLAKE2b-512('abc') correct");
+    dkcFreeBLAKE2b(&b2b);
+
+    /* BLAKE2s-256("") */
+    b2s = dkcAllocBLAKE2s();
+    TEST_ASSERT(b2s != NULL, "dkcAllocBLAKE2s");
+    dkcBLAKE2sLoad(b2s, (const BYTE*)"", 0);
+    dkcBLAKE2sFinalDigestStr(b2s, digest_s, sizeof(digest_s));
+    TEST_ASSERT(strcmp(digest_s, "69217a3079908094e11121d042354a7c1f55b6482ca1a51e1b250dfd1ed0eef9") == 0,
+                "BLAKE2s-256('') correct");
+    dkcFreeBLAKE2s(&b2s);
+
+    /* BLAKE2s-256("abc") */
+    b2s = dkcAllocBLAKE2s();
+    dkcBLAKE2sLoad(b2s, (const BYTE*)"abc", 3);
+    dkcBLAKE2sFinalDigestStr(b2s, digest_s, sizeof(digest_s));
+    TEST_ASSERT(strcmp(digest_s, "508c5e8c327c14e2e1a72ba34eeb452f37458b209ed63a294d999b4c86675982") == 0,
+                "BLAKE2s-256('abc') correct");
+    dkcFreeBLAKE2s(&b2s);
+
+    /* BLAKE2b split input */
+    b2b = dkcAllocBLAKE2b();
+    dkcBLAKE2bLoad(b2b, (const BYTE*)"a", 1);
+    dkcBLAKE2bLoad(b2b, (const BYTE*)"b", 1);
+    dkcBLAKE2bLoad(b2b, (const BYTE*)"c", 1);
+    dkcBLAKE2bFinalDigestStr(b2b, digest_b, sizeof(digest_b));
+    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6886a7e7907d2e2e7104f9f7ee592e723f044eef62cef1ee0b29649e2b5e72c6816e8ef1e2") == 0,
+                "BLAKE2b split input matches");
+    dkcFreeBLAKE2b(&b2b);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcBLAKE3.c
+ */
+void Test_BLAKE3(void)
+{
+    DKC_BLAKE3 *b3;
+    char digest[BLAKE3_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("dkcBLAKE3 Test");
+
+    /* BLAKE3("") */
+    b3 = dkcAllocBLAKE3();
+    TEST_ASSERT(b3 != NULL, "dkcAllocBLAKE3");
+    dkcBLAKE3Load(b3, (const BYTE*)"", 0);
+    dkcBLAKE3FinalDigestStr(b3, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262") == 0,
+                "BLAKE3('') correct");
+    dkcFreeBLAKE3(&b3);
+
+    /* BLAKE3 split input */
+    b3 = dkcAllocBLAKE3();
+    dkcBLAKE3Load(b3, (const BYTE*)"a", 1);
+    dkcBLAKE3Load(b3, (const BYTE*)"b", 1);
+    dkcBLAKE3Load(b3, (const BYTE*)"c", 1);
+    dkcBLAKE3Final(b3);
+    dkcBLAKE3DigestStr(b3, digest, sizeof(digest));
+    /* Just verify it produces a 64-char hex string */
+    TEST_ASSERT(strlen(digest) == 64, "BLAKE3('abc') produces 64 hex chars");
+    dkcFreeBLAKE3(&b3);
+
+    /* Free sets NULL */
+    b3 = dkcAllocBLAKE3();
+    dkcFreeBLAKE3(&b3);
+    TEST_ASSERT(b3 == NULL, "Free BLAKE3 sets NULL");
+
+    TEST_END();
+}
+
+/*
+ * Test: BLAKE SHO interface
+ */
+void Test_BLAKE_SHO(void)
+{
+    DKC_SECURE_HASH_OBJECT *sho;
+    char digest[BLAKE2B_STR_BUFFER_SIZE];
+
+    TEST_BEGIN("BLAKE SHO Interface Test");
+
+    /* BLAKE-256 via SHO */
+    sho = dkcAllocSHO(edkcSH_BLAKE256);
+    TEST_ASSERT(sho != NULL, "dkcAllocSHO(BLAKE256)");
+    dkcSHOInit(sho);
+    dkcSHOLoad(sho, (const BYTE*)"abc", 3);
+    dkcSHOFinal(sho);
+    dkcSHODigestStr(sho, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "1833a9fa7cf4086bd5fda73da32e5a1d75b4c3f89d5c436369f9d78bb2da5c28") == 0,
+                "BLAKE-256 via SHO correct");
+    dkcFreeSHO(&sho);
+
+    /* BLAKE2b via SHO */
+    sho = dkcAllocSHO(edkcSH_BLAKE2b);
+    TEST_ASSERT(sho != NULL, "dkcAllocSHO(BLAKE2b)");
+    dkcSHOInit(sho);
+    dkcSHOLoad(sho, (const BYTE*)"", 0);
+    dkcSHOFinal(sho);
+    dkcSHODigestStr(sho, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce") == 0,
+                "BLAKE2b via SHO correct");
+    dkcFreeSHO(&sho);
+
+    /* BLAKE3 via SHO */
+    sho = dkcAllocSHO(edkcSH_BLAKE3);
+    TEST_ASSERT(sho != NULL, "dkcAllocSHO(BLAKE3)");
+    dkcSHOInit(sho);
+    dkcSHOLoad(sho, (const BYTE*)"", 0);
+    dkcSHOFinal(sho);
+    dkcSHODigestStr(sho, digest, sizeof(digest));
+    TEST_ASSERT(strcmp(digest, "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262") == 0,
+                "BLAKE3 via SHO correct");
+    dkcFreeSHO(&sho);
 
     TEST_END();
 }
@@ -1676,6 +2209,82 @@ void Test_Camellia(void)
 }
 
 /*
+ * Test: dkcTwofish.c
+ */
+void Test_Twofish(void)
+{
+    DKC_TWOFISH *tf;
+    unsigned char key128[16] = {0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF,
+                                0xFE,0xDC,0xBA,0x98,0x76,0x54,0x32,0x10};
+    unsigned char key256[32] = {0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF,
+                                0xFE,0xDC,0xBA,0x98,0x76,0x54,0x32,0x10,
+                                0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
+                                0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF};
+    unsigned char plaintext[32];
+    unsigned char ciphertext[32];
+    unsigned char decrypted[32];
+    unsigned char inplace[32];
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcTwofish Test");
+
+    /* Fill plaintext with test data */
+    for (i = 0; i < 32; i++) {
+        plaintext[i] = (unsigned char)i;
+    }
+
+    /* --- 128-bit key test --- */
+    tf = dkcAllocTwofish(key128, 16);
+    TEST_ASSERT(tf != NULL, "dkcAllocTwofish (128-bit key)");
+
+    result = dkcTwofishEncrypt(tf, ciphertext, 16, plaintext, 16);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encrypt 128-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, ciphertext, 16) != 0, "Ciphertext differs from plaintext (128-bit)");
+
+    result = dkcTwofishDecrypt(tf, decrypted, 16, ciphertext, 16);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decrypt 128-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, decrypted, 16) == 0, "Decrypt matches original (128-bit)");
+
+    dkcFreeTwofish(&tf);
+    TEST_ASSERT(tf == NULL, "Free twofish (128-bit)");
+
+    /* --- 256-bit key test --- */
+    tf = dkcAllocTwofish(key256, 32);
+    TEST_ASSERT(tf != NULL, "dkcAllocTwofish (256-bit key)");
+
+    result = dkcTwofishEncrypt(tf, ciphertext, 32, plaintext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encrypt 256-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, ciphertext, 32) != 0, "Ciphertext differs from plaintext (256-bit)");
+
+    result = dkcTwofishDecrypt(tf, decrypted, 32, ciphertext, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decrypt 256-bit succeeds");
+    TEST_ASSERT(memcmp(plaintext, decrypted, 32) == 0, "Decrypt matches original (256-bit)");
+
+    /* In-place encrypt/decrypt (NoDest) */
+    memcpy(inplace, plaintext, 32);
+    dkcTwofishEncryptNoDest(tf, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, ciphertext, 32) == 0, "In-place encrypt matches (256-bit)");
+    dkcTwofishDecryptNoDest(tf, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, plaintext, 32) == 0, "In-place decrypt matches (256-bit)");
+
+    dkcFreeTwofish(&tf);
+
+    /* --- Invalid key size test --- */
+    tf = dkcAllocTwofish(key128, 15);
+    TEST_ASSERT(tf == NULL, "Invalid key size (15) returns NULL");
+
+    /* --- Size not multiple of 16 test --- */
+    tf = dkcAllocTwofish(key128, 16);
+    result = dkcTwofishEncrypt(tf, ciphertext, 32, plaintext, 17);
+    TEST_ASSERT(result == edk_ArgumentException, "Non-block-aligned size rejected");
+    dkcFreeTwofish(&tf);
+    TEST_ASSERT(tf == NULL, "Free sets pointer to NULL");
+
+    TEST_END();
+}
+
+/*
  * Test: dkcVernam.c
  */
 void Test_Vernam(void)
@@ -1759,7 +2368,27 @@ void Test_Sort(void)
     int arr1[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int arr2[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int arr3[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr4[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr5[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr6[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr7[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr8[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr9[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr10[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr11[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr12[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr13[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr14[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr15[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr16[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr17[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int sorted[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    /* RadixSort test data (with negative values) */
+    int rarr1[] = {5, -2, 8, -1, 9, 3, -7, 4, 6, 0};
+    int rsorted[] = {-7, -2, -1, 0, 3, 4, 5, 6, 8, 9};
+    unsigned int uarr1[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    unsigned int usorted[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     TEST_BEGIN("dkcSort Test");
 
@@ -1771,6 +2400,55 @@ void Test_Sort(void)
 
     dkcBubbleSort(arr3, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr3, sorted, sizeof(sorted)) == 0, "BubbleSort");
+
+    dkcInsertionSort(arr4, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr4, sorted, sizeof(sorted)) == 0, "InsertionSort");
+
+    dkcSelectionSort(arr5, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr5, sorted, sizeof(sorted)) == 0, "SelectionSort");
+
+    dkcMergeSort(arr6, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr6, sorted, sizeof(sorted)) == 0, "MergeSort");
+
+    dkcHeapSort(arr7, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr7, sorted, sizeof(sorted)) == 0, "HeapSort");
+
+    dkcCocktailSort(arr8, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr8, sorted, sizeof(sorted)) == 0, "CocktailSort");
+
+    dkcGnomeSort(arr9, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr9, sorted, sizeof(sorted)) == 0, "GnomeSort");
+
+    dkcOddEvenSort(arr10, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr10, sorted, sizeof(sorted)) == 0, "OddEvenSort");
+
+    dkcPancakeSort(arr11, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr11, sorted, sizeof(sorted)) == 0, "PancakeSort");
+
+    dkcCycleSort(arr12, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr12, sorted, sizeof(sorted)) == 0, "CycleSort");
+
+    dkcBitonicSort(arr13, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr13, sorted, sizeof(sorted)) == 0, "BitonicSort");
+
+    dkcMultiPartitionSort(arr14, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr14, sorted, sizeof(sorted)) == 0, "MultiPartitionSort");
+
+    dkcIntroSort(arr15, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr15, sorted, sizeof(sorted)) == 0, "IntroSort");
+
+    dkcTimSort(arr16, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr16, sorted, sizeof(sorted)) == 0, "TimSort");
+
+    dkcQuickSort(arr17, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr17, sorted, sizeof(sorted)) == 0, "QuickSort");
+
+    /* RadixSort tests */
+    TEST_ASSERT(dkcRadixSortInt(10, rarr1) == edk_SUCCEEDED, "RadixSortInt return");
+    TEST_ASSERT(memcmp(rarr1, rsorted, sizeof(rsorted)) == 0, "RadixSortInt");
+
+    TEST_ASSERT(dkcRadixSortUInt(10, uarr1) == edk_SUCCEEDED, "RadixSortUInt return");
+    TEST_ASSERT(memcmp(uarr1, usorted, sizeof(usorted)) == 0, "RadixSortUInt");
 
     TEST_END();
 }
@@ -1853,6 +2531,8 @@ int main(int argc, char *argv[])
     Test_Deque();
     Test_HashSet();
     Test_HashMap();
+    Test_HashMultiSet();
+    Test_HashMultiMap();
     Test_SingleList();
     Test_MemoryStream();
     Test_CircularMemoryStream();
@@ -1873,7 +2553,13 @@ int main(int argc, char *argv[])
     Test_SHA256();
     Test_SHA384();
     Test_SHA512();
+    Test_SHA3();
     Test_HMAC();
+    Test_BLAKE256();
+    Test_BLAKE512();
+    Test_BLAKE2();
+    Test_BLAKE3();
+    Test_BLAKE_SHO();
 
     /* Cipher Tests */
     Test_Arcfour();
@@ -1888,6 +2574,7 @@ int main(int argc, char *argv[])
     Test_RLE_PackBits();
 
     Test_Camellia();
+    Test_Twofish();
 
     /* Cipher Tests (additional) */
     Test_Vernam();

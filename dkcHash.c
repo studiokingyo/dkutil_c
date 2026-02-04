@@ -102,7 +102,140 @@ void WINAPI dkcSHO_SHA384Init(DKC_SECURE_HASH_OBJECT *p){
 }
 
 
-///‚±‚ê‚É‚æ‚éHMAC‚Ì¶¬‚ğ§—ã‚·‚éB
+void WINAPI dkcSHO_SHA3_224Init(DKC_SECURE_HASH_OBJECT *p){
+
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_224Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_224Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_224Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_224DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_224Digest;
+
+	p->digest_string_size = SHA3_224_STR_BUFFER_SIZE;
+	p->digest_binary_size = SHA3_224_BIN_BUFFER_SIZE;
+
+	p->mObj = dkcAllocSHA3_224();
+}
+
+void WINAPI dkcSHO_SHA3_256Init(DKC_SECURE_HASH_OBJECT *p){
+
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_256Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_256Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_256Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_256DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_256Digest;
+
+	p->digest_string_size = SHA3_256_STR_BUFFER_SIZE;
+	p->digest_binary_size = SHA3_256_BIN_BUFFER_SIZE;
+
+	p->mObj = dkcAllocSHA3_256();
+}
+
+void WINAPI dkcSHO_SHA3_384Init(DKC_SECURE_HASH_OBJECT *p){
+
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_384Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_384Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_384Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_384DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_384Digest;
+
+	p->digest_string_size = SHA3_384_STR_BUFFER_SIZE;
+	p->digest_binary_size = SHA3_384_BIN_BUFFER_SIZE;
+
+	p->mObj = dkcAllocSHA3_384();
+}
+
+void WINAPI dkcSHO_SHA3_512Init(DKC_SECURE_HASH_OBJECT *p){
+
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_512Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_512Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_512Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_512DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcSHA3_512Digest;
+
+	p->digest_string_size = SHA3_512_STR_BUFFER_SIZE;
+	p->digest_binary_size = SHA3_512_BIN_BUFFER_SIZE;
+
+	p->mObj = dkcAllocSHA3_512();
+}
+
+void WINAPI dkcSHO_BLAKE224Init(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224Digest;
+	p->digest_string_size = BLAKE224_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE224_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE224();
+}
+
+void WINAPI dkcSHO_BLAKE256Init(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256Digest;
+	p->digest_string_size = BLAKE256_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE256_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE256();
+}
+
+void WINAPI dkcSHO_BLAKE384Init(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384Digest;
+	p->digest_string_size = BLAKE384_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE384_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE384();
+}
+
+void WINAPI dkcSHO_BLAKE512Init(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512Digest;
+	p->digest_string_size = BLAKE512_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE512_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE512();
+}
+
+void WINAPI dkcSHO_BLAKE2sInit(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sInit;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sLoad;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sFinal;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sDigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sDigest;
+	p->digest_string_size = BLAKE2S_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE2S_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE2s();
+}
+
+void WINAPI dkcSHO_BLAKE2bInit(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bInit;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bLoad;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bFinal;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bDigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bDigest;
+	p->digest_string_size = BLAKE2B_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE2B_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE2b();
+}
+
+void WINAPI dkcSHO_BLAKE3Init(DKC_SECURE_HASH_OBJECT *p){
+	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3Init;
+	p->Load = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3Load;
+	p->Final = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3Final;
+	p->DigestStr = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3DigestStr;
+	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3Digest;
+	p->digest_string_size = BLAKE3_STR_BUFFER_SIZE;
+	p->digest_binary_size = BLAKE3_BIN_BUFFER_SIZE;
+	p->mObj = dkcAllocBLAKE3();
+}
+
+///ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½HMACï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã‚·ï¿½ï¿½B
 void WINAPI dkcSHO_SHA512Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA512Init;
@@ -161,18 +294,51 @@ DKC_SECURE_HASH_OBJECT *WINAPI dkcAllocSHO(UINT option)
 		case edkcSH_SHA512:
 			init_func = dkcSHO_SHA512Init;
 			break;
+		case edkcSH_SHA3_224:
+			init_func = dkcSHO_SHA3_224Init;
+			break;
+		case edkcSH_SHA3_256:
+			init_func = dkcSHO_SHA3_256Init;
+			break;
+		case edkcSH_SHA3_384:
+			init_func = dkcSHO_SHA3_384Init;
+			break;
+		case edkcSH_SHA3_512:
+			init_func = dkcSHO_SHA3_512Init;
+			break;
+		case edkcSH_BLAKE224:
+			init_func = dkcSHO_BLAKE224Init;
+			break;
+		case edkcSH_BLAKE256:
+			init_func = dkcSHO_BLAKE256Init;
+			break;
+		case edkcSH_BLAKE384:
+			init_func = dkcSHO_BLAKE384Init;
+			break;
+		case edkcSH_BLAKE512:
+			init_func = dkcSHO_BLAKE512Init;
+			break;
+		case edkcSH_BLAKE2s:
+			init_func = dkcSHO_BLAKE2sInit;
+			break;
+		case edkcSH_BLAKE2b:
+			init_func = dkcSHO_BLAKE2bInit;
+			break;
+		case edkcSH_BLAKE3:
+			init_func = dkcSHO_BLAKE3Init;
+			break;
 		default:
 			goto Error;
 		}
 	}
 
-	//ŠeƒnƒbƒVƒ…‚É‰‚¶‚½‰Šú‰»
+	//ï¿½eï¿½nï¿½bï¿½Vï¿½ï¿½ï¿½É‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	init_func(p);
 	if(NULL==p->mObj){
 		goto Error;
 	}
 	p->mOption = option;
-	//dkcAllocate()‚Ímemset(0)
+	//dkcAllocate()ï¿½ï¿½memset(0)
 	//p->mInited = 0;
 
 
@@ -216,6 +382,39 @@ int WINAPI dkcFreeSHO(DKC_SECURE_HASH_OBJECT **pp)
 		break;
 	case edkcSH_SHA512:
 		dkcFreeSHA512((DKC_SHA512 **)obj);
+		break;
+	case edkcSH_SHA3_224:
+		dkcFreeSHA3_224((DKC_SHA3_224 **)obj);
+		break;
+	case edkcSH_SHA3_256:
+		dkcFreeSHA3_256((DKC_SHA3_256 **)obj);
+		break;
+	case edkcSH_SHA3_384:
+		dkcFreeSHA3_384((DKC_SHA3_384 **)obj);
+		break;
+	case edkcSH_SHA3_512:
+		dkcFreeSHA3_512((DKC_SHA3_512 **)obj);
+		break;
+	case edkcSH_BLAKE224:
+		dkcFreeBLAKE224((DKC_BLAKE224 **)obj);
+		break;
+	case edkcSH_BLAKE256:
+		dkcFreeBLAKE256((DKC_BLAKE256 **)obj);
+		break;
+	case edkcSH_BLAKE384:
+		dkcFreeBLAKE384((DKC_BLAKE384 **)obj);
+		break;
+	case edkcSH_BLAKE512:
+		dkcFreeBLAKE512((DKC_BLAKE512 **)obj);
+		break;
+	case edkcSH_BLAKE2s:
+		dkcFreeBLAKE2s((DKC_BLAKE2S **)obj);
+		break;
+	case edkcSH_BLAKE2b:
+		dkcFreeBLAKE2b((DKC_BLAKE2B **)obj);
+		break;
+	case edkcSH_BLAKE3:
+		dkcFreeBLAKE3((DKC_BLAKE3 **)obj);
 		break;
 	//default:
 
@@ -307,7 +506,7 @@ int WINAPI dkcSecureHashCalculateBinaryDigest(
 	return shc(hash_option,digest_dest,destsize,data,data_size,TRUE);
 }
 
-///•¶š—ñ‚Ìo—Í‚ğ‚·‚é @see ‚»‚Ì‘¼ˆø”“™‚Í dkcSecureHashCalculateBinaryDigest()
+///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìoï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ @see ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ dkcSecureHashCalculateBinaryDigest()
 int WINAPI dkcSecureHashCalculateStringDigest(
 	UINT hash_option,char *digest_dest,size_t destsize,
 	const BYTE *data,size_t data_size

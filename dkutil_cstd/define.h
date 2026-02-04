@@ -345,6 +345,21 @@ enum edk_SecureHash{
 	edkcSH_SHA384,
 	edkcSH_SHA512,
 
+	edkcSH_SHA3_224 = 48,
+	edkcSH_SHA3_256,
+	edkcSH_SHA3_384,
+	edkcSH_SHA3_512,
+
+	edkcSH_BLAKE224 = 64,
+	edkcSH_BLAKE256,
+	edkcSH_BLAKE384,
+	edkcSH_BLAKE512,
+
+	edkcSH_BLAKE2s = 80,
+	edkcSH_BLAKE2b,
+
+	edkcSH_BLAKE3 = 96,
+
 	edkcSH_RIPEMD128 = 32,
 	edkcSH_RIPEMD160,
 	edkcSH_RIPEMD256,

@@ -61,6 +61,8 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcArrayOneByOne.h"
 #include "dkcHashSet.h"
 #include "dkcHashMap.h"
+#include "dkcHashMultiSet.h"
+#include "dkcHashMultiMap.h"
 
 /* generic interface */
 #include "dkcCircularStream.h"
