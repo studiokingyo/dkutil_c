@@ -4,7 +4,9 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(make:*)",
+      "Bash(where:*)"
     ]
   }
 }

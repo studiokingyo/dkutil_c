@@ -55,6 +55,7 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkc2Tree.h"
 #include "dkcBTree.h"
 #include "dkcRedBlackTree.h"
+#include "dkcAVLTree.h"
 #include "dkcMemoryStream.h"
 
 #include "dkcCircularMemoryStream.h"

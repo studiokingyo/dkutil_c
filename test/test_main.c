@@ -1651,6 +1651,88 @@ void Test_HC256(void)
     TEST_END();
 }
 
+/*
+ * Test: dkcKCipher2.c
+ */
+void Test_KCipher2(void)
+{
+    DKC_KCIPHER2 *kc;
+    unsigned char key[16];
+    unsigned char iv[16];
+    unsigned char plaintext[64];
+    unsigned char ciphertext[64];
+    unsigned char decrypted[64];
+    unsigned char inplace[64];
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcKCipher2 Test");
+
+    /* Initialize test data */
+    for (i = 0; i < 16; i++) {
+        key[i] = (unsigned char)(i + 0x10);
+        iv[i] = (unsigned char)(i + 0x20);
+    }
+    for (i = 0; i < 64; i++) {
+        plaintext[i] = (unsigned char)(i * 3);
+    }
+
+    /* Allocate context */
+    kc = dkcAllocKCipher2(key, 16, iv, 16);
+    TEST_ASSERT(kc != NULL, "dkcAllocKCipher2");
+
+    /* Encrypt */
+    result = dkcKCipher2Encrypt(kc, ciphertext, 64, plaintext, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KCipher2 encrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext, ciphertext, 64) != 0, "Ciphertext differs from plaintext");
+
+    dkcFreeKCipher2(&kc);
+    TEST_ASSERT(kc == NULL, "Free KCipher2");
+
+    /* Decrypt with fresh context (same key/iv) */
+    kc = dkcAllocKCipher2(key, 16, iv, 16);
+    TEST_ASSERT(kc != NULL, "Reallocate KCipher2 for decrypt");
+
+    result = dkcKCipher2Decrypt(kc, decrypted, 64, ciphertext, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KCipher2 decrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext, decrypted, 64) == 0, "Decrypt matches original");
+
+    dkcFreeKCipher2(&kc);
+
+    /* In-place encrypt/decrypt */
+    kc = dkcAllocKCipher2(key, 16, iv, 16);
+    memcpy(inplace, plaintext, 64);
+    result = dkcKCipher2EncryptNoDest(kc, inplace, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "In-place encrypt succeeds");
+    TEST_ASSERT(memcmp(inplace, ciphertext, 64) == 0, "In-place encrypt matches");
+    dkcFreeKCipher2(&kc);
+
+    kc = dkcAllocKCipher2(key, 16, iv, 16);
+    result = dkcKCipher2DecryptNoDest(kc, inplace, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "In-place decrypt succeeds");
+    TEST_ASSERT(memcmp(inplace, plaintext, 64) == 0, "In-place decrypt matches");
+    dkcFreeKCipher2(&kc);
+
+    /* Test Init function (re-initialize existing context) */
+    kc = dkcAllocKCipher2(key, 16, iv, 16);
+    result = dkcKCipher2Init(kc, key, 16, iv, 16);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KCipher2Init succeeds");
+
+    memcpy(inplace, plaintext, 64);
+    dkcKCipher2EncryptNoDest(kc, inplace, 64);
+    TEST_ASSERT(memcmp(inplace, ciphertext, 64) == 0, "Re-init produces same output");
+    dkcFreeKCipher2(&kc);
+
+    /* Error cases */
+    kc = dkcAllocKCipher2(key, 15, iv, 16);
+    TEST_ASSERT(kc == NULL, "Invalid key size returns NULL");
+
+    kc = dkcAllocKCipher2(key, 16, iv, 15);
+    TEST_ASSERT(kc == NULL, "Invalid IV size returns NULL");
+
+    TEST_END();
+}
+
 /* ========================================
  * TREE TESTS
  * ======================================== */
@@ -2285,6 +2367,135 @@ void Test_Twofish(void)
 }
 
 /*
+ * Test: dkcThreefish.c
+ */
+void Test_Threefish(void)
+{
+    DKC_THREEFISH256 *tf256;
+    DKC_THREEFISH512 *tf512;
+    DKC_THREEFISH *tf;
+    unsigned char key256[32];
+    unsigned char key512[64];
+    unsigned char tweak[16];
+    unsigned char plaintext256[32];
+    unsigned char plaintext512[64];
+    unsigned char ciphertext256[32];
+    unsigned char ciphertext512[64];
+    unsigned char decrypted256[32];
+    unsigned char decrypted512[64];
+    unsigned char inplace[64];
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcThreefish Test");
+
+    /* Initialize test data */
+    for (i = 0; i < 32; i++) {
+        key256[i] = (unsigned char)i;
+        plaintext256[i] = (unsigned char)(i * 3);
+    }
+    for (i = 0; i < 64; i++) {
+        key512[i] = (unsigned char)(i * 2);
+        plaintext512[i] = (unsigned char)(i * 5);
+    }
+    for (i = 0; i < 16; i++) {
+        tweak[i] = (unsigned char)(0xAA ^ i);
+    }
+
+    /* ===== Threefish-256 tests ===== */
+    tf256 = dkcAllocThreefish256(key256, 32, NULL);
+    TEST_ASSERT(tf256 != NULL, "dkcAllocThreefish256 (no tweak)");
+
+    result = dkcThreefish256Encrypt(tf256, ciphertext256, 32, plaintext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-256 encrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext256, ciphertext256, 32) != 0, "Threefish-256 ciphertext differs");
+
+    result = dkcThreefish256Decrypt(tf256, decrypted256, 32, ciphertext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-256 decrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext256, decrypted256, 32) == 0, "Threefish-256 decrypt matches original");
+
+    dkcFreeThreefish256(&tf256);
+    TEST_ASSERT(tf256 == NULL, "Free Threefish-256");
+
+    /* Threefish-256 with tweak */
+    tf256 = dkcAllocThreefish256(key256, 32, tweak);
+    TEST_ASSERT(tf256 != NULL, "dkcAllocThreefish256 (with tweak)");
+
+    result = dkcThreefish256Encrypt(tf256, ciphertext256, 32, plaintext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-256 encrypt with tweak succeeds");
+
+    result = dkcThreefish256Decrypt(tf256, decrypted256, 32, ciphertext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-256 decrypt with tweak succeeds");
+    TEST_ASSERT(memcmp(plaintext256, decrypted256, 32) == 0, "Threefish-256 tweak decrypt matches");
+
+    /* In-place test */
+    memcpy(inplace, plaintext256, 32);
+    dkcThreefish256EncryptNoDest(tf256, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, ciphertext256, 32) == 0, "Threefish-256 in-place encrypt");
+    dkcThreefish256DecryptNoDest(tf256, inplace, 32);
+    TEST_ASSERT(memcmp(inplace, plaintext256, 32) == 0, "Threefish-256 in-place decrypt");
+
+    /* SetTweak test */
+    result = dkcThreefish256SetTweak(tf256, tweak);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-256 SetTweak");
+
+    dkcFreeThreefish256(&tf256);
+
+    /* ===== Threefish-512 tests ===== */
+    tf512 = dkcAllocThreefish512(key512, 64, tweak);
+    TEST_ASSERT(tf512 != NULL, "dkcAllocThreefish512");
+
+    result = dkcThreefish512Encrypt(tf512, ciphertext512, 64, plaintext512, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-512 encrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext512, ciphertext512, 64) != 0, "Threefish-512 ciphertext differs");
+
+    result = dkcThreefish512Decrypt(tf512, decrypted512, 64, ciphertext512, 64);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Threefish-512 decrypt succeeds");
+    TEST_ASSERT(memcmp(plaintext512, decrypted512, 64) == 0, "Threefish-512 decrypt matches original");
+
+    /* In-place test */
+    memcpy(inplace, plaintext512, 64);
+    dkcThreefish512EncryptNoDest(tf512, inplace, 64);
+    TEST_ASSERT(memcmp(inplace, ciphertext512, 64) == 0, "Threefish-512 in-place encrypt");
+    dkcThreefish512DecryptNoDest(tf512, inplace, 64);
+    TEST_ASSERT(memcmp(inplace, plaintext512, 64) == 0, "Threefish-512 in-place decrypt");
+
+    dkcFreeThreefish512(&tf512);
+    TEST_ASSERT(tf512 == NULL, "Free Threefish-512");
+
+    /* ===== Generic Threefish API tests ===== */
+    tf = dkcAllocThreefish(edkcThreefish256, key256, 32, tweak);
+    TEST_ASSERT(tf != NULL, "dkcAllocThreefish (256)");
+    TEST_ASSERT(dkcThreefishGetBlockSize(tf) == 32, "GetBlockSize returns 32 for 256-bit");
+
+    result = dkcThreefishEncrypt(tf, ciphertext256, 32, plaintext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Generic Threefish-256 encrypt");
+
+    result = dkcThreefishDecrypt(tf, decrypted256, 32, ciphertext256, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Generic Threefish-256 decrypt");
+    TEST_ASSERT(memcmp(plaintext256, decrypted256, 32) == 0, "Generic Threefish-256 roundtrip");
+
+    dkcFreeThreefish(&tf);
+    TEST_ASSERT(tf == NULL, "Free generic Threefish");
+
+    tf = dkcAllocThreefish(edkcThreefish512, key512, 64, NULL);
+    TEST_ASSERT(tf != NULL, "dkcAllocThreefish (512)");
+    TEST_ASSERT(dkcThreefishGetBlockSize(tf) == 64, "GetBlockSize returns 64 for 512-bit");
+    dkcFreeThreefish(&tf);
+
+    /* ===== Error case tests ===== */
+    tf256 = dkcAllocThreefish256(key256, 31, NULL);
+    TEST_ASSERT(tf256 == NULL, "Invalid key size (31) returns NULL");
+
+    tf256 = dkcAllocThreefish256(key256, 32, NULL);
+    result = dkcThreefish256Encrypt(tf256, ciphertext256, 32, plaintext256, 17);
+    TEST_ASSERT(result == edk_FAILED, "Non-block-aligned size rejected");
+    dkcFreeThreefish256(&tf256);
+
+    TEST_END();
+}
+
+/*
  * Test: dkcVernam.c
  */
 void Test_Vernam(void)
@@ -2622,6 +2833,182 @@ static BOOL WINAPI test_nary_preorder_callback(DKC_NARYTREE_NODE *node, void *us
 }
 
 /*
+ * Compare function for AVL Tree int keys
+ */
+static int WINAPIV compare_avltree_int(const void *a, const void *b)
+{
+    int ia = *(const int *)a;
+    int ib = *(const int *)b;
+    if (ia < ib) return -1;
+    if (ia > ib) return 1;
+    return 0;
+}
+
+/*
+ * Callback for AVL Tree foreach
+ */
+static BOOL WINAPI avltree_foreach_callback(const void *key, void *data, size_t data_size, void *user)
+{
+    int *counter = (int *)user;
+    (void)key;
+    (void)data;
+    (void)data_size;
+    (*counter)++;
+    return TRUE;
+}
+
+/*
+ * Test: dkcAVLTree.c
+ */
+void Test_AVLTree(void)
+{
+    DKC_AVLTREE_ROOT *tree;
+    DKC_AVLTREE_NODE *node;
+    DKC_AVLTREE_NODE *min_node;
+    DKC_AVLTREE_NODE *max_node;
+    int keys[10];
+    int data_vals[10];
+    int read_data;
+    int result;
+    int i;
+    int counter;
+    int height;
+
+    TEST_BEGIN("dkcAVLTree (AVL Tree) Test");
+
+    /* Create AVL tree */
+    tree = dkcAllocAVLTreeRoot(sizeof(int), 10, compare_avltree_int, 100);
+    TEST_ASSERT(tree != NULL, "dkcAllocAVLTreeRoot");
+
+    TEST_ASSERT(dkcAVLTreeIsEmpty(tree) == TRUE, "New tree is empty");
+    TEST_ASSERT(dkcAVLTreeSize(tree) == 0, "Size is 0");
+
+    /* Insert multiple keys to test balancing */
+    /* Insert in order that would create unbalanced tree without AVL balancing */
+    keys[0] = 10; data_vals[0] = 100;
+    keys[1] = 20; data_vals[1] = 200;
+    keys[2] = 30; data_vals[2] = 300;
+    keys[3] = 40; data_vals[3] = 400;
+    keys[4] = 50; data_vals[4] = 500;
+    keys[5] = 25; data_vals[5] = 250;
+
+    for (i = 0; i < 6; i++) {
+        result = dkcAVLTreeInsert(tree, &keys[i], &data_vals[i], sizeof(int));
+        TEST_ASSERT(result == edk_SUCCEEDED, "Insert key");
+    }
+
+    TEST_ASSERT(dkcAVLTreeSize(tree) == 6, "Size is 6 after inserts");
+    TEST_ASSERT(dkcAVLTreeIsEmpty(tree) == FALSE, "Tree is not empty");
+
+    /* Check height - AVL tree should be balanced (height <= log2(n)+1) */
+    height = dkcAVLTreeHeight(tree);
+    TEST_ASSERT(height <= 4, "Tree height is balanced");
+
+    /* Find existing keys */
+    node = dkcAVLTreeFindEqual(tree, &keys[0]);
+    TEST_ASSERT(node != NULL, "Find key 10");
+
+    if (node != NULL) {
+        dkcAVLTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 100, "Key 10 has data 100");
+    }
+
+    node = dkcAVLTreeFindEqual(tree, &keys[4]);
+    TEST_ASSERT(node != NULL, "Find key 50");
+
+    if (node != NULL) {
+        dkcAVLTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 500, "Key 50 has data 500");
+    }
+
+    /* Find non-existing key */
+    i = 999;
+    node = dkcAVLTreeFindEqual(tree, &i);
+    TEST_ASSERT(node == NULL, "Key 999 not found");
+
+    /* Test FindMin and FindMax */
+    min_node = dkcAVLTreeFindMin(tree);
+    TEST_ASSERT(min_node != NULL, "FindMin returns node");
+    if (min_node != NULL) {
+        dkcAVLTreeGetBuffer(min_node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 100, "Min node has data 100 (key 10)");
+    }
+
+    max_node = dkcAVLTreeFindMax(tree);
+    TEST_ASSERT(max_node != NULL, "FindMax returns node");
+    if (max_node != NULL) {
+        dkcAVLTreeGetBuffer(max_node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 500, "Max node has data 500 (key 50)");
+    }
+
+    /* Test FindMinimalGreater */
+    i = 25;
+    node = dkcAVLTreeFindMinimalGreater(tree, &i);
+    TEST_ASSERT(node != NULL, "FindMinimalGreater(25) returns node");
+    if (node != NULL) {
+        dkcAVLTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 300, "MinimalGreater(25) is 30 (data 300)");
+    }
+
+    /* Test FindMaximumLess */
+    i = 25;
+    node = dkcAVLTreeFindMaximumLess(tree, &i);
+    TEST_ASSERT(node != NULL, "FindMaximumLess(25) returns node");
+    if (node != NULL) {
+        dkcAVLTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 200, "MaximumLess(25) is 20 (data 200)");
+    }
+
+    /* Test foreach (in-order traversal) */
+    counter = 0;
+    result = dkcAVLTreeForeach(tree, edkcAVLTreeInOrder, avltree_foreach_callback, &counter);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Foreach in-order succeeded");
+    TEST_ASSERT(counter == 6, "Foreach visited all 6 nodes");
+
+    /* Test node existence */
+    node = dkcAVLTreeFindEqual(tree, &keys[2]);
+    TEST_ASSERT(dkcAVLTreeExist(tree, node) == edkcAVLTREE_EXIST, "Node exists in tree");
+
+    /* Test delete */
+    i = 30;
+    result = dkcAVLTreeEraseFromKey(tree, &i);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Delete key 30");
+    TEST_ASSERT(dkcAVLTreeSize(tree) == 5, "Size is 5 after delete");
+
+    node = dkcAVLTreeFindEqual(tree, &i);
+    TEST_ASSERT(node == NULL, "Key 30 not found after delete");
+
+    /* Delete non-existing key */
+    i = 999;
+    result = dkcAVLTreeEraseFromKey(tree, &i);
+    TEST_ASSERT(result == edk_Not_Found, "Delete non-existing key returns Not_Found");
+
+    /* Test update existing key */
+    i = 10;
+    read_data = 1000;
+    result = dkcAVLTreeInsert(tree, &i, &read_data, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Update existing key 10");
+
+    node = dkcAVLTreeFindEqual(tree, &i);
+    if (node != NULL) {
+        dkcAVLTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 1000, "Key 10 updated to data 1000");
+    }
+
+    /* Test clear */
+    result = dkcAVLTreeClear(tree);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Clear tree");
+    TEST_ASSERT(dkcAVLTreeIsEmpty(tree) == TRUE, "Tree is empty after clear");
+    TEST_ASSERT(dkcAVLTreeSize(tree) == 0, "Size is 0 after clear");
+
+    /* Free tree */
+    dkcFreeAVLTreeRoot(&tree);
+    TEST_ASSERT(tree == NULL, "Free AVL tree");
+
+    TEST_END();
+}
+
+/*
  * Test: dkcNaryTree.c
  */
 void Test_NaryTree(void)
@@ -2826,6 +3213,7 @@ int main(int argc, char *argv[])
     Test_BTree();
     Test_2Tree();
     Test_RedBlackTree();
+    Test_AVLTree();
     Test_NaryTree();
 
     /* Hash/Digest Tests */
@@ -2851,6 +3239,7 @@ int main(int argc, char *argv[])
     Test_Rijndael();
     Test_SNOW20();
     Test_HC256();
+    Test_KCipher2();
 
     /* Compression Tests */
     Test_LZSS();
@@ -2859,6 +3248,7 @@ int main(int argc, char *argv[])
 
     Test_Camellia();
     Test_Twofish();
+    Test_Threefish();
 
     /* Cipher Tests (additional) */
     Test_Vernam();

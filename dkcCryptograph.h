@@ -15,8 +15,10 @@ INCLUDE CRYPTOGRAPH ALGORITHM ALL
 #include "dkcArcfour.h"
 #include "dkcCamellia.h"
 #include "dkcTwofish.h"
+#include "dkcThreefish.h"
 #include "dkcHC256.h"
 #include "dkcSNOW20.h"
+#include "dkcKCipher2.h"
 
 #include "dkcHMAC.h"
 
