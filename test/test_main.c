@@ -3916,6 +3916,365 @@ void Test_LRUCache2(void)
 }
 
 /*
+ * Test: dkcSegmentTree.c
+ */
+void Test_SegmentTree(void)
+{
+    DKC_SEGMENT_TREE tree;
+    DKC_LAZY_SEGMENT_TREE lazy_tree;
+    DKC_SEGTREE_VALUE values[] = {1, 3, 5, 7, 9, 11};
+    DKC_SEGTREE_VALUE result;
+    int ret;
+
+    TEST_BEGIN("dkcSegmentTree Test");
+
+    /* === Range Sum Query === */
+    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpSum, dkcd_SEGTREE_IDENTITY_SUM);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SegTree build (sum)");
+    TEST_ASSERT(dkcSegmentTreeSize(&tree) == 6, "SegTree size is 6");
+
+    /* 全区間の合計 */
+    result = dkcSegmentTreeQuery(&tree, 0, 6);
+    TEST_ASSERT(result == 36, "SegTree sum [0,6) = 36");
+
+    /* 部分区間 */
+    result = dkcSegmentTreeQuery(&tree, 1, 4);
+    TEST_ASSERT(result == 15, "SegTree sum [1,4) = 3+5+7 = 15");
+
+    /* 単一要素 */
+    result = dkcSegmentTreeGet(&tree, 2);
+    TEST_ASSERT(result == 5, "SegTree get(2) = 5");
+
+    /* 点更新 */
+    dkcSegmentTreeUpdate(&tree, 2, 10);
+    result = dkcSegmentTreeQuery(&tree, 0, 6);
+    TEST_ASSERT(result == 41, "SegTree after update: sum = 41");
+
+    dkcSegmentTreeFree(&tree);
+
+    /* === Range Minimum Query === */
+    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMin, LLONG_MAX);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SegTree build (min)");
+
+    result = dkcSegmentTreeQuery(&tree, 0, 6);
+    TEST_ASSERT(result == 1, "SegTree min [0,6) = 1");
+
+    result = dkcSegmentTreeQuery(&tree, 2, 5);
+    TEST_ASSERT(result == 5, "SegTree min [2,5) = 5");
+
+    dkcSegmentTreeFree(&tree);
+
+    /* === Range Maximum Query === */
+    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMax, LLONG_MIN);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SegTree build (max)");
+
+    result = dkcSegmentTreeQuery(&tree, 0, 6);
+    TEST_ASSERT(result == 11, "SegTree max [0,6) = 11");
+
+    dkcSegmentTreeFree(&tree);
+
+    /* === Lazy Segment Tree (Range Add) === */
+    ret = dkcLazySegmentTreeCreate(&lazy_tree, 6, dkcSegTreeOpSum, 0, 0);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "LazySegTree create");
+
+    /* 区間加算 */
+    dkcLazySegmentTreeRangeAdd(&lazy_tree, 1, 4, 10);  /* [1,4) に 10 を加算 */
+    result = dkcLazySegmentTreeQuery(&lazy_tree, 0, 6);
+    TEST_ASSERT(result == 30, "LazySegTree after range add: sum = 30");
+
+    result = dkcLazySegmentTreeQuery(&lazy_tree, 1, 4);
+    TEST_ASSERT(result == 30, "LazySegTree query [1,4) = 30");
+
+    dkcLazySegmentTreeFree(&lazy_tree);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcFenwickTree.c
+ */
+void Test_FenwickTree(void)
+{
+    DKC_FENWICK_TREE tree;
+    DKC_FENWICK_TREE_2D tree2d;
+    DKC_FENWICK_VALUE values[] = {1, 3, 5, 7, 9, 11};
+    DKC_FENWICK_VALUE result;
+    int ret;
+
+    TEST_BEGIN("dkcFenwickTree Test");
+
+    /* === 1次元 Fenwick Tree === */
+    ret = dkcFenwickTreeBuild(&tree, values, 6);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "FenwickTree build");
+    TEST_ASSERT(dkcFenwickTreeSize(&tree) == 6, "FenwickTree size is 6");
+
+    /* 累積和 */
+    result = dkcFenwickTreeSum(&tree, 5);
+    TEST_ASSERT(result == 36, "FenwickTree sum [0,5] = 36");
+
+    result = dkcFenwickTreeSum(&tree, 2);
+    TEST_ASSERT(result == 9, "FenwickTree sum [0,2] = 1+3+5 = 9");
+
+    /* 区間和 */
+    result = dkcFenwickTreeRangeSum(&tree, 1, 4);
+    TEST_ASSERT(result == 15, "FenwickTree range [1,4) = 3+5+7 = 15");
+
+    /* 点取得 */
+    result = dkcFenwickTreeGet(&tree, 3);
+    TEST_ASSERT(result == 7, "FenwickTree get(3) = 7");
+
+    /* 点加算 */
+    dkcFenwickTreeAdd(&tree, 2, 5);
+    result = dkcFenwickTreeSum(&tree, 5);
+    TEST_ASSERT(result == 41, "FenwickTree after add: sum = 41");
+
+    /* 点設定 */
+    dkcFenwickTreeSet(&tree, 2, 5);  /* 10 -> 5 に戻す */
+    result = dkcFenwickTreeSum(&tree, 5);
+    TEST_ASSERT(result == 36, "FenwickTree after set: sum = 36");
+
+    /* lower_bound */
+    {
+        size_t idx = dkcFenwickTreeLowerBound(&tree, 10);
+        TEST_ASSERT(idx <= 6, "FenwickTree lower_bound valid");
+    }
+
+    dkcFenwickTreeFree(&tree);
+
+    /* === 2次元 Fenwick Tree === */
+    ret = dkcFenwickTree2DCreate(&tree2d, 4, 4);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "FenwickTree2D create");
+
+    /* 点加算 */
+    dkcFenwickTree2DAdd(&tree2d, 0, 0, 1);
+    dkcFenwickTree2DAdd(&tree2d, 1, 1, 2);
+    dkcFenwickTree2DAdd(&tree2d, 2, 2, 3);
+    dkcFenwickTree2DAdd(&tree2d, 3, 3, 4);
+
+    /* 累積和 */
+    result = dkcFenwickTree2DSum(&tree2d, 3, 3);
+    TEST_ASSERT(result == 10, "FenwickTree2D sum = 1+2+3+4 = 10");
+
+    /* 区間和 */
+    result = dkcFenwickTree2DRangeSum(&tree2d, 1, 1, 3, 3);
+    TEST_ASSERT(result == 5, "FenwickTree2D range sum = 2+3 = 5");
+
+    dkcFenwickTree2DFree(&tree2d);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcUnionFind.c
+ */
+void Test_UnionFind(void)
+{
+    DKC_UNION_FIND uf;
+    DKC_WEIGHTED_UNION_FIND wuf;
+    int ret;
+    BOOL united;
+    size_t roots[10];
+    size_t members[10];
+    size_t count;
+
+    TEST_BEGIN("dkcUnionFind Test");
+
+    /* === 基本 Union-Find === */
+    ret = dkcUnionFindCreate(&uf, 10);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "UnionFind create");
+    TEST_ASSERT(dkcUnionFindNumElements(&uf) == 10, "UnionFind has 10 elements");
+    TEST_ASSERT(dkcUnionFindNumSets(&uf) == 10, "UnionFind initially has 10 sets");
+
+    /* 併合 */
+    united = dkcUnionFindUnite(&uf, 0, 1);
+    TEST_ASSERT(united == TRUE, "UnionFind unite 0-1");
+    TEST_ASSERT(dkcUnionFindNumSets(&uf) == 9, "UnionFind now has 9 sets");
+
+    united = dkcUnionFindUnite(&uf, 1, 2);
+    TEST_ASSERT(united == TRUE, "UnionFind unite 1-2");
+
+    united = dkcUnionFindUnite(&uf, 3, 4);
+    TEST_ASSERT(united == TRUE, "UnionFind unite 3-4");
+
+    /* 同一集合判定 */
+    TEST_ASSERT(dkcUnionFindSame(&uf, 0, 2) == TRUE, "UnionFind 0 and 2 are same");
+    TEST_ASSERT(dkcUnionFindSame(&uf, 0, 3) == FALSE, "UnionFind 0 and 3 are different");
+
+    /* 集合サイズ */
+    TEST_ASSERT(dkcUnionFindSize(&uf, 0) == 3, "UnionFind set containing 0 has size 3");
+    TEST_ASSERT(dkcUnionFindSize(&uf, 3) == 2, "UnionFind set containing 3 has size 2");
+
+    /* 重複併合は無視 */
+    united = dkcUnionFindUnite(&uf, 0, 2);
+    TEST_ASSERT(united == FALSE, "UnionFind duplicate unite returns FALSE");
+
+    /* 根の列挙 */
+    count = dkcUnionFindGetRoots(&uf, roots);
+    TEST_ASSERT(count == dkcUnionFindNumSets(&uf), "UnionFind roots count matches");
+
+    /* メンバー列挙 */
+    count = dkcUnionFindGetMembers(&uf, 0, members, 10);
+    TEST_ASSERT(count == 3, "UnionFind members of set 0 = 3");
+
+    dkcUnionFindFree(&uf);
+
+    /* === 重み付き Union-Find === */
+    ret = dkcWeightedUnionFindCreate(&wuf, 5);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "WeightedUnionFind create");
+
+    /* weight(1) - weight(0) = 5 */
+    united = dkcWeightedUnionFindUnite(&wuf, 0, 1, 5);
+    TEST_ASSERT(united == TRUE, "WeightedUF unite 0-1 with weight 5");
+
+    /* weight(2) - weight(1) = 3 => weight(2) - weight(0) = 8 */
+    united = dkcWeightedUnionFindUnite(&wuf, 1, 2, 3);
+    TEST_ASSERT(united == TRUE, "WeightedUF unite 1-2 with weight 3");
+
+    /* 同一集合判定 */
+    TEST_ASSERT(dkcWeightedUnionFindSame(&wuf, 0, 2) == TRUE, "WeightedUF 0 and 2 are same");
+
+    /* 重み差分取得 */
+    {
+        int64 diff = dkcWeightedUnionFindDiff(&wuf, 0, 2);
+        TEST_ASSERT(diff == 8, "WeightedUF diff(0,2) = 8");
+    }
+
+    /* 矛盾する併合は FALSE */
+    united = dkcWeightedUnionFindUnite(&wuf, 0, 2, 10);  /* 実際は 8 */
+    TEST_ASSERT(united == FALSE, "WeightedUF contradictory unite returns FALSE");
+
+    dkcWeightedUnionFindFree(&wuf);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcSparseSet.c
+ */
+void Test_SparseSet(void)
+{
+    DKC_SPARSE_SET set, set_a, set_b, set_result;
+    int ret;
+    size_t i;
+    const size_t *dense;
+
+    TEST_BEGIN("dkcSparseSet Test");
+
+    /* === 基本操作 === */
+    ret = dkcSparseSetCreate(&set, 100);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet create");
+    TEST_ASSERT(dkcSparseSetCapacity(&set) == 100, "SparseSet capacity is 100");
+    TEST_ASSERT(dkcSparseSetSize(&set) == 0, "SparseSet initially empty");
+    TEST_ASSERT(dkcSparseSetIsEmpty(&set) == TRUE, "SparseSet is empty");
+
+    /* 追加 */
+    ret = dkcSparseSetAdd(&set, 5);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet add 5");
+    ret = dkcSparseSetAdd(&set, 1);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet add 1");
+    ret = dkcSparseSetAdd(&set, 42);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet add 42");
+
+    TEST_ASSERT(dkcSparseSetSize(&set) == 3, "SparseSet size is 3");
+    TEST_ASSERT(dkcSparseSetIsEmpty(&set) == FALSE, "SparseSet is not empty");
+
+    /* メンバーシップテスト */
+    TEST_ASSERT(dkcSparseSetContains(&set, 5) == TRUE, "SparseSet contains 5");
+    TEST_ASSERT(dkcSparseSetContains(&set, 1) == TRUE, "SparseSet contains 1");
+    TEST_ASSERT(dkcSparseSetContains(&set, 42) == TRUE, "SparseSet contains 42");
+    TEST_ASSERT(dkcSparseSetContains(&set, 0) == FALSE, "SparseSet does not contain 0");
+    TEST_ASSERT(dkcSparseSetContains(&set, 99) == FALSE, "SparseSet does not contain 99");
+
+    /* 重複追加は無視される */
+    ret = dkcSparseSetAdd(&set, 5);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet duplicate add succeeds");
+    TEST_ASSERT(dkcSparseSetSize(&set) == 3, "SparseSet size unchanged");
+
+    /* === 削除 === */
+    ret = dkcSparseSetRemove(&set, 1);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet remove 1");
+    TEST_ASSERT(dkcSparseSetSize(&set) == 2, "SparseSet size is 2");
+    TEST_ASSERT(dkcSparseSetContains(&set, 1) == FALSE, "SparseSet no longer contains 1");
+    TEST_ASSERT(dkcSparseSetContains(&set, 5) == TRUE, "SparseSet still contains 5");
+    TEST_ASSERT(dkcSparseSetContains(&set, 42) == TRUE, "SparseSet still contains 42");
+
+    /* 存在しない要素の削除は失敗 */
+    ret = dkcSparseSetRemove(&set, 1);
+    TEST_ASSERT(ret == edk_FAILED, "SparseSet remove non-existent fails");
+
+    /* === O(1) クリア === */
+    dkcSparseSetClear(&set);
+    TEST_ASSERT(dkcSparseSetSize(&set) == 0, "SparseSet cleared");
+    TEST_ASSERT(dkcSparseSetContains(&set, 5) == FALSE, "SparseSet 5 gone after clear");
+    TEST_ASSERT(dkcSparseSetContains(&set, 42) == FALSE, "SparseSet 42 gone after clear");
+
+    /* === イテレーション === */
+    dkcSparseSetAdd(&set, 10);
+    dkcSparseSetAdd(&set, 20);
+    dkcSparseSetAdd(&set, 30);
+
+    /* dense配列直接アクセス */
+    dense = dkcSparseSetGetDense(&set);
+    TEST_ASSERT(dense != NULL, "SparseSet dense array accessible");
+    TEST_ASSERT(dense[0] == 10, "SparseSet dense[0] = 10 (insertion order)");
+    TEST_ASSERT(dense[1] == 20, "SparseSet dense[1] = 20");
+    TEST_ASSERT(dense[2] == 30, "SparseSet dense[2] = 30");
+
+    /* GetAt */
+    TEST_ASSERT(dkcSparseSetGetAt(&set, 0) == 10, "SparseSet GetAt(0) = 10");
+    TEST_ASSERT(dkcSparseSetGetAt(&set, 2) == 30, "SparseSet GetAt(2) = 30");
+
+    dkcSparseSetFree(&set);
+
+    /* === 集合演算 === */
+    dkcSparseSetCreate(&set_a, 50);
+    dkcSparseSetCreate(&set_b, 50);
+    dkcSparseSetCreate(&set_result, 50);
+
+    /* A = {1, 2, 3, 4} */
+    for (i = 1; i <= 4; i++) dkcSparseSetAdd(&set_a, i);
+
+    /* B = {3, 4, 5, 6} */
+    for (i = 3; i <= 6; i++) dkcSparseSetAdd(&set_b, i);
+
+    /* 和集合: A ∪ B = {1, 2, 3, 4, 5, 6} */
+    ret = dkcSparseSetUnion(&set_result, &set_a, &set_b);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet union");
+    TEST_ASSERT(dkcSparseSetSize(&set_result) == 6, "SparseSet union size = 6");
+
+    /* 積集合: A ∩ B = {3, 4} */
+    ret = dkcSparseSetIntersection(&set_result, &set_a, &set_b);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet intersection");
+    TEST_ASSERT(dkcSparseSetSize(&set_result) == 2, "SparseSet intersection size = 2");
+    TEST_ASSERT(dkcSparseSetContains(&set_result, 3) == TRUE, "SparseSet intersection has 3");
+    TEST_ASSERT(dkcSparseSetContains(&set_result, 4) == TRUE, "SparseSet intersection has 4");
+
+    /* 差集合: A - B = {1, 2} */
+    ret = dkcSparseSetDifference(&set_result, &set_a, &set_b);
+    TEST_ASSERT(ret == edk_SUCCEEDED, "SparseSet difference");
+    TEST_ASSERT(dkcSparseSetSize(&set_result) == 2, "SparseSet difference size = 2");
+    TEST_ASSERT(dkcSparseSetContains(&set_result, 1) == TRUE, "SparseSet difference has 1");
+    TEST_ASSERT(dkcSparseSetContains(&set_result, 2) == TRUE, "SparseSet difference has 2");
+
+    /* 等価判定 */
+    TEST_ASSERT(dkcSparseSetEquals(&set_a, &set_a) == TRUE, "SparseSet A == A");
+    TEST_ASSERT(dkcSparseSetEquals(&set_a, &set_b) == FALSE, "SparseSet A != B");
+
+    /* 部分集合判定 */
+    dkcSparseSetClear(&set_result);
+    dkcSparseSetAdd(&set_result, 1);
+    dkcSparseSetAdd(&set_result, 2);
+    TEST_ASSERT(dkcSparseSetIsSubset(&set_result, &set_a) == TRUE, "SparseSet {1,2} subset of A");
+    TEST_ASSERT(dkcSparseSetIsSubset(&set_a, &set_result) == FALSE, "SparseSet A not subset of {1,2}");
+
+    dkcSparseSetFree(&set_a);
+    dkcSparseSetFree(&set_b);
+    dkcSparseSetFree(&set_result);
+
+    TEST_END();
+}
+
+/*
  * Test: dkcUniqueID.c
  */
 void Test_UniqueID(void)
@@ -4174,6 +4533,12 @@ int main(int argc, char *argv[])
     /* LRU Cache Tests */
     Test_LRUCache();
     Test_LRUCache2();
+
+    /* Advanced Data Structures */
+    Test_SegmentTree();
+    Test_FenwickTree();
+    Test_UnionFind();
+    Test_SparseSet();
 
     /* UniqueID Tests */
     Test_UniqueID();

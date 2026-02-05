@@ -1,6 +1,6 @@
 /*! @file
 	@brief LRUキャッシュ Ver.2（ライブラリコンポーネント再利用版）
-	@author d.Kingyo
+	@author d.Kingyo, threeBrane
 	@note
 	dkcDoubleList + dkcHashMap を組み合わせた実装。
 	dkcLRUCache.c がフルスクラッチ実装なのに対し、

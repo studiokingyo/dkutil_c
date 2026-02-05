@@ -67,6 +67,10 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcMPH.h"
 #include "dkcDoubleList.h"
 #include "dkcNaryTree.h"
+#include "dkcSegmentTree.h"
+#include "dkcFenwickTree.h"
+#include "dkcUnionFind.h"
+#include "dkcSparseSet.h"
 
 /* generic interface */
 #include "dkcCircularStream.h"

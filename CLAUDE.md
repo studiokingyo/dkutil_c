@@ -43,7 +43,7 @@ clean.bat
 
 | Category | Components |
 |----------|------------|
-| **Data Structures** | dkc2Tree (binary), dkcBTree (B-Tree), dkcRedBlackTree, dkcAVLTree (AVL Tree), dkcHashSet, dkcHashMap, dkcHashMultiSet, dkcHashMultiMap, dkcMPH (Minimal Perfect Hash - CHD), dkcBloomFilter, dkcCuckooHash (Cuckoo Hash Table/Filter), dkcLRUCache, dkcLRUCache2 (library reuse), dkcSingleList, dkcStack, dkcQueue, dkcDeque, dkcDynamicArray, dkcHash, dkcLightHash |
+| **Data Structures** | dkc2Tree (binary), dkcBTree (B-Tree), dkcRedBlackTree, dkcAVLTree (AVL Tree), dkcHashSet, dkcHashMap, dkcHashMultiSet, dkcHashMultiMap, dkcMPH (Minimal Perfect Hash - CHD), dkcBloomFilter, dkcCuckooHash (Cuckoo Hash Table/Filter), dkcLRUCache, dkcLRUCache2 (library reuse), dkcSegmentTree (Segment Tree), dkcFenwickTree (BIT), dkcUnionFind (DSU), dkcSparseSet, dkcSingleList, dkcStack, dkcQueue, dkcDeque, dkcDynamicArray, dkcHash, dkcLightHash |
 | **Streams** | dkcStream, dkcCircularStream, dkcMemoryStream |
 | **Cryptography** | Rijndael, Blowfish, ARC4, Camellia, Twofish, Threefish, HC256, SNOW2.0, KCipher-2, Vernam |
 | **Message Digests** | MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512, Keccak, SHA3-224/256/384/512, BLAKE-224/256/384/512, BLAKE2s, BLAKE2b, BLAKE3, HMAC, CRC |
@@ -96,7 +96,7 @@ Open `test/test_dkutil_c.dsw` in VC6, build dkutil_c first, then build test_dkut
 | Category | Modules Tested |
 |----------|---------------|
 | **Containers** | Stack, Queue, Deque, HashSet, HashMap, HashMultiSet, HashMultiMap, SingleList, MemoryStream, CircularMemoryStream, Buffer, MemoryPool |
-| **Trees** | BTree, 2Tree (Binary Tree), RedBlackTree, AVLTree |
+| **Trees** | BTree, 2Tree (Binary Tree), RedBlackTree, AVLTree, NaryTree, SegmentTree, FenwickTree (BIT), UnionFind (DSU), SparseSet |
 | **Hash/Digest** | CRC32, CRC-CCITT, MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, BLAKE-224, BLAKE-256, BLAKE-384, BLAKE-512, BLAKE2s, BLAKE2b, BLAKE3, HMAC-MD5, HMAC-SHA1 |
 | **Ciphers** | Arcfour (RC4), Blowfish, Rijndael (AES), Camellia, Twofish, Threefish, SNOW 2.0, HC256, KCipher-2, Vernam |
 | **Compression** | LZSS, LZW, RLE (PackBits) |
