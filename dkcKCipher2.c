@@ -1,6 +1,6 @@
 /*! @file
 	@brief KCipher-2 Stream Cipher 実装
-	@author threeBrane
+	@author d.Kingyo
 	@note
 	RFC 7008 - A Description of the KCipher-2 Encryption Algorithm
 	に基づく実装

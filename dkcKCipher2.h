@@ -1,6 +1,6 @@
 /*! @file
 	@brief KCipher-2 Stream Cipher
-	@author threeBrane
+	@author d.Kingyo
 	@note
 	KCipher-2はKDDI研究所が開発したストリーム暗号で、
 	ISO/IEC 18033-4で標準化されています。

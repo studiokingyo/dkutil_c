@@ -1,6 +1,6 @@
 /*! @file
 	@brief AVL木 (自己平衡二分探索木)
-	@author threeBrane
+	@author d.Kingyo
 	@note
 	AVL木は各ノードの左右部分木の高さの差（バランスファクター）が
 	-1, 0, 1 のいずれかであることを保証する平衡二分探索木です。

@@ -1,6 +1,6 @@
 /*! @file
 	@brief Threefish Block Cipher 実装
-	@author threeBrane
+	@author d.Kingyo
 	@note
 	Skeinハッシュ関数で使用されるThreefish暗号の実装
 	参考: The Skein Hash Function Family (Version 1.3)

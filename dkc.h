@@ -64,6 +64,7 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcHashMap.h"
 #include "dkcHashMultiSet.h"
 #include "dkcHashMultiMap.h"
+#include "dkcMPH.h"
 #include "dkcDoubleList.h"
 #include "dkcNaryTree.h"
 
@@ -104,7 +105,12 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 
 /* gemerate signature */
 #include "dkcHash.h" /* and hash table */
+#include "dkcLightHash.h" /* non-cryptographic hash functions */
 #include "dkcCRC.h"
+#include "dkcBloomFilter.h"
+#include "dkcCuckooHash.h"
+#include "dkcLRUCache.h"
+#include "dkcLRUCache2.h" /* library component reuse version */
 
 /* routine */
 #include "dkcTelecomConfirmPacket.h"

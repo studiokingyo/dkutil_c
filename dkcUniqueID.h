@@ -1,53 +1,257 @@
-/*!
-@file dkcUniqueID.h
-@brief 
-@note
-glib‚ÌƒNƒH[ƒN‚Á‚Û‚­H‚Å‚àAƒCƒ`ƒCƒ`ƒR[ƒfƒBƒ“ƒO‚·‚é‚Ì–Ê“|c‚Æ‚è‚ ‚¦‚¸A‚ ‚Æ5”N‚­‚ç‚¢‚ÍÀ‘•‚µ‚È‚¢‚Â‚à‚è
-@section ‰ß‹ƒƒO
-2004”N“xFƒf[ƒ^‚©‚çUnique‚ÈID‚ğ¶¬‚·‚é‚à‚Ì‚ğì‚ë‚¤‚Æv‚Á‚Ä‚¢‚½‚ªA‚·‚Å‚Éì‚é‹C–³‚µB‚Ç‚¿‚ç—l‚©ƒ\[ƒX‚ğŠñ•t‚µ‚Ä‚¢‚½‚¾‚¯‚È‚¢‚Å‚µ‚å‚¤‚©H
+/*! @file
+	@brief ãƒ¦ãƒ‹ãƒ¼ã‚¯IDç”Ÿæˆãƒ©ã‚¤ãƒ–ãƒ©ãƒª
+	@author d.Kingyo
+	@note
+	UUID (RFC 9562) ãŠã‚ˆã³å„ç¨®ãƒ¦ãƒ‹ãƒ¼ã‚¯IDå½¢å¼ã®å®Ÿè£…
+
+	å¯¾å¿œå½¢å¼:
+	- UUID v1-v8
+	- ULID
+	- Snowflake
+	- KSUID
+	- XID
+	- NanoID
+	- CUID/CUID2
 */
-#ifndef dkutil_c_UniqueID__h
-#define dkutil_c_UniqueID__h
+
+#ifndef DKC_UNIQUEID_INC_
+#define DKC_UNIQUEID_INC_
 
 #include "dkcOSIndependent.h"
-#include "dkcMemoryStream.h"
 
-/*!
-ƒ†ƒj[ƒN‚ÈID‚ğ¶¬‚·‚é‹@\‚Ì•Û‘¶ƒf[ƒ^\‘¢
-*/
-typedef struct dkc_UniqueID{
-	DKC_MEMORYSTREAM *mStream;
-	int mCounter;
-}DKC_UNIQUE_ID;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+/* ====================================================================
+ * UUID æ§‹é€ ä½“ãƒ»å®šæ•°
+ * ==================================================================== */
 
+#define dkcd_UUID_SIZE          16
+#define dkcd_UUID_STRING_SIZE   36
 
-//typedef uint32 DKC_UNIQUE_ID; 
+typedef struct dkc_UUID {
+	uint8 bytes[dkcd_UUID_SIZE];
+} DKC_UUID;
 
-///ID‚ğ¶¬‚·‚é‚à‚Ì‚ğæ“¾B
-DKC_EXTERN DKC_UNIQUE_ID * WINAPI dkcAllocUniqueID(void);
-/*!
-DKC_UNIQUE_ID‚ğƒfƒŠ[ƒg
-@note
-•K‚¸g—p‚µ‚½‚ ‚Æ‚Í‚±‚ê‚ğŒÄ‚ñ‚Å‚­‚¾‚³‚¢B
-*/
-DKC_EXTERN int WINAPI dkcFreeUniqueID(DKC_UNIQUE_ID **ptr);
+typedef enum {
+	edkcUUID_V1 = 1, edkcUUID_V2 = 2, edkcUUID_V3 = 3, edkcUUID_V4 = 4,
+	edkcUUID_V5 = 5, edkcUUID_V6 = 6, edkcUUID_V7 = 7, edkcUUID_V8 = 8
+} edkcUUIDVersion;
 
+typedef enum {
+	edkcUUID_NS_DNS = 0, edkcUUID_NS_URL = 1,
+	edkcUUID_NS_OID = 2, edkcUUID_NS_X500 = 3
+} edkcUUIDNamespace;
 
-/*!
-@note
+typedef enum {
+	edkcUUID_DOMAIN_PERSON = 0, edkcUUID_DOMAIN_GROUP = 1, edkcUUID_DOMAIN_ORG = 2
+} edkcUUIDLocalDomain;
 
-*/
-DKC_EXTERN int WINAPI dkcUniqueIDGet(DKC_UNIQUE_ID *ptr);
-/*!
-@param id[in] “¯‚¶id‚ğ“ñ‰ñ‰ğ•ú‚·‚é‚ÆƒoƒOƒŠ‚Ü‚·B
-*/
-DKC_EXTERN void dkcUniqueIDReturn(DKC_UNIQUE_ID *ptr,int id);
-/*!
-“à•”‚Å“ñ‰ñ‰ğ•ú‚µ‚Ä‚¢‚È‚¢‚©Šm‚©‚ß‚ÄˆÀ‘S‚ÉID‚ğ‰ğ•ú‚µ‚Ü‚·B
-‚µ‚©‚µA’x‚¢‚Ì‚Åg‚¤‹@‰ï‚Í–³‚¢‚Å‚µ‚å‚¤OOGG
-*/
-//DKC_EXTERN void dkcUniqueIDSafeReturn(DKC_UNIQUE_ID *ptr,int id);
+/*! @brief UUIDã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ */
+typedef struct dkc_UUIDGenerator {
+	uint32 rand_state;      /*!< ä¹±æ•°çŠ¶æ…‹ */
+	uint16 clock_seq;       /*!< ã‚¯ãƒ­ãƒƒã‚¯ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ */
+	uint8 node_id[6];       /*!< ãƒãƒ¼ãƒ‰ID */
+	int initialized;        /*!< åˆæœŸåŒ–æ¸ˆã¿ãƒ•ãƒ©ã‚° */
+} DKC_UUID_GEN;
 
+/* ====================================================================
+ * ULID æ§‹é€ ä½“ãƒ»å®šæ•°
+ * ==================================================================== */
 
-#endif //end of include once
+#define dkcd_ULID_SIZE          16
+#define dkcd_ULID_STRING_SIZE   26
+
+typedef struct dkc_ULID {
+	uint8 bytes[dkcd_ULID_SIZE];
+} DKC_ULID;
+
+/*! @brief ULIDã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ */
+typedef struct dkc_ULIDGenerator {
+	uint32 rand_state;      /*!< ä¹±æ•°çŠ¶æ…‹ */
+	uint64 last_timestamp;  /*!< æœ€å¾Œã®ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ— */
+	uint8 last_random[10];  /*!< æœ€å¾Œã®ãƒ©ãƒ³ãƒ€ãƒ éƒ¨åˆ†ï¼ˆå˜èª¿å¢—åŠ ç”¨ï¼‰ */
+} DKC_ULID_GEN;
+
+/* ====================================================================
+ * Snowflake æ§‹é€ ä½“ãƒ»å®šæ•°
+ * ==================================================================== */
+
+#define dkcd_SNOWFLAKE_SIZE     8
+
+typedef struct dkc_Snowflake {
+	uint64 id;
+} DKC_SNOWFLAKE;
+
+typedef struct dkc_SnowflakeGenerator {
+	uint32 rand_state;      /*!< ä¹±æ•°çŠ¶æ…‹ */
+	uint64 epoch;
+	uint16 worker_id;
+	uint16 datacenter_id;
+	uint16 sequence;
+	uint64 last_timestamp;
+} DKC_SNOWFLAKE_GEN;
+
+/* ====================================================================
+ * KSUID æ§‹é€ ä½“ãƒ»å®šæ•°
+ * ==================================================================== */
+
+#define dkcd_KSUID_SIZE         20
+#define dkcd_KSUID_STRING_SIZE  27
+#define dkcd_KSUID_EPOCH        1400000000
+
+typedef struct dkc_KSUID {
+	uint8 bytes[dkcd_KSUID_SIZE];
+} DKC_KSUID;
+
+typedef struct dkc_KSUIDGenerator {
+	uint32 rand_state;
+} DKC_KSUID_GEN;
+
+/* ====================================================================
+ * XID æ§‹é€ ä½“ãƒ»å®šæ•°
+ * ==================================================================== */
+
+#define dkcd_XID_SIZE           12
+#define dkcd_XID_STRING_SIZE    20
+
+typedef struct dkc_XID {
+	uint8 bytes[dkcd_XID_SIZE];
+} DKC_XID;
+
+typedef struct dkc_XIDGenerator {
+	uint32 rand_state;
+	uint8 machine_id[3];
+	uint16 pid;
+	uint32 counter;
+} DKC_XID_GEN;
+
+/* ====================================================================
+ * NanoID å®šæ•°ãƒ»æ§‹é€ ä½“
+ * ==================================================================== */
+
+#define dkcd_NANOID_DEFAULT_SIZE    21
+#define dkcd_NANOID_DEFAULT_ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+
+typedef struct dkc_NanoIDGenerator {
+	uint32 rand_state;
+} DKC_NANOID_GEN;
+
+/* ====================================================================
+ * CUID å®šæ•°ãƒ»æ§‹é€ ä½“
+ * ==================================================================== */
+
+#define dkcd_CUID_SIZE          25
+#define dkcd_CUID2_DEFAULT_SIZE 24
+
+typedef struct dkc_CUIDGenerator {
+	uint32 rand_state;
+	uint32 counter;
+} DKC_CUID_GEN;
+
+/* ====================================================================
+ * UUID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcUUIDGenInit(DKC_UUID_GEN *gen, uint32 seed);
+
+DKC_EXTERN int WINAPI dkcUUIDv1Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDv2Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid,
+	edkcUUIDLocalDomain domain, uint32 id);
+DKC_EXTERN int WINAPI dkcUUIDv3Generate(DKC_UUID *uuid,
+	const DKC_UUID *ns_uuid, const char *name, size_t name_len);
+DKC_EXTERN int WINAPI dkcUUIDv3GenerateNS(DKC_UUID *uuid,
+	edkcUUIDNamespace ns, const char *name, size_t name_len);
+DKC_EXTERN int WINAPI dkcUUIDv4Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDv5Generate(DKC_UUID *uuid,
+	const DKC_UUID *ns_uuid, const char *name, size_t name_len);
+DKC_EXTERN int WINAPI dkcUUIDv5GenerateNS(DKC_UUID *uuid,
+	edkcUUIDNamespace ns, const char *name, size_t name_len);
+DKC_EXTERN int WINAPI dkcUUIDv6Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDv7Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDv8Generate(DKC_UUID *uuid,
+	uint64 custom_a, uint16 custom_b, uint64 custom_c);
+
+DKC_EXTERN int WINAPI dkcUUIDToString(const DKC_UUID *uuid, char *str);
+DKC_EXTERN int WINAPI dkcUUIDFromString(const char *str, DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDGetVersion(const DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDCompare(const DKC_UUID *a, const DKC_UUID *b);
+DKC_EXTERN BOOL WINAPI dkcUUIDIsNil(const DKC_UUID *uuid);
+DKC_EXTERN void WINAPI dkcUUIDNil(DKC_UUID *uuid);
+DKC_EXTERN int WINAPI dkcUUIDGetNamespace(edkcUUIDNamespace ns, DKC_UUID *uuid);
+
+/* ====================================================================
+ * ULID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcULIDGenInit(DKC_ULID_GEN *gen, uint32 seed);
+DKC_EXTERN int WINAPI dkcULIDGenerate(DKC_ULID_GEN *gen, DKC_ULID *ulid);
+DKC_EXTERN int WINAPI dkcULIDGenerateWithTime(DKC_ULID_GEN *gen, DKC_ULID *ulid, uint64 timestamp_ms);
+DKC_EXTERN int WINAPI dkcULIDToString(const DKC_ULID *ulid, char *str);
+DKC_EXTERN int WINAPI dkcULIDFromString(const char *str, DKC_ULID *ulid);
+DKC_EXTERN uint64 WINAPI dkcULIDGetTimestamp(const DKC_ULID *ulid);
+DKC_EXTERN int WINAPI dkcULIDCompare(const DKC_ULID *a, const DKC_ULID *b);
+
+/* ====================================================================
+ * Snowflake é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcSnowflakeInit(DKC_SNOWFLAKE_GEN *gen,
+	uint16 worker_id, uint16 datacenter_id, uint64 epoch, uint32 seed);
+DKC_EXTERN int WINAPI dkcSnowflakeGenerate(DKC_SNOWFLAKE_GEN *gen, DKC_SNOWFLAKE *sf);
+DKC_EXTERN int WINAPI dkcSnowflakeToString(const DKC_SNOWFLAKE *sf, char *str);
+DKC_EXTERN int WINAPI dkcSnowflakeFromString(const char *str, DKC_SNOWFLAKE *sf);
+DKC_EXTERN uint64 WINAPI dkcSnowflakeGetTimestamp(const DKC_SNOWFLAKE *sf, uint64 epoch);
+
+/* ====================================================================
+ * KSUID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcKSUIDGenInit(DKC_KSUID_GEN *gen, uint32 seed);
+DKC_EXTERN int WINAPI dkcKSUIDGenerate(DKC_KSUID_GEN *gen, DKC_KSUID *ksuid);
+DKC_EXTERN int WINAPI dkcKSUIDGenerateWithTime(DKC_KSUID_GEN *gen, DKC_KSUID *ksuid, uint32 timestamp);
+DKC_EXTERN int WINAPI dkcKSUIDToString(const DKC_KSUID *ksuid, char *str);
+DKC_EXTERN int WINAPI dkcKSUIDFromString(const char *str, DKC_KSUID *ksuid);
+DKC_EXTERN uint32 WINAPI dkcKSUIDGetTimestamp(const DKC_KSUID *ksuid);
+DKC_EXTERN int WINAPI dkcKSUIDCompare(const DKC_KSUID *a, const DKC_KSUID *b);
+
+/* ====================================================================
+ * XID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcXIDInit(DKC_XID_GEN *gen, uint32 seed);
+DKC_EXTERN int WINAPI dkcXIDGenerate(DKC_XID_GEN *gen, DKC_XID *xid);
+DKC_EXTERN int WINAPI dkcXIDToString(const DKC_XID *xid, char *str);
+DKC_EXTERN int WINAPI dkcXIDFromString(const char *str, DKC_XID *xid);
+DKC_EXTERN uint32 WINAPI dkcXIDGetTimestamp(const DKC_XID *xid);
+DKC_EXTERN int WINAPI dkcXIDCompare(const DKC_XID *a, const DKC_XID *b);
+
+/* ====================================================================
+ * NanoID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcNanoIDGenInit(DKC_NANOID_GEN *gen, uint32 seed);
+DKC_EXTERN int WINAPI dkcNanoIDGenerate(DKC_NANOID_GEN *gen, char *str);
+DKC_EXTERN int WINAPI dkcNanoIDGenerateCustom(DKC_NANOID_GEN *gen, char *str, size_t size, const char *alphabet);
+
+/* ====================================================================
+ * CUID é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcCUIDGenInit(DKC_CUID_GEN *gen, uint32 seed);
+DKC_EXTERN int WINAPI dkcCUIDGenerate(DKC_CUID_GEN *gen, char *str);
+DKC_EXTERN int WINAPI dkcCUID2Generate(DKC_CUID_GEN *gen, char *str);
+DKC_EXTERN int WINAPI dkcCUID2GenerateCustom(DKC_CUID_GEN *gen, char *str, size_t length);
+
+/* ====================================================================
+ * ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°
+ * ==================================================================== */
+
+DKC_EXTERN int WINAPI dkcUniqueIDRandomBytes(uint32 *rand_state, void *buf, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DKC_UNIQUEID_INC_ */

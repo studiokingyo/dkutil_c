@@ -3181,6 +3181,909 @@ void Test_Base64(void)
     TEST_END();
 }
 
+/*
+ * Test: dkcMPH.c (Minimal Perfect Hash - CHD Algorithm)
+ */
+void Test_MPH(void)
+{
+    DKC_MPH mph;
+    const char *words[] = {
+        "apple", "banana", "cherry", "date", "elderberry",
+        "fig", "grape", "honeydew", "kiwi", "lemon",
+        "mango", "nectarine", "orange", "papaya", "quince"
+    };
+    size_t num_words = sizeof(words) / sizeof(words[0]);
+    size_t indices[15];
+    uint8 used[15];
+    int result;
+    size_t i, j;
+    void *serial_buf;
+    size_t serial_size;
+
+    TEST_BEGIN("dkcMPH Test (CHD Algorithm)");
+
+    /* === 初期化テスト === */
+    result = dkcMPHInit(&mph);
+    TEST_ASSERT(result == edk_SUCCEEDED, "MPH init");
+
+    /* === 文字列配列からの構築テスト === */
+    result = dkcMPHBuildStrings(&mph, words, num_words);
+    TEST_ASSERT(result == edk_SUCCEEDED, "MPH build from strings");
+    TEST_ASSERT(mph.num_keys == num_words, "MPH num_keys matches");
+    TEST_ASSERT(mph.g != NULL, "MPH g array allocated");
+
+    /* === ルックアップテスト === */
+    /* 全てのキーが0〜n-1の一意なインデックスを返すことを確認 */
+    memset(used, 0, sizeof(used));
+    for (i = 0; i < num_words; i++) {
+        indices[i] = dkcMPHLookupString(&mph, words[i]);
+        TEST_ASSERT(indices[i] < num_words, "MPH lookup returns valid index");
+    }
+
+    /* 全てのインデックスが一意であることを確認 */
+    for (i = 0; i < num_words; i++) {
+        TEST_ASSERT(used[indices[i]] == 0, "MPH index is unique");
+        used[indices[i]] = 1;
+    }
+
+    /* 全ての0〜n-1が使われていることを確認（最小完全ハッシュの特性） */
+    for (i = 0; i < num_words; i++) {
+        TEST_ASSERT(used[i] == 1, "MPH all slots used (minimal)");
+    }
+
+    /* === 同じキーは同じインデックスを返す === */
+    for (i = 0; i < num_words; i++) {
+        size_t idx2 = dkcMPHLookupString(&mph, words[i]);
+        TEST_ASSERT(indices[i] == idx2, "MPH lookup is deterministic");
+    }
+
+    /* === ユーティリティ関数テスト === */
+    {
+        size_t mem_usage = dkcMPHMemoryUsage(&mph);
+        double bits_per_key = dkcMPHBitsPerKey(&mph);
+        TEST_ASSERT(mem_usage > 0, "MPH memory usage > 0");
+        TEST_ASSERT(bits_per_key > 0.0, "MPH bits per key > 0");
+        /* CHDは通常2〜3 bits/key */
+        TEST_ASSERT(bits_per_key < 50.0, "MPH bits per key reasonable");
+    }
+
+    /* === シリアライズ/デシリアライズテスト === */
+    serial_size = dkcMPHSerializedSize(&mph);
+    TEST_ASSERT(serial_size > 0, "MPH serialized size > 0");
+
+    serial_buf = malloc(serial_size);
+    TEST_ASSERT(serial_buf != NULL, "Serial buffer allocated");
+
+    result = dkcMPHSerialize(&mph, serial_buf, serial_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "MPH serialize");
+
+    /* 別のMPH構造体にデシリアライズ */
+    {
+        DKC_MPH mph2;
+        dkcMPHInit(&mph2);
+
+        result = dkcMPHDeserialize(&mph2, serial_buf, serial_size);
+        TEST_ASSERT(result == edk_SUCCEEDED, "MPH deserialize");
+        TEST_ASSERT(mph2.num_keys == mph.num_keys, "Deserialized num_keys matches");
+        TEST_ASSERT(mph2.g_size == mph.g_size, "Deserialized g_size matches");
+
+        /* デシリアライズ後も同じ結果を返すことを確認 */
+        for (i = 0; i < num_words; i++) {
+            size_t idx_orig = dkcMPHLookupString(&mph, words[i]);
+            size_t idx_deser = dkcMPHLookupString(&mph2, words[i]);
+            TEST_ASSERT(idx_orig == idx_deser, "Deserialized lookup matches");
+        }
+
+        dkcMPHFree(&mph2);
+    }
+
+    free(serial_buf);
+
+    /* === 配列APIテスト === */
+    {
+        DKC_MPH mph3;
+        const void *key_ptrs[5];
+        size_t key_lens[5];
+        const char *test_keys[] = {"one", "two", "three", "four", "five"};
+
+        for (i = 0; i < 5; i++) {
+            key_ptrs[i] = test_keys[i];
+            key_lens[i] = strlen(test_keys[i]);
+        }
+
+        dkcMPHInit(&mph3);
+        result = dkcMPHBuild(&mph3, key_ptrs, key_lens, 5);
+        TEST_ASSERT(result == edk_SUCCEEDED, "MPH build from array");
+
+        /* 一意性確認 */
+        {
+            uint8 used3[5] = {0};
+            for (i = 0; i < 5; i++) {
+                size_t idx = dkcMPHLookup(&mph3, test_keys[i], strlen(test_keys[i]));
+                TEST_ASSERT(idx < 5, "Array API lookup valid");
+                TEST_ASSERT(used3[idx] == 0, "Array API index unique");
+                used3[idx] = 1;
+            }
+        }
+
+        dkcMPHFree(&mph3);
+    }
+
+    /* === コールバックAPIテスト === */
+    /* dkcMPHBuildStringsが内部でコールバックを使用しているため、
+       コールバックAPIは間接的にテスト済み */
+
+    /* === 解放テスト === */
+    dkcMPHFree(&mph);
+    TEST_ASSERT(mph.g == NULL, "MPH freed");
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcLightHash.c (Non-cryptographic hash functions)
+ */
+void Test_LightHash(void)
+{
+    const char *test_str = "Hello, World!";
+    size_t test_len = strlen(test_str);
+    uint32 h32_1, h32_2;
+    uint64 h64_1, h64_2;
+    uint64 murmur128[2];
+
+    TEST_BEGIN("dkcLightHash Test");
+
+    /* === Classic Hash Functions === */
+    h32_1 = dkcHashDJB2(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "DJB2 hash non-zero");
+
+    h32_1 = dkcHashDJB2a(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "DJB2a hash non-zero");
+
+    h32_1 = dkcHashSDBM(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "SDBM hash non-zero");
+
+    h32_1 = dkcHashFNV1_32(test_str, test_len);
+    h32_2 = dkcHashFNV1_32(test_str, test_len);
+    TEST_ASSERT(h32_1 == h32_2, "FNV1-32 deterministic");
+
+    h32_1 = dkcHashFNV1a_32(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "FNV1a-32 hash non-zero");
+
+    h64_1 = dkcHashFNV1_64(test_str, test_len);
+    TEST_ASSERT(h64_1 != 0, "FNV1-64 hash non-zero");
+
+    h64_1 = dkcHashFNV1a_64(test_str, test_len);
+    TEST_ASSERT(h64_1 != 0, "FNV1a-64 hash non-zero");
+
+    h32_1 = dkcHashJenkinsOAAT(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "Jenkins OAAT hash non-zero");
+
+    h32_1 = dkcHashELF(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "ELF hash non-zero");
+
+    h32_1 = dkcHashPJW(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "PJW hash non-zero");
+
+    h32_1 = dkcHashSuperFast(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "SuperFast hash non-zero");
+
+    {
+        uint8 p = dkcHashPearson(test_str, test_len);
+        TEST_ASSERT(p != dkcHashPearson("different", 9), "Pearson different inputs differ");
+    }
+
+    /* === Modern Hash Functions === */
+    h32_1 = dkcHashMurmur2_32(test_str, test_len, 0);
+    h32_2 = dkcHashMurmur2_32(test_str, test_len, 0);
+    TEST_ASSERT(h32_1 == h32_2, "MurmurHash2-32 deterministic");
+
+    h64_1 = dkcHashMurmur2_64(test_str, test_len, 0);
+    TEST_ASSERT(h64_1 != 0, "MurmurHash2-64 non-zero");
+
+    h32_1 = dkcHashMurmur3_32(test_str, test_len, 0);
+    TEST_ASSERT(h32_1 != 0, "MurmurHash3-32 non-zero");
+
+    dkcHashMurmur3_128(test_str, test_len, 0, murmur128);
+    TEST_ASSERT(murmur128[0] != 0 || murmur128[1] != 0, "MurmurHash3-128 non-zero");
+
+    h32_1 = dkcHashXX32(test_str, test_len, 0);
+    h32_2 = dkcHashXX32(test_str, test_len, 0);
+    TEST_ASSERT(h32_1 == h32_2, "xxHash32 deterministic");
+
+    h64_1 = dkcHashXX64(test_str, test_len, 0);
+    TEST_ASSERT(h64_1 != 0, "xxHash64 non-zero");
+
+    h64_1 = dkcHashCity64(test_str, test_len);
+    TEST_ASSERT(h64_1 != 0, "CityHash64 non-zero");
+
+    h64_1 = dkcHashCity64WithSeed(test_str, test_len, 12345);
+    TEST_ASSERT(h64_1 != 0, "CityHash64WithSeed non-zero");
+
+    h64_1 = dkcHashWy(test_str, test_len, 0);
+    TEST_ASSERT(h64_1 != 0, "wyhash non-zero");
+
+    h32_1 = dkcHashFx32(test_str, test_len);
+    TEST_ASSERT(h32_1 != 0, "FxHash32 non-zero");
+
+    h64_1 = dkcHashFx64(test_str, test_len);
+    TEST_ASSERT(h64_1 != 0, "FxHash64 non-zero");
+
+    h32_1 = dkcHashLookup3(test_str, test_len, 0);
+    TEST_ASSERT(h32_1 != 0, "Lookup3 non-zero");
+
+    /* === Utility Functions === */
+    h32_1 = dkcHashString("test string");
+    TEST_ASSERT(h32_1 != 0, "HashString non-zero");
+
+    h32_1 = dkcHashInt32(12345678);
+    TEST_ASSERT(h32_1 != 12345678, "HashInt32 transforms input");
+
+    h64_1 = dkcHashInt64(0x123456789ABCDEFULL);
+    TEST_ASSERT(h64_1 != 0x123456789ABCDEFULL, "HashInt64 transforms input");
+
+    {
+        uint32 combined = dkcHashCombine32(0x12345678, 0x9ABCDEF0);
+        TEST_ASSERT(combined != 0x12345678 && combined != 0x9ABCDEF0, "HashCombine32 works");
+    }
+
+    /* === Collision resistance (basic check) === */
+    {
+        uint32 h1 = dkcHashFNV1a_32("abc", 3);
+        uint32 h2 = dkcHashFNV1a_32("abd", 3);
+        TEST_ASSERT(h1 != h2, "FNV1a different inputs produce different hashes");
+    }
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcBloomFilter.c
+ */
+void Test_BloomFilter(void)
+{
+    DKC_BLOOM bloom;
+    DKC_COUNTING_BLOOM cbloom;
+    const char *words[] = {"apple", "banana", "cherry", "date", "elderberry"};
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcBloomFilter Test");
+
+    /* === Basic Bloom Filter === */
+    result = dkcBloomCreate(&bloom, 100, 0.01);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Bloom create");
+    TEST_ASSERT(bloom.bits != NULL, "Bloom bits allocated");
+    TEST_ASSERT(bloom.num_bits > 0, "Bloom num_bits > 0");
+    TEST_ASSERT(bloom.num_hashes > 0, "Bloom num_hashes > 0");
+
+    /* Add elements */
+    for (i = 0; i < 5; i++) {
+        result = dkcBloomAddString(&bloom, words[i]);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Bloom add string");
+    }
+
+    /* Check contains */
+    for (i = 0; i < 5; i++) {
+        TEST_ASSERT(dkcBloomContainsString(&bloom, words[i]) == TRUE,
+            "Bloom contains added word");
+    }
+
+    /* Check not contains (may have false positives, but unlikely for these) */
+    TEST_ASSERT(dkcBloomContainsString(&bloom, "notinset") == FALSE ||
+                dkcBloomContainsString(&bloom, "xyz123") == FALSE,
+                "Bloom likely doesn't contain random words");
+
+    /* FPR and fill ratio */
+    {
+        double fpr = dkcBloomGetFPR(&bloom);
+        double fill = dkcBloomGetFillRatio(&bloom);
+        TEST_ASSERT(fpr >= 0.0 && fpr <= 1.0, "Bloom FPR in valid range");
+        TEST_ASSERT(fill >= 0.0 && fill <= 1.0, "Bloom fill ratio in valid range");
+    }
+
+    /* Memory usage */
+    {
+        size_t mem = dkcBloomMemoryUsage(&bloom);
+        TEST_ASSERT(mem > 0, "Bloom memory usage > 0");
+    }
+
+    /* Serialize/Deserialize */
+    {
+        size_t serial_size = dkcBloomSerializedSize(&bloom);
+        void *buf = malloc(serial_size);
+        DKC_BLOOM bloom2;
+
+        TEST_ASSERT(buf != NULL, "Bloom serial buffer allocated");
+        result = dkcBloomSerialize(&bloom, buf, serial_size);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Bloom serialize");
+
+        memset(&bloom2, 0, sizeof(bloom2));
+        result = dkcBloomDeserialize(&bloom2, buf, serial_size);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Bloom deserialize");
+
+        /* Check deserialized filter still contains words */
+        for (i = 0; i < 5; i++) {
+            TEST_ASSERT(dkcBloomContainsString(&bloom2, words[i]) == TRUE,
+                "Deserialized bloom contains words");
+        }
+
+        dkcBloomFree(&bloom2);
+        free(buf);
+    }
+
+    /* Clear */
+    dkcBloomClear(&bloom);
+    TEST_ASSERT(bloom.num_items == 0, "Bloom cleared");
+    TEST_ASSERT(dkcBloomContainsString(&bloom, words[0]) == FALSE,
+        "Bloom empty after clear");
+
+    dkcBloomFree(&bloom);
+
+    /* === Counting Bloom Filter === */
+    result = dkcCountingBloomCreate(&cbloom, 100, 0.01);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Counting bloom create");
+
+    /* Add elements */
+    for (i = 0; i < 5; i++) {
+        result = dkcCountingBloomAdd(&cbloom, words[i], strlen(words[i]));
+        TEST_ASSERT(result == edk_SUCCEEDED, "Counting bloom add");
+    }
+
+    /* Check contains */
+    for (i = 0; i < 5; i++) {
+        TEST_ASSERT(dkcCountingBloomContains(&cbloom, words[i], strlen(words[i])) == TRUE,
+            "Counting bloom contains added");
+    }
+
+    /* Remove an element */
+    result = dkcCountingBloomRemove(&cbloom, words[0], strlen(words[0]));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Counting bloom remove");
+    TEST_ASSERT(dkcCountingBloomContains(&cbloom, words[0], strlen(words[0])) == FALSE,
+        "Counting bloom doesn't contain removed");
+
+    /* Other elements still there */
+    TEST_ASSERT(dkcCountingBloomContains(&cbloom, words[1], strlen(words[1])) == TRUE,
+        "Counting bloom still contains others");
+
+    dkcCountingBloomFree(&cbloom);
+
+    /* === Utility functions === */
+    {
+        size_t opt_bits = dkcBloomOptimalBits(1000, 0.01);
+        uint32 opt_hashes = dkcBloomOptimalHashes(opt_bits, 1000);
+        TEST_ASSERT(opt_bits > 0, "Optimal bits > 0");
+        TEST_ASSERT(opt_hashes > 0 && opt_hashes <= 16, "Optimal hashes reasonable");
+    }
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcCuckooHash.c
+ */
+void Test_CuckooHash(void)
+{
+    DKC_CUCKOO_HASH hash;
+    DKC_CUCKOO_FILTER filter;
+    const char *keys[] = {"key1", "key2", "key3", "key4", "key5"};
+    int values[] = {100, 200, 300, 400, 500};
+    int result;
+    size_t i;
+
+    TEST_BEGIN("dkcCuckooHash Test");
+
+    /* === Cuckoo Hash Table === */
+    result = dkcCuckooHashCreate(&hash, 16);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo hash create");
+    TEST_ASSERT(hash.table1 != NULL, "Cuckoo table1 allocated");
+    TEST_ASSERT(hash.table2 != NULL, "Cuckoo table2 allocated");
+
+    /* Insert elements */
+    for (i = 0; i < 5; i++) {
+        result = dkcCuckooHashInsertString(&hash, keys[i], &values[i]);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo insert");
+    }
+
+    TEST_ASSERT(dkcCuckooHashCount(&hash) == 5, "Cuckoo count is 5");
+
+    /* Lookup elements */
+    for (i = 0; i < 5; i++) {
+        int *val = (int *)dkcCuckooHashLookupString(&hash, keys[i]);
+        TEST_ASSERT(val != NULL, "Cuckoo lookup found");
+        TEST_ASSERT(*val == values[i], "Cuckoo lookup value correct");
+    }
+
+    /* Contains check */
+    TEST_ASSERT(dkcCuckooHashContains(&hash, keys[0], strlen(keys[0]) + 1) == TRUE,
+        "Cuckoo contains existing key");
+    TEST_ASSERT(dkcCuckooHashContains(&hash, "nonexistent", 12) == FALSE,
+        "Cuckoo doesn't contain nonexistent");
+
+    /* Lookup nonexistent */
+    TEST_ASSERT(dkcCuckooHashLookupString(&hash, "nonexistent") == NULL,
+        "Cuckoo lookup nonexistent returns NULL");
+
+    /* Update value */
+    {
+        int new_val = 999;
+        result = dkcCuckooHashInsertString(&hash, keys[0], &new_val);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo update");
+
+        int *val = (int *)dkcCuckooHashLookupString(&hash, keys[0]);
+        TEST_ASSERT(val != NULL && *val == 999, "Cuckoo value updated");
+    }
+
+    /* Remove element */
+    result = dkcCuckooHashRemoveString(&hash, keys[1]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo remove");
+    TEST_ASSERT(dkcCuckooHashCount(&hash) == 4, "Cuckoo count after remove");
+    TEST_ASSERT(dkcCuckooHashLookupString(&hash, keys[1]) == NULL,
+        "Cuckoo removed element not found");
+
+    /* Load factor */
+    {
+        double lf = dkcCuckooHashLoadFactor(&hash);
+        TEST_ASSERT(lf > 0.0 && lf < 1.0, "Cuckoo load factor reasonable");
+    }
+
+    /* Clear */
+    dkcCuckooHashClear(&hash);
+    TEST_ASSERT(dkcCuckooHashCount(&hash) == 0, "Cuckoo cleared");
+
+    dkcCuckooHashFree(&hash);
+
+    /* === Cuckoo Filter === */
+    result = dkcCuckooFilterCreate(&filter, 100);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo filter create");
+    TEST_ASSERT(filter.buckets != NULL, "Cuckoo filter buckets allocated");
+
+    /* Add elements */
+    for (i = 0; i < 5; i++) {
+        result = dkcCuckooFilterAddString(&filter, keys[i]);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo filter add");
+    }
+
+    TEST_ASSERT(dkcCuckooFilterCount(&filter) == 5, "Cuckoo filter count is 5");
+
+    /* Contains check */
+    for (i = 0; i < 5; i++) {
+        TEST_ASSERT(dkcCuckooFilterContainsString(&filter, keys[i]) == TRUE,
+            "Cuckoo filter contains added");
+    }
+
+    /* Remove element (unlike Bloom filter, this is supported) */
+    result = dkcCuckooFilterRemoveString(&filter, keys[0]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo filter remove");
+    TEST_ASSERT(dkcCuckooFilterCount(&filter) == 4, "Cuckoo filter count after remove");
+    TEST_ASSERT(dkcCuckooFilterContainsString(&filter, keys[0]) == FALSE,
+        "Cuckoo filter doesn't contain removed");
+
+    /* Memory usage */
+    {
+        size_t mem = dkcCuckooFilterMemoryUsage(&filter);
+        TEST_ASSERT(mem > 0, "Cuckoo filter memory usage > 0");
+    }
+
+    /* Load factor */
+    {
+        double lf = dkcCuckooFilterLoadFactor(&filter);
+        TEST_ASSERT(lf >= 0.0 && lf <= 1.0, "Cuckoo filter load factor valid");
+    }
+
+    /* Clear */
+    dkcCuckooFilterClear(&filter);
+    TEST_ASSERT(dkcCuckooFilterCount(&filter) == 0, "Cuckoo filter cleared");
+
+    dkcCuckooFilterFree(&filter);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcLRUCache.c
+ */
+void Test_LRUCache(void)
+{
+    DKC_LRU_CACHE cache;
+    int values[] = {100, 200, 300, 400, 500};
+    int result;
+    int *val;
+
+    TEST_BEGIN("dkcLRUCache Test");
+
+    /* === 基本操作 === */
+    result = dkcLRUCacheCreate(&cache, 3);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU cache create");
+    TEST_ASSERT(dkcLRUCacheCapacity(&cache) == 3, "LRU capacity is 3");
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 0, "LRU initially empty");
+
+    /* Put操作 */
+    result = dkcLRUCachePutString(&cache, "key1", &values[0]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU put key1");
+
+    result = dkcLRUCachePutString(&cache, "key2", &values[1]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU put key2");
+
+    result = dkcLRUCachePutString(&cache, "key3", &values[2]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU put key3");
+
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 3, "LRU count is 3");
+    TEST_ASSERT(dkcLRUCacheIsFull(&cache) == TRUE, "LRU is full");
+
+    /* Get操作 */
+    val = (int *)dkcLRUCacheGetString(&cache, "key1");
+    TEST_ASSERT(val != NULL && *val == 100, "LRU get key1");
+
+    val = (int *)dkcLRUCacheGetString(&cache, "key2");
+    TEST_ASSERT(val != NULL && *val == 200, "LRU get key2");
+
+    /* 存在確認（位置移動なし） */
+    TEST_ASSERT(dkcLRUCacheContains(&cache, "key3", 5) == TRUE, "LRU contains key3");
+    TEST_ASSERT(dkcLRUCacheContains(&cache, "nonexistent", 12) == FALSE, "LRU doesn't contain nonexistent");
+
+    /* === LRU削除テスト === */
+    /* key3にアクセスしていないので、key3が最古 */
+    /* 新しい要素を追加すると、アクセス順は key2 -> key1 -> key3（古い順） */
+    /* key1に再度アクセス */
+    dkcLRUCacheGetString(&cache, "key1");
+    /* アクセス順: key1(新) -> key2 -> key3(古) */
+
+    /* key4を追加するとkey3が削除されるはず */
+    result = dkcLRUCachePutString(&cache, "key4", &values[3]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU put key4 (should evict key3)");
+
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 3, "LRU count still 3");
+    TEST_ASSERT(dkcLRUCacheGetString(&cache, "key3") == NULL, "key3 was evicted");
+    TEST_ASSERT(dkcLRUCacheGetString(&cache, "key4") != NULL, "key4 exists");
+
+    /* === 値更新テスト === */
+    {
+        int new_val = 999;
+        result = dkcLRUCachePutString(&cache, "key1", &new_val);
+        TEST_ASSERT(result == edk_SUCCEEDED, "LRU update key1");
+
+        val = (int *)dkcLRUCacheGetString(&cache, "key1");
+        TEST_ASSERT(val != NULL && *val == 999, "LRU key1 value updated");
+    }
+
+    /* === 削除テスト === */
+    result = dkcLRUCacheRemoveString(&cache, "key2");
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU remove key2");
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 2, "LRU count is 2");
+    TEST_ASSERT(dkcLRUCacheGetString(&cache, "key2") == NULL, "key2 removed");
+
+    /* === 統計情報テスト === */
+    {
+        uint64 hits, misses, evictions;
+        double hit_rate;
+
+        dkcLRUCacheGetStats(&cache, &hits, &misses, &evictions);
+        TEST_ASSERT(hits > 0, "LRU has hits");
+        TEST_ASSERT(evictions > 0, "LRU has evictions");
+
+        hit_rate = dkcLRUCacheHitRate(&cache);
+        TEST_ASSERT(hit_rate >= 0.0 && hit_rate <= 1.0, "LRU hit rate valid");
+
+        dkcLRUCacheResetStats(&cache);
+        dkcLRUCacheGetStats(&cache, &hits, &misses, &evictions);
+        TEST_ASSERT(hits == 0 && misses == 0 && evictions == 0, "LRU stats reset");
+    }
+
+    /* === Peek操作テスト === */
+    {
+        const char *oldest = (const char *)dkcLRUCachePeekOldest(&cache, NULL);
+        const char *newest = (const char *)dkcLRUCachePeekNewest(&cache, NULL);
+        TEST_ASSERT(oldest != NULL, "LRU peek oldest");
+        TEST_ASSERT(newest != NULL, "LRU peek newest");
+    }
+
+    /* === クリアテスト === */
+    dkcLRUCacheClear(&cache);
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 0, "LRU cleared");
+    TEST_ASSERT(dkcLRUCacheGetString(&cache, "key1") == NULL, "LRU empty after clear");
+
+    /* === リサイズテスト === */
+    dkcLRUCachePutString(&cache, "a", &values[0]);
+    dkcLRUCachePutString(&cache, "b", &values[1]);
+    dkcLRUCachePutString(&cache, "c", &values[2]);
+
+    result = dkcLRUCacheResize(&cache, 2);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU resize to 2");
+    TEST_ASSERT(dkcLRUCacheCapacity(&cache) == 2, "LRU new capacity is 2");
+    TEST_ASSERT(dkcLRUCacheCount(&cache) == 2, "LRU count is 2 after resize");
+
+    dkcLRUCacheFree(&cache);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcLRUCache2.c (Library component reuse version)
+ */
+void Test_LRUCache2(void)
+{
+    DKC_LRU_CACHE2 *cache;
+    int values[] = {100, 200, 300, 400, 500};
+    int result;
+    int *val;
+
+    TEST_BEGIN("dkcLRUCache2 Test (Library Reuse)");
+
+    /* === 基本操作 === */
+    /* キーサイズ32バイトで容量3のキャッシュを作成 */
+    cache = dkcLRUCache2Create(3, 32);
+    TEST_ASSERT(cache != NULL, "LRU2 cache create");
+    TEST_ASSERT(dkcLRUCache2Capacity(cache) == 3, "LRU2 capacity is 3");
+    TEST_ASSERT(dkcLRUCache2Count(cache) == 0, "LRU2 initially empty");
+
+    /* Put操作 */
+    result = dkcLRUCache2PutString(cache, "key1", &values[0]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 put key1");
+
+    result = dkcLRUCache2PutString(cache, "key2", &values[1]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 put key2");
+
+    result = dkcLRUCache2PutString(cache, "key3", &values[2]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 put key3");
+
+    TEST_ASSERT(dkcLRUCache2Count(cache) == 3, "LRU2 count is 3");
+    TEST_ASSERT(dkcLRUCache2IsFull(cache) == TRUE, "LRU2 is full");
+
+    /* Get操作 */
+    val = (int *)dkcLRUCache2GetString(cache, "key1");
+    TEST_ASSERT(val != NULL && *val == 100, "LRU2 get key1");
+
+    val = (int *)dkcLRUCache2GetString(cache, "key2");
+    TEST_ASSERT(val != NULL && *val == 200, "LRU2 get key2");
+
+    /* === LRU削除テスト === */
+    /* key3にアクセスしていないので、key3が最古 */
+    /* key1に再度アクセス */
+    dkcLRUCache2GetString(cache, "key1");
+    /* アクセス順: key1(新) -> key2 -> key3(古) */
+
+    /* key4を追加するとkey3が削除されるはず */
+    result = dkcLRUCache2PutString(cache, "key4", &values[3]);
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 put key4 (should evict key3)");
+
+    TEST_ASSERT(dkcLRUCache2Count(cache) == 3, "LRU2 count still 3");
+    TEST_ASSERT(dkcLRUCache2GetString(cache, "key3") == NULL, "LRU2 key3 was evicted");
+    TEST_ASSERT(dkcLRUCache2GetString(cache, "key4") != NULL, "LRU2 key4 exists");
+
+    /* === 値更新テスト === */
+    {
+        int new_val = 999;
+        result = dkcLRUCache2PutString(cache, "key1", &new_val);
+        TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 update key1");
+
+        val = (int *)dkcLRUCache2GetString(cache, "key1");
+        TEST_ASSERT(val != NULL && *val == 999, "LRU2 key1 value updated");
+    }
+
+    /* === 削除テスト === */
+    result = dkcLRUCache2RemoveString(cache, "key2");
+    TEST_ASSERT(result == edk_SUCCEEDED, "LRU2 remove key2");
+    TEST_ASSERT(dkcLRUCache2Count(cache) == 2, "LRU2 count is 2");
+    TEST_ASSERT(dkcLRUCache2GetString(cache, "key2") == NULL, "LRU2 key2 removed");
+
+    /* === 統計情報テスト === */
+    {
+        uint64 hits, misses, evictions;
+        double hit_rate;
+
+        dkcLRUCache2GetStats(cache, &hits, &misses, &evictions);
+        TEST_ASSERT(hits > 0, "LRU2 has hits");
+        TEST_ASSERT(evictions > 0, "LRU2 has evictions");
+
+        hit_rate = dkcLRUCache2HitRate(cache);
+        TEST_ASSERT(hit_rate >= 0.0 && hit_rate <= 1.0, "LRU2 hit rate valid");
+
+        dkcLRUCache2ResetStats(cache);
+        dkcLRUCache2GetStats(cache, &hits, &misses, &evictions);
+        TEST_ASSERT(hits == 0 && misses == 0 && evictions == 0, "LRU2 stats reset");
+    }
+
+    /* === クリアテスト === */
+    dkcLRUCache2Clear(cache);
+    TEST_ASSERT(dkcLRUCache2Count(cache) == 0, "LRU2 cleared");
+    TEST_ASSERT(dkcLRUCache2GetString(cache, "key1") == NULL, "LRU2 empty after clear");
+
+    /* === 固定サイズキーテスト === */
+    {
+        uint32 int_key1 = 12345;
+        uint32 int_key2 = 67890;
+        DKC_LRU_CACHE2 *int_cache;
+
+        /* キーサイズ4バイト（uint32）で作成 */
+        int_cache = dkcLRUCache2Create(4, sizeof(uint32));
+        TEST_ASSERT(int_cache != NULL, "LRU2 int-key cache create");
+
+        dkcLRUCache2Put(int_cache, &int_key1, &values[0]);
+        dkcLRUCache2Put(int_cache, &int_key2, &values[1]);
+
+        val = (int *)dkcLRUCache2Get(int_cache, &int_key1);
+        TEST_ASSERT(val != NULL && *val == 100, "LRU2 int-key get");
+
+        dkcLRUCache2Free(&int_cache);
+        TEST_ASSERT(int_cache == NULL, "LRU2 int-key cache freed");
+    }
+
+    dkcLRUCache2Free(&cache);
+    TEST_ASSERT(cache == NULL, "LRU2 freed");
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcUniqueID.c
+ */
+void Test_UniqueID(void)
+{
+    DKC_UUID uuid1, uuid2, uuid3;
+    DKC_UUID_GEN uuid_gen;
+    DKC_ULID ulid1, ulid2;
+    DKC_ULID_GEN ulid_gen;
+    DKC_SNOWFLAKE sf;
+    DKC_SNOWFLAKE_GEN sf_gen;
+    DKC_KSUID ksuid;
+    DKC_KSUID_GEN ksuid_gen;
+    DKC_XID xid;
+    DKC_XID_GEN xid_gen;
+    DKC_NANOID_GEN nanoid_gen;
+    DKC_CUID_GEN cuid_gen;
+    char str_buf[64];
+    int result;
+
+    TEST_BEGIN("dkcUniqueID Test");
+
+    /* === UUID Generator Init === */
+    result = dkcUUIDGenInit(&uuid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID generator init");
+
+    /* === UUID v4 Tests === */
+    result = dkcUUIDv4Generate(&uuid_gen, &uuid1);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v4 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 4, "UUID v4 version is 4");
+    TEST_ASSERT(dkcUUIDIsNil(&uuid1) == FALSE, "UUID v4 is not nil");
+
+    result = dkcUUIDToString(&uuid1, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID to string");
+    TEST_ASSERT(strlen(str_buf) == 36, "UUID string length is 36");
+
+    result = dkcUUIDFromString(str_buf, &uuid2);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID from string");
+    TEST_ASSERT(dkcUUIDCompare(&uuid1, &uuid2) == 0, "UUID roundtrip matches");
+
+    /* === UUID v1 Tests === */
+    result = dkcUUIDv1Generate(&uuid_gen, &uuid1);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v1 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 1, "UUID v1 version is 1");
+
+    /* === UUID v3 (MD5) Tests === */
+    result = dkcUUIDv3GenerateNS(&uuid1, edkcUUID_NS_DNS, "example.com", 11);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v3 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 3, "UUID v3 version is 3");
+
+    /* Same input produces same UUID */
+    result = dkcUUIDv3GenerateNS(&uuid2, edkcUUID_NS_DNS, "example.com", 11);
+    TEST_ASSERT(dkcUUIDCompare(&uuid1, &uuid2) == 0, "UUID v3 deterministic");
+
+    /* === UUID v5 (SHA-1) Tests === */
+    result = dkcUUIDv5GenerateNS(&uuid1, edkcUUID_NS_URL, "https://example.com", 19);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v5 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 5, "UUID v5 version is 5");
+
+    /* === UUID v6 Tests === */
+    result = dkcUUIDv6Generate(&uuid_gen, &uuid1);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v6 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 6, "UUID v6 version is 6");
+
+    /* === UUID v7 Tests === */
+    result = dkcUUIDv7Generate(&uuid_gen, &uuid1);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v7 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 7, "UUID v7 version is 7");
+
+    /* === UUID v8 Tests === */
+    result = dkcUUIDv8Generate(&uuid1, 0x123456789ABCULL, 0xDEF, 0x0123456789ABCDEFULL);
+    TEST_ASSERT(result == edk_SUCCEEDED, "UUID v8 generate");
+    TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 8, "UUID v8 version is 8");
+
+    /* === NIL UUID Tests === */
+    dkcUUIDNil(&uuid3);
+    TEST_ASSERT(dkcUUIDIsNil(&uuid3) == TRUE, "NIL UUID is nil");
+
+    /* === ULID Generator Init === */
+    result = dkcULIDGenInit(&ulid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ULID generator init");
+
+    /* === ULID Tests === */
+    result = dkcULIDGenerate(&ulid_gen, &ulid1);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ULID generate");
+
+    result = dkcULIDToString(&ulid1, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ULID to string");
+    TEST_ASSERT(strlen(str_buf) == 26, "ULID string length is 26");
+
+    result = dkcULIDFromString(str_buf, &ulid2);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ULID from string");
+    TEST_ASSERT(dkcULIDCompare(&ulid1, &ulid2) == 0, "ULID roundtrip matches");
+
+    /* ULID timestamp */
+    {
+        uint64 ts = dkcULIDGetTimestamp(&ulid1);
+        TEST_ASSERT(ts > 0, "ULID timestamp is valid");
+    }
+
+    /* === Snowflake Tests === */
+    result = dkcSnowflakeInit(&sf_gen, 1, 1, 0, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Snowflake init");
+
+    result = dkcSnowflakeGenerate(&sf_gen, &sf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Snowflake generate");
+    TEST_ASSERT(sf.id != 0, "Snowflake ID is not zero");
+
+    result = dkcSnowflakeToString(&sf, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Snowflake to string");
+
+    /* === KSUID Tests === */
+    result = dkcKSUIDGenInit(&ksuid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KSUID generator init");
+
+    result = dkcKSUIDGenerate(&ksuid_gen, &ksuid);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KSUID generate");
+
+    result = dkcKSUIDToString(&ksuid, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "KSUID to string");
+    TEST_ASSERT(strlen(str_buf) == 27, "KSUID string length is 27");
+
+    /* KSUID timestamp */
+    {
+        uint32 ts = dkcKSUIDGetTimestamp(&ksuid);
+        TEST_ASSERT(ts > 0, "KSUID timestamp is valid");
+    }
+
+    /* === XID Tests === */
+    result = dkcXIDInit(&xid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "XID init");
+
+    result = dkcXIDGenerate(&xid_gen, &xid);
+    TEST_ASSERT(result == edk_SUCCEEDED, "XID generate");
+
+    result = dkcXIDToString(&xid, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "XID to string");
+    TEST_ASSERT(strlen(str_buf) == 20, "XID string length is 20");
+
+    /* === NanoID Tests === */
+    result = dkcNanoIDGenInit(&nanoid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "NanoID generator init");
+
+    result = dkcNanoIDGenerate(&nanoid_gen, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "NanoID generate");
+    TEST_ASSERT(strlen(str_buf) == 21, "NanoID default length is 21");
+
+    /* Custom NanoID */
+    result = dkcNanoIDGenerateCustom(&nanoid_gen, str_buf, 10, "abc123");
+    TEST_ASSERT(result == edk_SUCCEEDED, "NanoID custom generate");
+    TEST_ASSERT(strlen(str_buf) == 10, "NanoID custom length is 10");
+
+    /* === CUID Tests === */
+    result = dkcCUIDGenInit(&cuid_gen, 12345);
+    TEST_ASSERT(result == edk_SUCCEEDED, "CUID generator init");
+
+    result = dkcCUIDGenerate(&cuid_gen, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "CUID generate");
+    TEST_ASSERT(str_buf[0] == 'c', "CUID starts with 'c'");
+    TEST_ASSERT(strlen(str_buf) == 25, "CUID length is 25");
+
+    /* === CUID2 Tests === */
+    result = dkcCUID2Generate(&cuid_gen, str_buf);
+    TEST_ASSERT(result == edk_SUCCEEDED, "CUID2 generate");
+    TEST_ASSERT(strlen(str_buf) == 24, "CUID2 default length is 24");
+
+    TEST_END();
+}
+
 /* ========================================
  * MAIN
  * ======================================== */
@@ -3255,6 +4158,25 @@ int main(int argc, char *argv[])
 
     /* Base64 Test */
     Test_Base64();
+
+    /* MPH (Minimal Perfect Hash) Tests */
+    Test_MPH();
+
+    /* LightHash Tests */
+    Test_LightHash();
+
+    /* Bloom Filter Tests */
+    Test_BloomFilter();
+
+    /* Cuckoo Hash Tests */
+    Test_CuckooHash();
+
+    /* LRU Cache Tests */
+    Test_LRUCache();
+    Test_LRUCache2();
+
+    /* UniqueID Tests */
+    Test_UniqueID();
 
     /* Regex Tests */
     Test_Regex();

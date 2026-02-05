@@ -1,6 +1,6 @@
 /*! @file
 	@brief Threefish Block Cipher
-	@author threeBrane
+	@author d.Kingyo
 	@note
 	Threefishは、SHA-3コンペティションのファイナリストであるSkeinハッシュ関数で
 	使用されるtweakable block cipherです。

@@ -43,14 +43,14 @@ clean.bat
 
 | Category | Components |
 |----------|------------|
-| **Data Structures** | dkc2Tree (binary), dkcBTree (B-Tree), dkcRedBlackTree, dkcAVLTree (AVL Tree), dkcHashSet, dkcHashMap, dkcHashMultiSet, dkcHashMultiMap, dkcSingleList, dkcStack, dkcQueue, dkcDeque, dkcDynamicArray, dkcHash |
+| **Data Structures** | dkc2Tree (binary), dkcBTree (B-Tree), dkcRedBlackTree, dkcAVLTree (AVL Tree), dkcHashSet, dkcHashMap, dkcHashMultiSet, dkcHashMultiMap, dkcMPH (Minimal Perfect Hash - CHD), dkcBloomFilter, dkcCuckooHash (Cuckoo Hash Table/Filter), dkcLRUCache, dkcLRUCache2 (library reuse), dkcSingleList, dkcStack, dkcQueue, dkcDeque, dkcDynamicArray, dkcHash, dkcLightHash |
 | **Streams** | dkcStream, dkcCircularStream, dkcMemoryStream |
 | **Cryptography** | Rijndael, Blowfish, ARC4, Camellia, Twofish, Threefish, HC256, SNOW2.0, KCipher-2, Vernam |
 | **Message Digests** | MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512, Keccak, SHA3-224/256/384/512, BLAKE-224/256/384/512, BLAKE2s, BLAKE2b, BLAKE3, HMAC, CRC |
 | **Compression** | dkcLZSS, dkcLZW, dkcRLE, dkcBlockSort |
 | **File Systems** | dkcFileSystems, dkcSJISFS (Shift-JIS support), dkcSafeFS |
 | **Threading** | dkcThread, dkcThreadLock (pthread/Win32) |
-| **Utilities** | dkcDLL, dkcRegex, dkcMath, dkcMemoryPool, dkcOS |
+| **Utilities** | dkcDLL, dkcRegex, dkcMath, dkcMemoryPool, dkcUniqueID (UUID/ULID/Snowflake/KSUID/XID/NanoID/CUID), dkcOS |
 
 ### Standard Library Abstraction
 `dkutil_cstd/` contains platform-independent wrappers for memory, stdlib, and x86 optimizations.
@@ -101,7 +101,7 @@ Open `test/test_dkutil_c.dsw` in VC6, build dkutil_c first, then build test_dkut
 | **Ciphers** | Arcfour (RC4), Blowfish, Rijndael (AES), Camellia, Twofish, Threefish, SNOW 2.0, HC256, KCipher-2, Vernam |
 | **Compression** | LZSS, LZW, RLE (PackBits) |
 | **Regex** | Regular Expression matching and search |
-| **Utilities** | Memory allocation, Sort (Shell/Comb/Bubble), Bit operations, XorShift RNG, SJIS String |
+| **Utilities** | Memory allocation, Sort (Shell/Comb/Bubble), Bit operations, XorShift RNG, SJIS String, UniqueID (UUID v1-v8, ULID, Snowflake, KSUID, XID, NanoID, CUID), MPH (Minimal Perfect Hash), LightHash (DJB2, FNV, MurmurHash, xxHash, CityHash, wyhash, FxHash等), BloomFilter, CuckooHash/CuckooFilter, LRUCache, LRUCache2 |
 
 ### Notes on Untested Modules
 - All major modules are covered by the test suite.

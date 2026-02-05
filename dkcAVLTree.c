@@ -1,6 +1,6 @@
 /*! @file
 	@brief AVL木 (自己平衡二分探索木) 実装
-	@author threeBrane
+	@author d.Kingyo
 */
 
 #include "dkcAVLTree.h"

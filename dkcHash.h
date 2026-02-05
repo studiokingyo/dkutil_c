@@ -18,7 +18,7 @@ typedef int (WINAPI *DKC_SHO_DIGESTSTR_F_TYPE)(void *p,char *buff,size_t size);
 typedef int (WINAPI *DKC_SHO_DIGEST_F_TYPE)(void *p,BYTE *buff,size_t size);
 
 
-///DKC_SHO‚Ì–¼‘O‚Í”p~‚·‚é‰Â”\«ƒAƒŠ
+///DKC_SHOï¿½Ì–ï¿½ï¿½Oï¿½Í”pï¿½~ï¿½ï¿½ï¿½ï¿½Â”\ï¿½ï¿½ï¿½Aï¿½ï¿½
 typedef struct dkc_SecureHashObject{
 	DKC_WINAPI_PROC_F_TYPE Init;
 	DKC_WINAPI_PROC_F_TYPE Load;
@@ -50,19 +50,19 @@ int WINAPI dkcSHODigestStr(DKC_SECURE_HASH_OBJECT *p,char *buff,size_t size);
 int WINAPI dkcSHODigest(DKC_SECURE_HASH_OBJECT *p,BYTE *buff,size_t size);
 
 /**
-@param hash_option[in] edk_SecureHash‚Ì‚Ç‚ê‚©
-@param digest_dest[out] ƒ_ƒCƒWƒFƒXƒg‚Ìo—Íƒoƒbƒtƒ@
-@param dest_size[in] digest_dest‚É“n‚µ‚½ƒoƒbƒtƒ@‚ÌƒTƒCƒY
-@param data[in] ƒnƒbƒVƒ…‚ğŒvZ‚µ‚½‚¢ƒf[ƒ^
-@param data_size[in] data‚ÌƒTƒCƒY
+@param hash_option[in] edk_SecureHashï¿½Ì‚Ç‚ê‚©
+@param digest_dest[out] ï¿½_ï¿½Cï¿½Wï¿½Fï¿½Xï¿½gï¿½Ìoï¿½Íƒoï¿½bï¿½tï¿½@
+@param dest_size[in] digest_destï¿½É“nï¿½ï¿½ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÌƒTï¿½Cï¿½Y
+@param data[in] ï¿½nï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^
+@param data_size[in] dataï¿½ÌƒTï¿½Cï¿½Y
 */
-///ƒoƒCƒiƒŠ‚Å‚ÌƒnƒbƒVƒ…‚ğo—Í‚ğ‚·‚é
+///ï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½Å‚Ìƒnï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½
 DKC_EXTERN int WINAPI dkcSecureHashCalculateBinaryDigest(
 	UINT hash_option,BYTE *digest_dest,size_t destsize,
 	const BYTE *data,size_t data_size
 );
 
-///•¶š—ñ‚Ìo—Í‚ğ‚·‚é @see ‚»‚Ì‘¼ˆø”“™‚Í dkcSecureHashCalculateBinaryDigest()
+///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìoï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ @see ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ dkcSecureHashCalculateBinaryDigest()
 DKC_EXTERN int WINAPI dkcSecureHashCalculateStringDigest(
 	UINT hash_option,char *digest_dest,size_t destsize,
 	const BYTE *data,size_t data_size
@@ -72,43 +72,5 @@ DKC_EXTERN int WINAPI dkcSecureHashCalculateStringDigest(
 DKC_EXTERN uint32 dkcHash24(uint8 *,size_t);
 DKC_EXTERN uint16 dkcHash16(uint8 *,size_t);
 DKC_EXTERN uint8 dkcHash8(uint8 *,size_t);
-
-
-#if 0//defined(__cplusplus)
-
-namespace dkutil{
-
-///‚Æ‚è‚ ‚¦‚¸A•µˆÍ‹C‚¾‚¯¥¥¥
-class map_st{
-	st_table *mM;
-public:
-	map_st(){
-		mM = st_init_strtable();
-	}
-	bool reset(){
-		clear();
-		mM = st_init_strtable();
-	}
-	bool insert(const char *key,const char *data){
-		
-	}
-	void clear(){
-		if(mM){
-			st_free_table(mM);
-		}
-	}
-	bool lookup(const char *key,char *buff,size_t size){
-		st_lookup(m, key, &buff);
-	}
-
-
-};
-
-
-
-}//end of namespace
-
-
-#endif
 
 #endif //end of include once
