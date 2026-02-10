@@ -71,6 +71,16 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcFenwickTree.h"
 #include "dkcUnionFind.h"
 #include "dkcSparseSet.h"
+#include "dkcHeap.h"
+#include "dkcSplayTree.h"
+#include "dkcPatricia.h"
+#include "dkcBigInteger.h"
+#include "dkcSkipList.h"
+#include "dkcTreap.h"
+#include "dkcBPlusTree.h"
+#include "dkcFibonacciHeap.h"
+#include "dkcSuffixArray.h"
+#include "dkcRope.h"
 
 /* generic interface */
 #include "dkcCircularStream.h"
@@ -105,6 +115,12 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 /* cryptograph */
 #include "dkcCryptoGraph.h"
 #include "dkcBase64.h"
+#include "dkcChaCha20.h"
+#include "dkcPoly1305.h"
+#include "dkcAESGCM.h"
+#include "dkcBcrypt.h"
+#include "dkcScrypt.h"
+#include "dkcArgon2.h"
 
 
 /* gemerate signature */

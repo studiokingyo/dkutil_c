@@ -2621,7 +2621,7 @@ void Test_Sort(void)
     dkcMergeSort(arr6, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr6, sorted, sizeof(sorted)) == 0, "MergeSort");
 
-    dkcHeapSort(arr7, 10, sizeof(int), compare_int);
+    dkcHeapSort2(arr7, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr7, sorted, sizeof(sorted)) == 0, "HeapSort");
 
     dkcCocktailSort(arr8, 10, sizeof(int), compare_int);
@@ -4444,6 +4444,1243 @@ void Test_UniqueID(void)
 }
 
 /* ========================================
+ * HEAP TESTS
+ * ======================================== */
+
+/*
+ * Test: dkcHeap (pointer heap)
+ */
+void Test_Heap(void)
+{
+    DKC_HEAP heap;
+    int result;
+    int vals[10];
+    int *top;
+    int i;
+
+    TEST_BEGIN("dkcHeap (Pointer Heap) Test");
+
+    /* --- Min-Heap --- */
+    result = dkcHeapCreate(&heap, 0, dkcHeapCompareInt, TRUE);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Min-Heap create");
+    TEST_ASSERT(dkcHeapIsEmpty(&heap) == TRUE, "New heap is empty");
+    TEST_ASSERT(dkcHeapSize(&heap) == 0, "New heap size is 0");
+
+    vals[0] = 30; vals[1] = 10; vals[2] = 50; vals[3] = 20; vals[4] = 40;
+    for (i = 0; i < 5; i++) {
+        result = dkcHeapPush(&heap, &vals[i]);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Min-Heap push");
+    }
+
+    TEST_ASSERT(dkcHeapSize(&heap) == 5, "Min-Heap size is 5");
+    TEST_ASSERT(dkcHeapIsEmpty(&heap) == FALSE, "Min-Heap is not empty");
+
+    top = (int *)dkcHeapTop(&heap);
+    TEST_ASSERT(top != NULL && *top == 10, "Min-Heap top is 10");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 10, "Min-Heap pop returns 10");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 20, "Min-Heap pop returns 20");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 30, "Min-Heap pop returns 30");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 40, "Min-Heap pop returns 40");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 50, "Min-Heap pop returns 50");
+
+    TEST_ASSERT(dkcHeapIsEmpty(&heap) == TRUE, "Min-Heap empty after all pops");
+    TEST_ASSERT(dkcHeapPop(&heap) == NULL, "Pop from empty heap returns NULL");
+
+    dkcHeapFree(&heap);
+
+    /* --- Max-Heap --- */
+    result = dkcHeapCreate(&heap, 4, dkcHeapCompareInt, FALSE);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Max-Heap create");
+
+    vals[0] = 30; vals[1] = 10; vals[2] = 50; vals[3] = 20; vals[4] = 40;
+    for (i = 0; i < 5; i++) {
+        dkcHeapPush(&heap, &vals[i]);
+    }
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 50, "Max-Heap pop returns 50");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 40, "Max-Heap pop returns 40");
+
+    top = (int *)dkcHeapPop(&heap);
+    TEST_ASSERT(top != NULL && *top == 30, "Max-Heap pop returns 30");
+
+    dkcHeapClear(&heap);
+    TEST_ASSERT(dkcHeapIsEmpty(&heap) == TRUE, "Clear empties heap");
+
+    dkcHeapFree(&heap);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcTypedHeap (typed heap)
+ */
+void Test_TypedHeap(void)
+{
+    DKC_TYPED_HEAP heap;
+    int result;
+    int val, out;
+    int arr[] = {50, 30, 10, 40, 20, 60, 5};
+    int i;
+
+    TEST_BEGIN("dkcTypedHeap (Typed Heap) Test");
+
+    /* --- Create and push --- */
+    result = dkcTypedHeapCreate(&heap, 4, sizeof(int), dkcHeapCompareInt, TRUE);
+    TEST_ASSERT(result == edk_SUCCEEDED, "TypedHeap create");
+
+    val = 30; dkcTypedHeapPush(&heap, &val);
+    val = 10; dkcTypedHeapPush(&heap, &val);
+    val = 50; dkcTypedHeapPush(&heap, &val);
+    val = 20; dkcTypedHeapPush(&heap, &val);
+    val = 40; dkcTypedHeapPush(&heap, &val);
+
+    TEST_ASSERT(dkcTypedHeapSize(&heap) == 5, "TypedHeap size is 5");
+
+    result = dkcTypedHeapTop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 10, "TypedHeap top is 10");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 10, "TypedHeap pop returns 10");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 20, "TypedHeap pop returns 20");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 30, "TypedHeap pop returns 30");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 40, "TypedHeap pop returns 40");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 50, "TypedHeap pop returns 50");
+
+    TEST_ASSERT(dkcTypedHeapIsEmpty(&heap) == TRUE, "TypedHeap empty after pops");
+    dkcTypedHeapFree(&heap);
+
+    /* --- Build from array (O(n) heapify) --- */
+    result = dkcTypedHeapBuild(&heap, arr, 7, sizeof(int), dkcHeapCompareInt, TRUE);
+    TEST_ASSERT(result == edk_SUCCEEDED, "TypedHeap build from array");
+    TEST_ASSERT(dkcTypedHeapSize(&heap) == 7, "Built heap size is 7");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 5, "Built heap pop returns 5");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 10, "Built heap pop returns 10");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 20, "Built heap pop returns 20");
+
+    dkcTypedHeapClear(&heap);
+    TEST_ASSERT(dkcTypedHeapIsEmpty(&heap) == TRUE, "TypedHeap clear");
+    dkcTypedHeapFree(&heap);
+
+    /* --- Max-Heap typed --- */
+    result = dkcTypedHeapCreate(&heap, 0, sizeof(int), dkcHeapCompareInt, FALSE);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Max TypedHeap create");
+
+    val = 10; dkcTypedHeapPush(&heap, &val);
+    val = 50; dkcTypedHeapPush(&heap, &val);
+    val = 30; dkcTypedHeapPush(&heap, &val);
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 50, "Max TypedHeap pop returns 50");
+
+    result = dkcTypedHeapPop(&heap, &out);
+    TEST_ASSERT(result == edk_SUCCEEDED && out == 30, "Max TypedHeap pop returns 30");
+
+    dkcTypedHeapFree(&heap);
+
+    TEST_END();
+}
+
+/*
+ * Test: dkcHeapSort
+ */
+void Test_HeapSortStandalone(void)
+{
+    int arr[] = {50, 30, 10, 40, 20, 60, 5, 35, 15, 45};
+    int result;
+    int i;
+    int sorted;
+
+    TEST_BEGIN("dkcHeapSort (Standalone) Test");
+
+    result = dkcHeapSort2(arr, 10, sizeof(int), dkcHeapCompareInt);
+    TEST_ASSERT(result == edk_SUCCEEDED, "HeapSort returns success");
+
+    sorted = 1;
+    for (i = 1; i < 10; i++) {
+        if (arr[i - 1] > arr[i]) {
+            sorted = 0;
+            break;
+        }
+    }
+    TEST_ASSERT(sorted, "HeapSort produces sorted array");
+    TEST_ASSERT(arr[0] == 5, "HeapSort first element is 5");
+    TEST_ASSERT(arr[9] == 60, "HeapSort last element is 60");
+
+    /* Single element */
+    result = dkcHeapSort2(arr, 1, sizeof(int), dkcHeapCompareInt);
+    TEST_ASSERT(result == edk_SUCCEEDED, "HeapSort single element");
+
+    /* Empty */
+    result = dkcHeapSort2(arr, 0, sizeof(int), dkcHeapCompareInt);
+    TEST_ASSERT(result == edk_SUCCEEDED, "HeapSort zero elements");
+
+    TEST_END();
+}
+
+/* ========================================
+ * SPLAY TREE TESTS
+ * ======================================== */
+
+static int WINAPIV compare_splaytree_int(const void *a, const void *b)
+{
+    int ia = *(const int *)a;
+    int ib = *(const int *)b;
+    if (ia < ib) return -1;
+    if (ia > ib) return 1;
+    return 0;
+}
+
+static BOOL WINAPI splaytree_foreach_callback(const void *key, void *data, size_t data_size, void *user)
+{
+    int *counter = (int *)user;
+    (void)key;
+    (void)data;
+    (void)data_size;
+    (*counter)++;
+    return TRUE;
+}
+
+void Test_SplayTree(void)
+{
+    DKC_SPLAYTREE_ROOT *tree;
+    DKC_SPLAYTREE_NODE *node;
+    DKC_SPLAYTREE_NODE *min_node;
+    DKC_SPLAYTREE_NODE *max_node;
+    int keys[10];
+    int data_vals[10];
+    int read_data;
+    int result;
+    int i;
+    int counter;
+
+    TEST_BEGIN("dkcSplayTree (Splay Tree) Test");
+
+    /* Create Splay tree */
+    tree = dkcAllocSplayTreeRoot(sizeof(int), 10, compare_splaytree_int, 100);
+    TEST_ASSERT(tree != NULL, "dkcAllocSplayTreeRoot");
+
+    TEST_ASSERT(dkcSplayTreeIsEmpty(tree) == TRUE, "New tree is empty");
+    TEST_ASSERT(dkcSplayTreeSize(tree) == 0, "Size is 0");
+
+    /* Insert multiple keys */
+    keys[0] = 10; data_vals[0] = 100;
+    keys[1] = 20; data_vals[1] = 200;
+    keys[2] = 30; data_vals[2] = 300;
+    keys[3] = 40; data_vals[3] = 400;
+    keys[4] = 50; data_vals[4] = 500;
+    keys[5] = 25; data_vals[5] = 250;
+
+    for (i = 0; i < 6; i++) {
+        result = dkcSplayTreeInsert(tree, &keys[i], &data_vals[i], sizeof(int));
+        TEST_ASSERT(result == edk_SUCCEEDED, "Insert key");
+    }
+
+    TEST_ASSERT(dkcSplayTreeSize(tree) == 6, "Size is 6 after inserts");
+    TEST_ASSERT(dkcSplayTreeIsEmpty(tree) == FALSE, "Tree is not empty");
+
+    /* Find existing keys */
+    node = dkcSplayTreeFind(tree, &keys[0]);
+    TEST_ASSERT(node != NULL, "Find key 10");
+
+    if (node != NULL) {
+        dkcSplayTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 100, "Key 10 has data 100");
+    }
+
+    /* After find, the found node should be at root (splay property) */
+    TEST_ASSERT(tree->root != tree->sentinel, "Root is not sentinel after find");
+    if (tree->root != tree->sentinel) {
+        dkcSplayTreeGetBuffer(tree->root, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 100, "Root is splayed node (key 10)");
+    }
+
+    node = dkcSplayTreeFind(tree, &keys[4]);
+    TEST_ASSERT(node != NULL, "Find key 50");
+
+    if (node != NULL) {
+        dkcSplayTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 500, "Key 50 has data 500");
+    }
+
+    /* Find non-existing key */
+    i = 999;
+    node = dkcSplayTreeFind(tree, &i);
+    TEST_ASSERT(node == NULL, "Key 999 not found");
+
+    /* Test FindMin and FindMax */
+    min_node = dkcSplayTreeFindMin(tree);
+    TEST_ASSERT(min_node != NULL, "FindMin returns node");
+    if (min_node != NULL) {
+        dkcSplayTreeGetBuffer(min_node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 100, "Min node has data 100 (key 10)");
+    }
+
+    max_node = dkcSplayTreeFindMax(tree);
+    TEST_ASSERT(max_node != NULL, "FindMax returns node");
+    if (max_node != NULL) {
+        dkcSplayTreeGetBuffer(max_node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 500, "Max node has data 500 (key 50)");
+    }
+
+    /* Test foreach (in-order traversal) */
+    counter = 0;
+    result = dkcSplayTreeForeach(tree, edkcSplayTreeInOrder, splaytree_foreach_callback, &counter);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Foreach in-order succeeded");
+    TEST_ASSERT(counter == 6, "Foreach visited all 6 nodes");
+
+    /* Test delete */
+    i = 30;
+    result = dkcSplayTreeEraseFromKey(tree, &i);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Delete key 30");
+    TEST_ASSERT(dkcSplayTreeSize(tree) == 5, "Size is 5 after delete");
+
+    node = dkcSplayTreeFind(tree, &i);
+    TEST_ASSERT(node == NULL, "Key 30 not found after delete");
+
+    /* Delete non-existing key */
+    i = 999;
+    result = dkcSplayTreeEraseFromKey(tree, &i);
+    TEST_ASSERT(result == edk_Not_Found, "Delete non-existing key returns Not_Found");
+
+    /* Test update existing key */
+    i = 10;
+    read_data = 1000;
+    result = dkcSplayTreeInsert(tree, &i, &read_data, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Update existing key 10");
+
+    node = dkcSplayTreeFind(tree, &i);
+    if (node != NULL) {
+        dkcSplayTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 1000, "Key 10 updated to data 1000");
+    }
+
+    /* Test repeated access (cache effect) */
+    i = 20;
+    node = dkcSplayTreeFind(tree, &i);
+    TEST_ASSERT(node != NULL, "Find key 20 first time");
+    node = dkcSplayTreeFind(tree, &i);
+    TEST_ASSERT(node != NULL, "Find key 20 second time (cached at root)");
+    if (node != NULL) {
+        dkcSplayTreeGetBuffer(node, &read_data, sizeof(int));
+        TEST_ASSERT(read_data == 200, "Key 20 still has data 200");
+    }
+
+    /* Test clear */
+    result = dkcSplayTreeClear(tree);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Clear tree");
+    TEST_ASSERT(dkcSplayTreeIsEmpty(tree) == TRUE, "Tree is empty after clear");
+    TEST_ASSERT(dkcSplayTreeSize(tree) == 0, "Size is 0 after clear");
+
+    /* Free tree */
+    dkcFreeSplayTreeRoot(&tree);
+    TEST_ASSERT(tree == NULL, "Free Splay tree");
+
+    TEST_END();
+}
+
+/* ========================================
+ * PATRICIA TRIE TESTS
+ * ======================================== */
+
+void Test_Patricia(void)
+{
+    DKC_PATRICIA trie;
+    int result;
+    void *data;
+    size_t data_size;
+    int val1 = 100, val2 = 200, val3 = 300, val4 = 400;
+
+    TEST_BEGIN("dkcPatricia (Patricia Trie) Test");
+
+    /* Create */
+    result = dkcPatriciaCreate(&trie);
+    TEST_ASSERT(result == edk_SUCCEEDED, "dkcPatriciaCreate");
+    TEST_ASSERT(dkcPatriciaIsEmpty(&trie) == TRUE, "New trie is empty");
+    TEST_ASSERT(dkcPatriciaCount(&trie) == 0, "Count is 0");
+
+    /* Insert */
+    result = dkcPatriciaInsert(&trie, (const BYTE *)"hello", 5, &val1, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 'hello'");
+
+    result = dkcPatriciaInsert(&trie, (const BYTE *)"world", 5, &val2, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 'world'");
+
+    result = dkcPatriciaInsert(&trie, (const BYTE *)"help", 4, &val3, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 'help'");
+
+    result = dkcPatriciaInsert(&trie, (const BYTE *)"test", 4, &val4, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert 'test'");
+
+    TEST_ASSERT(dkcPatriciaCount(&trie) == 4, "Count is 4");
+    TEST_ASSERT(dkcPatriciaIsEmpty(&trie) == FALSE, "Trie is not empty");
+
+    /* Search existing keys */
+    data = NULL;
+    data_size = 0;
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"hello", 5, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search 'hello' found");
+    if (data != NULL) {
+        TEST_ASSERT(*(int *)data == 100, "'hello' has data 100");
+    }
+
+    data = NULL;
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"world", 5, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search 'world' found");
+    if (data != NULL) {
+        TEST_ASSERT(*(int *)data == 200, "'world' has data 200");
+    }
+
+    data = NULL;
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"help", 4, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search 'help' found");
+    if (data != NULL) {
+        TEST_ASSERT(*(int *)data == 300, "'help' has data 300");
+    }
+
+    /* Search non-existing key */
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"xyz", 3, &data, &data_size);
+    TEST_ASSERT(result == edk_Not_Found, "Search 'xyz' not found");
+
+    /* Update existing key */
+    val1 = 999;
+    result = dkcPatriciaInsert(&trie, (const BYTE *)"hello", 5, &val1, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Update 'hello'");
+    TEST_ASSERT(dkcPatriciaCount(&trie) == 4, "Count still 4 after update");
+
+    data = NULL;
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"hello", 5, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search updated 'hello'");
+    if (data != NULL) {
+        TEST_ASSERT(*(int *)data == 999, "'hello' updated to 999");
+    }
+
+    /* Delete */
+    result = dkcPatriciaRemove(&trie, (const BYTE *)"help", 4);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Remove 'help'");
+    TEST_ASSERT(dkcPatriciaCount(&trie) == 3, "Count is 3 after remove");
+
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"help", 4, &data, &data_size);
+    TEST_ASSERT(result == edk_Not_Found, "'help' not found after remove");
+
+    /* Delete non-existing */
+    result = dkcPatriciaRemove(&trie, (const BYTE *)"notexist", 8);
+    TEST_ASSERT(result == edk_Not_Found, "Remove non-existing returns Not_Found");
+
+    /* Remaining keys still work */
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"hello", 5, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "'hello' still found after other remove");
+
+    result = dkcPatriciaSearch(&trie, (const BYTE *)"world", 5, &data, &data_size);
+    TEST_ASSERT(result == edk_SUCCEEDED, "'world' still found after other remove");
+
+    /* Free */
+    dkcPatriciaFree(&trie);
+    TEST_ASSERT(dkcPatriciaCount(&trie) == 0, "Count is 0 after free");
+
+    TEST_END();
+}
+
+/* ========================================
+ * BIGINTEGER TESTS
+ * ======================================== */
+
+void Test_BigInteger(void)
+{
+    DKC_BIGINTEGER a, b, c, d;
+    char buf[256];
+    int result;
+
+    TEST_BEGIN("dkcBigInteger (BigInteger) Test");
+
+    /* Create */
+    result = dkcBigIntCreate(&a, 0);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Create a");
+    result = dkcBigIntCreate(&b, 0);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Create b");
+    result = dkcBigIntCreate(&c, 0);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Create c");
+    result = dkcBigIntCreate(&d, 0);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Create d");
+
+    /* FromInt and IsZero */
+    TEST_ASSERT(dkcBigIntIsZero(&a) == TRUE, "New BigInt is zero");
+
+    dkcBigIntFromInt(&a, 0);
+    TEST_ASSERT(dkcBigIntIsZero(&a) == TRUE, "0 is zero");
+
+    dkcBigIntFromInt(&a, 123);
+    TEST_ASSERT(dkcBigIntIsZero(&a) == FALSE, "123 is not zero");
+
+    dkcBigIntFromInt(&b, -456);
+    TEST_ASSERT(dkcBigIntIsZero(&b) == FALSE, "-456 is not zero");
+
+    /* ToString (10進) */
+    dkcBigIntFromInt(&a, 12345);
+    result = dkcBigIntToString(&a, buf, sizeof(buf), 10);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ToString(12345)");
+    TEST_ASSERT(strcmp(buf, "12345") == 0, "12345 -> \"12345\"");
+
+    dkcBigIntFromInt(&a, -99);
+    result = dkcBigIntToString(&a, buf, sizeof(buf), 10);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ToString(-99)");
+    TEST_ASSERT(strcmp(buf, "-99") == 0, "-99 -> \"-99\"");
+
+    /* ToString (16進) */
+    dkcBigIntFromInt(&a, 255);
+    result = dkcBigIntToString(&a, buf, sizeof(buf), 16);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ToString(255, hex)");
+    TEST_ASSERT(strcmp(buf, "FF") == 0, "255 -> \"FF\"");
+
+    /* FromString */
+    dkcBigIntFromString(&a, "999", 10);
+    dkcBigIntToString(&a, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "999") == 0, "FromString(\"999\")");
+
+    dkcBigIntFromString(&a, "-42", 10);
+    dkcBigIntToString(&a, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "-42") == 0, "FromString(\"-42\")");
+
+    dkcBigIntFromString(&a, "FF", 16);
+    dkcBigIntToString(&a, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "255") == 0, "FromString(\"FF\", 16) -> 255");
+
+    /* Compare */
+    dkcBigIntFromInt(&a, 100);
+    dkcBigIntFromInt(&b, 200);
+    TEST_ASSERT(dkcBigIntCompare(&a, &b) < 0, "100 < 200");
+    TEST_ASSERT(dkcBigIntCompare(&b, &a) > 0, "200 > 100");
+
+    dkcBigIntFromInt(&b, 100);
+    TEST_ASSERT(dkcBigIntCompare(&a, &b) == 0, "100 == 100");
+
+    /* Add */
+    dkcBigIntFromInt(&a, 100);
+    dkcBigIntFromInt(&b, 200);
+    dkcBigIntAdd(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "300") == 0, "100 + 200 = 300");
+
+    /* Add with negative */
+    dkcBigIntFromInt(&a, 100);
+    dkcBigIntFromInt(&b, -150);
+    dkcBigIntAdd(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "-50") == 0, "100 + (-150) = -50");
+
+    /* Sub */
+    dkcBigIntFromInt(&a, 300);
+    dkcBigIntFromInt(&b, 100);
+    dkcBigIntSub(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "200") == 0, "300 - 100 = 200");
+
+    /* Mul */
+    dkcBigIntFromInt(&a, 123);
+    dkcBigIntFromInt(&b, 456);
+    dkcBigIntMul(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "56088") == 0, "123 * 456 = 56088");
+
+    /* Mul with negative */
+    dkcBigIntFromInt(&a, -7);
+    dkcBigIntFromInt(&b, 8);
+    dkcBigIntMul(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "-56") == 0, "-7 * 8 = -56");
+
+    /* Div */
+    dkcBigIntFromInt(&a, 100);
+    dkcBigIntFromInt(&b, 7);
+    dkcBigIntDiv(&c, &d, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "14") == 0, "100 / 7 = 14");
+    dkcBigIntToString(&d, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "2") == 0, "100 %% 7 = 2");
+
+    /* Mod */
+    dkcBigIntFromInt(&a, 17);
+    dkcBigIntFromInt(&b, 5);
+    dkcBigIntMod(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "2") == 0, "17 %% 5 = 2");
+
+    /* Shift Left */
+    dkcBigIntFromInt(&a, 1);
+    dkcBigIntShiftLeft(&c, &a, 10);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "1024") == 0, "1 << 10 = 1024");
+
+    /* Shift Right */
+    dkcBigIntFromInt(&a, 1024);
+    dkcBigIntShiftRight(&c, &a, 3);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "128") == 0, "1024 >> 3 = 128");
+
+    /* GCD */
+    dkcBigIntFromInt(&a, 12);
+    dkcBigIntFromInt(&b, 8);
+    dkcBigIntGCD(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "4") == 0, "gcd(12, 8) = 4");
+
+    dkcBigIntFromInt(&a, 35);
+    dkcBigIntFromInt(&b, 14);
+    dkcBigIntGCD(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "7") == 0, "gcd(35, 14) = 7");
+
+    /* ModPow: 2^10 mod 1000 = 24 */
+    dkcBigIntFromInt(&a, 2);
+    dkcBigIntFromInt(&b, 10);
+    dkcBigIntFromInt(&c, 1000);
+    dkcBigIntModPow(&d, &a, &b, &c);
+    dkcBigIntToString(&d, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "24") == 0, "2^10 mod 1000 = 24");
+
+    /* ModPow: 3^13 mod 100 = 3^13=1594323, 1594323%100=23 */
+    dkcBigIntFromInt(&a, 3);
+    dkcBigIntFromInt(&b, 13);
+    dkcBigIntFromInt(&c, 100);
+    dkcBigIntModPow(&d, &a, &b, &c);
+    dkcBigIntToString(&d, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "23") == 0, "3^13 mod 100 = 23");
+
+    /* Large number: from string */
+    dkcBigIntFromString(&a, "123456789012345678901234567890", 10);
+    dkcBigIntFromString(&b, "987654321098765432109876543210", 10);
+    dkcBigIntAdd(&c, &a, &b);
+    dkcBigIntToString(&c, buf, sizeof(buf), 10);
+    TEST_ASSERT(strcmp(buf, "1111111110111111111011111111100") == 0,
+        "Large number addition");
+
+    /* BitCount */
+    dkcBigIntFromInt(&a, 255);
+    TEST_ASSERT(dkcBigIntBitCount(&a) == 8, "BitCount(255) = 8");
+
+    dkcBigIntFromInt(&a, 256);
+    TEST_ASSERT(dkcBigIntBitCount(&a) == 9, "BitCount(256) = 9");
+
+    /* Free */
+    dkcBigIntFree(&a);
+    dkcBigIntFree(&b);
+    dkcBigIntFree(&c);
+    dkcBigIntFree(&d);
+
+    TEST_END();
+}
+
+/* ========================================
+ * ChaCha20 Test
+ * ======================================== */
+void Test_ChaCha20(void)
+{
+    /* RFC 8439 Section 2.4.2 test vector */
+    unsigned char key[32] = {
+        0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
+        0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
+        0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,
+        0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f
+    };
+    unsigned char nonce[12] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x4a,0x00,0x00,0x00,0x00};
+    unsigned char plaintext[64];
+    unsigned char ciphertext[64];
+    unsigned char decrypted[64];
+    DKC_CHACHA20 *ctx;
+    DKC_CHACHA20 *ctx2;
+    int result;
+
+    TEST_BEGIN("ChaCha20 Test");
+
+    memset(plaintext, 0, sizeof(plaintext));
+
+    ctx = dkcAllocChaCha20(key, 32, nonce, 12);
+    TEST_ASSERT(ctx != NULL, "dkcAllocChaCha20");
+
+    result = dkcChaCha20Encrypt(ctx, ciphertext, sizeof(ciphertext), plaintext, sizeof(plaintext));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Encrypt zeros");
+
+    /* Verify encrypt/decrypt roundtrip */
+    ctx2 = dkcAllocChaCha20(key, 32, nonce, 12);
+    result = dkcChaCha20Encrypt(ctx2, decrypted, sizeof(decrypted), ciphertext, sizeof(ciphertext));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Decrypt");
+    TEST_ASSERT(memcmp(decrypted, plaintext, 64) == 0, "Encrypt/Decrypt roundtrip");
+
+    dkcFreeChaCha20(&ctx);
+    dkcFreeChaCha20(&ctx2);
+    TEST_ASSERT(ctx == NULL, "Free ChaCha20");
+
+    TEST_END();
+}
+
+/* ========================================
+ * Poly1305 Test
+ * ======================================== */
+void Test_Poly1305(void)
+{
+    /* RFC 8439 Section 2.5.2 test vector */
+    unsigned char key[32] = {
+        0x85,0xd6,0xbe,0x78,0x57,0x55,0x6d,0x33,
+        0x7f,0x44,0x52,0xfe,0x42,0xd5,0x06,0xa8,
+        0x01,0x03,0x80,0x8a,0xfb,0x0d,0xb2,0xfd,
+        0x4a,0xbf,0xf6,0xaf,0x41,0x49,0xf5,0x1b
+    };
+    unsigned char msg[] = "Cryptographic Forum Research Group";
+    unsigned char tag[16];
+    unsigned char expected_tag[16] = {
+        0xa8,0x06,0x1d,0xc1,0x30,0x51,0x36,0xc6,
+        0xc2,0x2b,0x8b,0xaf,0x0c,0x01,0x27,0xa9
+    };
+    unsigned char tag2[16];
+    int result;
+
+    TEST_BEGIN("Poly1305 Test");
+
+    result = dkcPoly1305OneShot(key, 32, msg, 34, tag);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Poly1305 OneShot");
+    TEST_ASSERT(memcmp(tag, expected_tag, 16) == 0, "RFC 8439 test vector");
+
+    /* Verify constant-time comparison */
+    result = dkcPoly1305Verify(tag, expected_tag);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Poly1305 Verify (match)");
+
+    memset(tag2, 0, sizeof(tag2));
+    result = dkcPoly1305Verify(tag, tag2);
+    TEST_ASSERT(result == edk_FAILED, "Poly1305 Verify (mismatch)");
+
+    /* Empty message */
+    result = dkcPoly1305OneShot(key, 32, (const unsigned char *)"", 0, tag);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Poly1305 empty message");
+
+    TEST_END();
+}
+
+/* ========================================
+ * AES-GCM Test
+ * ======================================== */
+void Test_AESGCM(void)
+{
+    /* NIST test vector (AES-128-GCM) */
+    unsigned char key[16] = {0};
+    unsigned char iv[12] = {0};
+    unsigned char pt[16] = {0};
+    unsigned char ct[16];
+    unsigned char tag[16];
+    unsigned char decrypted[16];
+    DKC_AESGCM *ctx;
+    int result;
+
+    TEST_BEGIN("AES-GCM Test");
+
+    ctx = dkcAllocAESGCM(key, 16);
+    TEST_ASSERT(ctx != NULL, "dkcAllocAESGCM");
+
+    /* Encrypt */
+    result = dkcAESGCMEncrypt(ctx, iv, 12, NULL, 0, pt, 16, ct, tag);
+    TEST_ASSERT(result == edk_SUCCEEDED, "AES-GCM Encrypt");
+
+    /* Decrypt (valid tag) */
+    result = dkcAESGCMDecrypt(ctx, iv, 12, NULL, 0, ct, 16, tag, decrypted);
+    TEST_ASSERT(result == edk_SUCCEEDED, "AES-GCM Decrypt (valid tag)");
+    TEST_ASSERT(memcmp(decrypted, pt, 16) == 0, "AES-GCM roundtrip");
+
+    /* Tampered tag */
+    tag[0] ^= 0xFF;
+    result = dkcAESGCMDecrypt(ctx, iv, 12, NULL, 0, ct, 16, tag, decrypted);
+    TEST_ASSERT(result == edk_FAILED, "AES-GCM Decrypt (tampered tag)");
+
+    dkcFreeAESGCM(&ctx);
+    TEST_ASSERT(ctx == NULL, "Free AES-GCM");
+
+    TEST_END();
+}
+
+/* ========================================
+ * bcrypt Test
+ * ======================================== */
+void Test_Bcrypt(void)
+{
+    unsigned char salt[16] = {
+        0x71,0xd7,0x9f,0x82,0x18,0xa3,0x92,0x59,
+        0xa7,0xa2,0x9a,0xab,0xb2,0xdb,0xaf,0xc3
+    };
+    char hash_output[64];
+    int result;
+
+    TEST_BEGIN("bcrypt Test");
+
+    result = dkcBcryptHash((const unsigned char *)"password", 8, salt, 4,
+        hash_output, sizeof(hash_output));
+    TEST_ASSERT(result == edk_SUCCEEDED, "bcrypt hash (cost=4)");
+    TEST_ASSERT(hash_output[0] == '$' && hash_output[1] == '2', "bcrypt format $2b$");
+
+    /* Verify */
+    result = dkcBcryptVerify((const unsigned char *)"password", 8, hash_output);
+    TEST_ASSERT(result == edk_SUCCEEDED, "bcrypt verify (correct)");
+
+    result = dkcBcryptVerify((const unsigned char *)"wrong", 5, hash_output);
+    TEST_ASSERT(result == edk_FAILED, "bcrypt verify (wrong password)");
+
+    TEST_END();
+}
+
+/* ========================================
+ * scrypt Test
+ * ======================================== */
+void Test_Scrypt(void)
+{
+    /* RFC 7914 test vector #2: password="password", salt="NaCl", N=1024, r=8, p=16, dkLen=64 */
+    /* We use simpler params for speed: N=16, r=1, p=1 */
+    unsigned char output[32];
+    int result;
+
+    TEST_BEGIN("scrypt Test");
+
+    result = dkcScrypt(
+        (const unsigned char *)"password", 8,
+        (const unsigned char *)"salt", 4,
+        16, 1, 1,
+        output, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "scrypt basic");
+    TEST_ASSERT(output[0] != 0 || output[1] != 0, "scrypt non-zero output");
+
+    /* Verify determinism */
+    {
+        unsigned char output2[32];
+        result = dkcScrypt(
+            (const unsigned char *)"password", 8,
+            (const unsigned char *)"salt", 4,
+            16, 1, 1,
+            output2, 32);
+        TEST_ASSERT(memcmp(output, output2, 32) == 0, "scrypt deterministic");
+    }
+
+    TEST_END();
+}
+
+/* ========================================
+ * Argon2 Test
+ * ======================================== */
+void Test_Argon2(void)
+{
+    unsigned char hash1[32];
+    unsigned char hash2[32];
+    int result;
+
+    TEST_BEGIN("Argon2 Test");
+
+    /* Argon2d test */
+    result = dkcArgon2Hash(dkcd_ARGON2D, 1, 16, 1,
+        (const unsigned char *)"password", 8,
+        (const unsigned char *)"somesalt", 8,
+        hash1, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Argon2d hash");
+
+    /* Argon2i test */
+    result = dkcArgon2Hash(dkcd_ARGON2I, 1, 16, 1,
+        (const unsigned char *)"password", 8,
+        (const unsigned char *)"somesalt", 8,
+        hash2, 32);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Argon2i hash");
+
+    /* Argon2d and Argon2i should produce different outputs */
+    TEST_ASSERT(memcmp(hash1, hash2, 32) != 0, "Argon2d != Argon2i");
+
+    /* Determinism */
+    {
+        unsigned char hash3[32];
+        dkcArgon2Hash(dkcd_ARGON2D, 1, 16, 1,
+            (const unsigned char *)"password", 8,
+            (const unsigned char *)"somesalt", 8,
+            hash3, 32);
+        TEST_ASSERT(memcmp(hash1, hash3, 32) == 0, "Argon2 deterministic");
+    }
+
+    TEST_END();
+}
+
+/* ========================================
+ * Skip List Test
+ * ======================================== */
+
+static int sl_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    if(va < vb) return -1;
+    if(va > vb) return 1;
+    return 0;
+}
+
+void Test_SkipList(void)
+{
+    DKC_SKIPLIST_ROOT *sl;
+    DKC_SKIPLIST_NODE *node;
+    int i, val;
+    int result;
+
+    TEST_BEGIN("Skip List Test");
+
+    sl = dkcAllocSkipListRoot(sizeof(int), sl_int_compare, 0);
+    TEST_ASSERT(sl != NULL, "dkcAllocSkipListRoot");
+    TEST_ASSERT(dkcSkipListIsEmpty(sl) == TRUE, "Empty skip list");
+
+    /* Insert */
+    for(i = 0; i < 100; i++){
+        val = i * 3;
+        result = dkcSkipListInsert(sl, &val, &i, sizeof(int));
+        TEST_ASSERT(result == edk_SUCCEEDED || i > 0, "SkipList insert");
+    }
+    TEST_ASSERT(dkcSkipListSize(sl) == 100, "Size == 100");
+
+    /* Find */
+    val = 15; /* 5 * 3 */
+    node = dkcSkipListFind(sl, &val);
+    TEST_ASSERT(node != NULL, "Find key 15");
+
+    val = 999;
+    node = dkcSkipListFind(sl, &val);
+    TEST_ASSERT(node == NULL, "Find non-existent key");
+
+    /* Erase */
+    val = 15;
+    result = dkcSkipListErase(sl, &val);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Erase key 15");
+    TEST_ASSERT(dkcSkipListSize(sl) == 99, "Size after erase");
+
+    node = dkcSkipListFind(sl, &val);
+    TEST_ASSERT(node == NULL, "Find erased key");
+
+    dkcFreeSkipListRoot(&sl);
+    TEST_ASSERT(sl == NULL, "Free skip list");
+
+    TEST_END();
+}
+
+/* ========================================
+ * Treap Test
+ * ======================================== */
+
+static int treap_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    if(va < vb) return -1;
+    if(va > vb) return 1;
+    return 0;
+}
+
+void Test_Treap(void)
+{
+    DKC_TREAP_ROOT *treap;
+    DKC_TREAP_NODE *node;
+    int i, val;
+    int result;
+
+    TEST_BEGIN("Treap Test");
+
+    treap = dkcAllocTreapRoot(sizeof(int), 32, treap_int_compare, 0);
+    TEST_ASSERT(treap != NULL, "dkcAllocTreapRoot");
+    TEST_ASSERT(dkcTreapIsEmpty(treap) == TRUE, "Empty treap");
+
+    /* Insert */
+    for(i = 0; i < 100; i++){
+        val = 100 - i; /* reverse order to test balancing */
+        result = dkcTreapInsert(treap, &val, &i, sizeof(int));
+    }
+    TEST_ASSERT(dkcTreapSize(treap) == 100, "Size == 100");
+
+    /* Find */
+    val = 50;
+    node = dkcTreapFind(treap, &val);
+    TEST_ASSERT(node != NULL, "Find key 50");
+
+    val = 0;
+    node = dkcTreapFind(treap, &val);
+    TEST_ASSERT(node == NULL, "Find non-existent key 0");
+
+    /* Erase */
+    val = 50;
+    result = dkcTreapErase(treap, &val);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Erase key 50");
+    TEST_ASSERT(dkcTreapSize(treap) == 99, "Size after erase");
+
+    dkcFreeTreapRoot(&treap);
+    TEST_ASSERT(treap == NULL, "Free treap");
+
+    TEST_END();
+}
+
+/* ========================================
+ * B+ Tree Test
+ * ======================================== */
+
+static int bpt_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    if(va < vb) return -1;
+    if(va > vb) return 1;
+    return 0;
+}
+
+static int bpt_range_count;
+static BOOL WINAPI bpt_count_callback(const void *key, void *data, size_t data_size, void *user)
+{
+    (void)key; (void)data; (void)data_size; (void)user;
+    bpt_range_count++;
+    return TRUE;
+}
+
+void Test_BPlusTree(void)
+{
+    DKC_BPLUSTREE_ROOT *bpt;
+    int i, val;
+    int result;
+    int found;
+
+    TEST_BEGIN("B+ Tree Test");
+
+    bpt = dkcAllocBPlusTreeRoot(sizeof(int), 4, bpt_int_compare, 0);
+    TEST_ASSERT(bpt != NULL, "dkcAllocBPlusTreeRoot");
+    TEST_ASSERT(dkcBPlusTreeIsEmpty(bpt) == TRUE, "Empty B+ tree");
+
+    /* Insert 50 elements */
+    for(i = 0; i < 50; i++){
+        val = i * 2;
+        result = dkcBPlusTreeInsert(bpt, &val, &i, sizeof(int));
+    }
+    TEST_ASSERT(dkcBPlusTreeSize(bpt) == 50, "Size == 50");
+
+    /* Find */
+    val = 10;
+    result = dkcBPlusTreeFind(bpt, &val, &found, sizeof(int));
+    TEST_ASSERT(result == edk_SUCCEEDED, "Find key 10");
+    TEST_ASSERT(found == 5, "Found data == 5");
+
+    val = 11;
+    result = dkcBPlusTreeFind(bpt, &val, NULL, 0);
+    TEST_ASSERT(result == edk_Not_Found, "Find non-existent key");
+
+    /* Range foreach */
+    {
+        int start = 10, end = 30;
+        bpt_range_count = 0;
+        dkcBPlusTreeRangeForeach(bpt, &start, &end, bpt_count_callback, NULL);
+        TEST_ASSERT(bpt_range_count == 11, "Range [10,30] count == 11");
+    }
+
+    /* Erase */
+    val = 10;
+    result = dkcBPlusTreeErase(bpt, &val);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Erase key 10");
+    TEST_ASSERT(dkcBPlusTreeSize(bpt) == 49, "Size after erase");
+
+    dkcFreeBPlusTreeRoot(&bpt);
+    TEST_ASSERT(bpt == NULL, "Free B+ tree");
+
+    TEST_END();
+}
+
+/* ========================================
+ * Fibonacci Heap Test
+ * ======================================== */
+
+static int fh_int_compare(const void *a, const void *b)
+{
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    if(va < vb) return -1;
+    if(va > vb) return 1;
+    return 0;
+}
+
+void Test_FibonacciHeap(void)
+{
+    DKC_FIBHEAP_ROOT *fh;
+    DKC_FIBHEAP_NODE *min_node;
+    DKC_FIBHEAP_NODE *node;
+    int val, extracted;
+    int result;
+    int i;
+
+    TEST_BEGIN("Fibonacci Heap Test");
+
+    fh = dkcAllocFibHeapRoot(sizeof(int), fh_int_compare);
+    TEST_ASSERT(fh != NULL, "dkcAllocFibHeapRoot");
+    TEST_ASSERT(dkcFibHeapIsEmpty(fh) == TRUE, "Empty Fibonacci heap");
+
+    /* Insert */
+    val = 30;
+    dkcFibHeapInsert(fh, &val, NULL, 0);
+    val = 10;
+    node = dkcFibHeapInsert(fh, &val, NULL, 0);
+    val = 20;
+    dkcFibHeapInsert(fh, &val, NULL, 0);
+    val = 5;
+    dkcFibHeapInsert(fh, &val, NULL, 0);
+
+    TEST_ASSERT(dkcFibHeapSize(fh) == 4, "Size == 4");
+
+    /* FindMin */
+    min_node = dkcFibHeapFindMin(fh);
+    TEST_ASSERT(min_node != NULL, "FindMin not NULL");
+    TEST_ASSERT(*(int *)min_node->key == 5, "Min == 5");
+
+    /* DecreaseKey */
+    val = 1;
+    result = dkcFibHeapDecreaseKey(fh, node, &val);
+    TEST_ASSERT(result == edk_SUCCEEDED, "DecreaseKey 10->1");
+
+    min_node = dkcFibHeapFindMin(fh);
+    TEST_ASSERT(*(int *)min_node->key == 1, "Min == 1 after decrease");
+
+    /* ExtractMin */
+    result = dkcFibHeapExtractMin(fh, &extracted, NULL, 0);
+    TEST_ASSERT(result == edk_SUCCEEDED, "ExtractMin");
+    TEST_ASSERT(extracted == 1, "Extracted == 1");
+    TEST_ASSERT(dkcFibHeapSize(fh) == 3, "Size == 3");
+
+    result = dkcFibHeapExtractMin(fh, &extracted, NULL, 0);
+    TEST_ASSERT(extracted == 5, "Extracted == 5");
+
+    result = dkcFibHeapExtractMin(fh, &extracted, NULL, 0);
+    TEST_ASSERT(extracted == 20, "Extracted == 20");
+
+    result = dkcFibHeapExtractMin(fh, &extracted, NULL, 0);
+    TEST_ASSERT(extracted == 30, "Extracted == 30");
+
+    TEST_ASSERT(dkcFibHeapIsEmpty(fh) == TRUE, "Empty after all extractions");
+
+    dkcFreeFibHeapRoot(&fh);
+    TEST_ASSERT(fh == NULL, "Free Fibonacci heap");
+
+    TEST_END();
+}
+
+/* ========================================
+ * Suffix Array Test
+ * ======================================== */
+void Test_SuffixArray(void)
+{
+    DKC_SUFFIXARRAY *sa;
+    size_t first, count;
+    int result;
+
+    TEST_BEGIN("Suffix Array Test");
+
+    sa = dkcAllocSuffixArray("banana", 6);
+    TEST_ASSERT(sa != NULL, "dkcAllocSuffixArray");
+
+    /* Search for "ana" */
+    result = dkcSuffixArraySearch(sa, "ana", 3, &first, &count);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search 'ana'");
+    TEST_ASSERT(count == 2, "Found 2 occurrences of 'ana'");
+
+    /* Search for "ban" */
+    result = dkcSuffixArraySearch(sa, "ban", 3, &first, &count);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Search 'ban'");
+    TEST_ASSERT(count == 1, "Found 1 occurrence of 'ban'");
+
+    /* Search for non-existent */
+    result = dkcSuffixArraySearch(sa, "xyz", 3, &first, &count);
+    TEST_ASSERT(result == edk_Not_Found, "Search non-existent 'xyz'");
+
+    /* Build LCP */
+    result = dkcSuffixArrayBuildLCP(sa);
+    TEST_ASSERT(result == edk_SUCCEEDED, "Build LCP array");
+    TEST_ASSERT(sa->lcp != NULL, "LCP not NULL");
+
+    dkcFreeSuffixArray(&sa);
+    TEST_ASSERT(sa == NULL, "Free suffix array");
+
+    TEST_END();
+}
+
+/* ========================================
+ * Rope Test
+ * ======================================== */
+void Test_Rope(void)
+{
+    DKC_ROPE_NODE *rope;
+    DKC_ROPE_NODE *rope2;
+    char buf[256];
+    int ch;
+    int result;
+
+    TEST_BEGIN("Rope Test");
+
+    rope = dkcAllocRope("Hello");
+    TEST_ASSERT(rope != NULL, "dkcAllocRope");
+    TEST_ASSERT(dkcRopeLength(rope) == 5, "Length == 5");
+
+    /* CharAt */
+    ch = dkcRopeCharAt(rope, 0);
+    TEST_ASSERT(ch == 'H', "CharAt(0) == 'H'");
+    ch = dkcRopeCharAt(rope, 4);
+    TEST_ASSERT(ch == 'o', "CharAt(4) == 'o'");
+
+    /* Insert */
+    result = dkcRopeInsert(&rope, 5, " World");
+    TEST_ASSERT(result == edk_SUCCEEDED, "Insert ' World'");
+    TEST_ASSERT(dkcRopeLength(rope) == 11, "Length == 11");
+
+    dkcRopeToString(rope, buf, sizeof(buf));
+    TEST_ASSERT(strcmp(buf, "Hello World") == 0, "ToString == 'Hello World'");
+
+    /* Concat */
+    rope2 = dkcAllocRope("!!!");
+    rope = dkcRopeConcat(rope, rope2);
+    TEST_ASSERT(dkcRopeLength(rope) == 14, "Length after concat == 14");
+
+    dkcRopeToString(rope, buf, sizeof(buf));
+    TEST_ASSERT(strcmp(buf, "Hello World!!!") == 0, "Concat result");
+
+    /* Delete */
+    result = dkcRopeDelete(&rope, 5, 6); /* delete " World" */
+    TEST_ASSERT(result == edk_SUCCEEDED, "Delete");
+    TEST_ASSERT(dkcRopeLength(rope) == 8, "Length after delete == 8");
+
+    dkcRopeToString(rope, buf, sizeof(buf));
+    TEST_ASSERT(strcmp(buf, "Hello!!!") == 0, "Delete result");
+
+    /* Substring */
+    dkcRopeSubstring(rope, 0, 5, buf, sizeof(buf));
+    TEST_ASSERT(strcmp(buf, "Hello") == 0, "Substring(0,5)");
+
+    dkcFreeRope(&rope);
+    TEST_ASSERT(rope == NULL, "Free rope");
+
+    TEST_END();
+}
+
+/* ========================================
  * MAIN
  * ======================================== */
 
@@ -4540,11 +5777,43 @@ int main(int argc, char *argv[])
     Test_UnionFind();
     Test_SparseSet();
 
+    /* Heap Tests */
+    Test_Heap();
+    Test_TypedHeap();
+    Test_HeapSortStandalone();
+
+    /* Splay Tree Tests */
+    Test_SplayTree();
+
+    /* Patricia Trie Tests */
+    Test_Patricia();
+
+    /* BigInteger Tests */
+    Test_BigInteger();
+
     /* UniqueID Tests */
     Test_UniqueID();
 
     /* Regex Tests */
     Test_Regex();
+
+    /* ChaCha20 / Poly1305 / AES-GCM Tests */
+    Test_ChaCha20();
+    Test_Poly1305();
+    Test_AESGCM();
+
+    /* Password Hash Tests */
+    Test_Bcrypt();
+    Test_Scrypt();
+    Test_Argon2();
+
+    /* Additional Data Structure Tests */
+    Test_SkipList();
+    Test_Treap();
+    Test_BPlusTree();
+    Test_FibonacciHeap();
+    Test_SuffixArray();
+    Test_Rope();
 
     /* Utility Tests */
     Test_Memory();

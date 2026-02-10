@@ -6,7 +6,8 @@
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(make:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(iconv:*)"
     ]
   }
 }
