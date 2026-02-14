@@ -2627,7 +2627,7 @@ void Test_Sort(void)
     dkcMergeSort(arr6, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr6, sorted, sizeof(sorted)) == 0, "MergeSort");
 
-    dkcHeapSort2(arr7, 10, sizeof(int), compare_int);
+    dkcHeapSort2(arr7, 10, sizeof(int), dkcHeapCompareInt);
     TEST_ASSERT(memcmp(arr7, sorted, sizeof(sorted)) == 0, "HeapSort");
 
     dkcCocktailSort(arr8, 10, sizeof(int), compare_int);
@@ -3613,10 +3613,11 @@ void Test_CuckooHash(void)
     /* Update value */
     {
         int new_val = 999;
+        int *val;
         result = dkcCuckooHashInsertString(&hash, keys[0], &new_val);
         TEST_ASSERT(result == edk_SUCCEEDED, "Cuckoo update");
 
-        int *val = (int *)dkcCuckooHashLookupString(&hash, keys[0]);
+        val = (int *)dkcCuckooHashLookupString(&hash, keys[0]);
         TEST_ASSERT(val != NULL && *val == 999, "Cuckoo value updated");
     }
 
@@ -3959,7 +3960,7 @@ void Test_SegmentTree(void)
     dkcSegmentTreeFree(&tree);
 
     /* === Range Minimum Query === */
-    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMin, LLONG_MAX);
+    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMin, dkcd_SEGTREE_IDENTITY_MIN);
     TEST_ASSERT(ret == edk_SUCCEEDED, "SegTree build (min)");
 
     result = dkcSegmentTreeQuery(&tree, 0, 6);
@@ -3971,7 +3972,7 @@ void Test_SegmentTree(void)
     dkcSegmentTreeFree(&tree);
 
     /* === Range Maximum Query === */
-    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMax, LLONG_MIN);
+    ret = dkcSegmentTreeBuild(&tree, values, 6, dkcSegTreeOpMax, dkcd_SEGTREE_IDENTITY_MAX);
     TEST_ASSERT(ret == edk_SUCCEEDED, "SegTree build (max)");
 
     result = dkcSegmentTreeQuery(&tree, 0, 6);
@@ -5687,6 +5688,238 @@ void Test_Rope(void)
 }
 
 /* ========================================
+ * Thread Tests
+ * ======================================== */
+
+static long g_thread_counter = 0;
+
+#ifdef WIN32
+static unsigned int WINAPI thread_increment_func(void *data)
+{
+    int i;
+    int count = *((int *)data);
+    for(i = 0; i < count; i++){
+        InterlockedIncrement(&g_thread_counter);
+    }
+    return 0;
+}
+#else
+static void* thread_increment_func(void *data)
+{
+    int i;
+    int count = *((int *)data);
+    for(i = 0; i < count; i++){
+        g_thread_counter++;
+    }
+    return NULL;
+}
+#endif
+
+static void Test_ThreadCreateJoin(void)
+{
+    DKC_THREAD *t1 = NULL;
+    DKC_THREAD *t2 = NULL;
+    int count = 1000;
+    int r;
+
+    TEST_BEGIN("dkcThread Create/Join Test");
+
+    g_thread_counter = 0;
+
+    r = dkcThreadCreate(&t1, thread_increment_func, &count);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Create thread 1");
+    TEST_ASSERT(t1 != NULL, "Thread 1 not null");
+
+    r = dkcThreadCreate(&t2, thread_increment_func, &count);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Create thread 2");
+
+    r = dkcThreadJoin(t1);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Join thread 1");
+
+    r = dkcThreadJoin(t2);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Join thread 2");
+
+    TEST_ASSERT(g_thread_counter == 2000, "Counter is 2000");
+
+    dkcFreeThread(&t1);
+    dkcFreeThread(&t2);
+
+    TEST_END();
+}
+
+static void Test_ThreadSleepYield(void)
+{
+    TEST_BEGIN("dkcThread Sleep/Yield Test");
+
+    dkcThreadSleep(1);
+    TEST_ASSERT(1, "Sleep(1) returned");
+
+    dkcThreadYield();
+    TEST_ASSERT(1, "Yield returned");
+
+    TEST_END();
+}
+
+static void Test_TryLock(void)
+{
+    DKC_THREAD_LOCK *lock;
+    BOOL got;
+
+    TEST_BEGIN("dkcThreadLock TryLock Test");
+
+    lock = dkcAllocThreadLock();
+    TEST_ASSERT(lock != NULL, "Alloc lock");
+
+    got = dkcThreadLock_TryLock(lock);
+    TEST_ASSERT(got == TRUE, "TryLock succeeds on free lock");
+    TEST_ASSERT(lock->mLockCount == 1, "Lock count is 1");
+
+    dkcThreadLock_Unlock(lock);
+    TEST_ASSERT(lock->mLockCount == 0, "Lock count back to 0");
+
+    dkcFreeThreadLock(&lock);
+    TEST_ASSERT(lock == NULL, "Free lock");
+
+    TEST_END();
+}
+
+static void Test_RWLock(void)
+{
+    DKC_THREAD_RWLOCK *rwlock;
+    int r;
+
+    TEST_BEGIN("dkcThreadRWLock Test");
+
+    rwlock = dkcAllocThreadRWLock();
+    TEST_ASSERT(rwlock != NULL, "Alloc RWLock");
+
+    /* multiple reader locks should succeed */
+    dkcThreadRWLock_ReaderLock(rwlock);
+    dkcThreadRWLock_ReaderLock(rwlock);
+#ifdef WIN32
+    TEST_ASSERT(rwlock->reader_count == 2, "Reader count is 2");
+#else
+    TEST_ASSERT(1, "Reader locked (POSIX)");
+#endif
+
+    dkcThreadRWLock_ReaderUnlock(rwlock);
+    dkcThreadRWLock_ReaderUnlock(rwlock);
+#ifdef WIN32
+    TEST_ASSERT(rwlock->reader_count == 0, "Reader count is 0");
+#else
+    TEST_ASSERT(1, "Reader unlocked (POSIX)");
+#endif
+
+    /* writer lock/unlock */
+    dkcThreadRWLock_WriterLock(rwlock);
+    TEST_ASSERT(1, "Writer lock acquired");
+    dkcThreadRWLock_WriterUnlock(rwlock);
+    TEST_ASSERT(1, "Writer lock released");
+
+    r = dkcFreeThreadRWLock(&rwlock);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Free RWLock");
+    TEST_ASSERT(rwlock == NULL, "RWLock is NULL");
+
+    TEST_END();
+}
+
+static int g_cond_produced = 0;
+static int g_cond_consumed = 0;
+
+#ifdef WIN32
+static unsigned int WINAPI producer_func(void *data)
+#else
+static void* producer_func(void *data)
+#endif
+{
+    /* data points to array: {DKC_THREAD_LOCK*, DKC_THREAD_COND*} */
+    void **args = (void **)data;
+    DKC_THREAD_LOCK *mutex = (DKC_THREAD_LOCK *)args[0];
+    DKC_THREAD_COND *cond = (DKC_THREAD_COND *)args[1];
+    int i;
+
+    for(i = 0; i < 5; i++){
+        dkcThreadLock_Lock(mutex);
+        g_cond_produced++;
+        dkcThreadCond_Signal(cond);
+        dkcThreadLock_Unlock(mutex);
+    }
+#ifdef WIN32
+    return 0;
+#else
+    return NULL;
+#endif
+}
+
+#ifdef WIN32
+static unsigned int WINAPI consumer_func(void *data)
+#else
+static void* consumer_func(void *data)
+#endif
+{
+    void **args = (void **)data;
+    DKC_THREAD_LOCK *mutex = (DKC_THREAD_LOCK *)args[0];
+    DKC_THREAD_COND *cond = (DKC_THREAD_COND *)args[1];
+
+    dkcThreadLock_Lock(mutex);
+    while(g_cond_consumed < 5){
+        while(g_cond_produced <= g_cond_consumed){
+            dkcThreadCond_Wait(cond, mutex);
+        }
+        g_cond_consumed++;
+    }
+    dkcThreadLock_Unlock(mutex);
+#ifdef WIN32
+    return 0;
+#else
+    return NULL;
+#endif
+}
+
+static void Test_CondVar(void)
+{
+    DKC_THREAD_LOCK *mutex;
+    DKC_THREAD_COND *cond;
+    DKC_THREAD *producer = NULL;
+    DKC_THREAD *consumer = NULL;
+    void *args[2];
+    int r;
+
+    TEST_BEGIN("dkcThreadCond Producer-Consumer Test");
+
+    g_cond_produced = 0;
+    g_cond_consumed = 0;
+
+    mutex = dkcAllocThreadLock();
+    TEST_ASSERT(mutex != NULL, "Alloc mutex");
+
+    cond = dkcAllocThreadCond();
+    TEST_ASSERT(cond != NULL, "Alloc cond");
+
+    args[0] = mutex;
+    args[1] = cond;
+
+    r = dkcThreadCreate(&consumer, consumer_func, args);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Create consumer");
+
+    r = dkcThreadCreate(&producer, producer_func, args);
+    TEST_ASSERT(r == edk_SUCCEEDED, "Create producer");
+
+    dkcThreadJoin(producer);
+    dkcThreadJoin(consumer);
+
+    TEST_ASSERT(g_cond_produced == 5, "Produced 5 items");
+    TEST_ASSERT(g_cond_consumed == 5, "Consumed 5 items");
+
+    dkcFreeThread(&producer);
+    dkcFreeThread(&consumer);
+    dkcFreeThreadCond(&cond);
+    dkcFreeThreadLock(&mutex);
+
+    TEST_END();
+}
+
+/* ========================================
  * MAIN
  * ======================================== */
 
@@ -5820,6 +6053,13 @@ int main(int argc, char *argv[])
     Test_FibonacciHeap();
     Test_SuffixArray();
     Test_Rope();
+
+    /* Thread Tests */
+    Test_ThreadCreateJoin();
+    Test_ThreadSleepYield();
+    Test_TryLock();
+    Test_RWLock();
+    Test_CondVar();
 
     /* Utility Tests */
     Test_Memory();

@@ -1,7 +1,7 @@
 
 /*!
 @file dkcThreadLock.c
-@author d‹à‹›
+@author dé‡‘é­š
 @since 2004/3/xx
 */
 
@@ -11,6 +11,9 @@
 #include "dkcStdio.h"
 
 
+/* ========================================
+ * Mutex
+ * ======================================== */
 
 DKC_THREAD_LOCK * WINAPI dkcAllocThreadLock(){
 	DKC_THREAD_LOCK *p = (DKC_THREAD_LOCK *)dkcAllocate(sizeof(DKC_THREAD_LOCK));
@@ -21,17 +24,17 @@ DKC_THREAD_LOCK * WINAPI dkcAllocThreadLock(){
 	InitializeCriticalSection(&(p->m_csCriticalSection));
 
 #else
-	pthread_mutex_init(&(p->mMutex), NULL);  // POSIX
+	pthread_mutex_init(&(p->mMutex), NULL);
 
 #endif
 	p->mLockedThread = dkcdINVALID_THREAD_ID;
 	p->mLockCount	= 0;
-	
+
 	return p;
 }
 
 int WINAPI dkcFreeThreadLock(DKC_THREAD_LOCK **pp){
-	const char *asstr = "dkcThreadLock‚ðLock‚µ‚½‰ñ”‚¾‚¯Unlock‚µ‚È‚¢‚Ü‚ÜI—¹‚µ‚Ä‚¢‚é";
+	const char *asstr = "dkcThreadLockã®Lockå›žæ•°åˆ†ã ã‘Unlockã—ãªã„ã¾ã¾çµ‚äº†ã—ã¦ã„ã‚‹";
 	if(NULL==pp || NULL==*pp){
 		return edk_ArgumentException;
 	}
@@ -55,13 +58,11 @@ int WINAPI dkcFreeThreadLock(DKC_THREAD_LOCK **pp){
 
 void WINAPI dkcThreadLock_Lock(DKC_THREAD_LOCK *p){
 	dkcmFORCE_NOT_ASSERT(NULL==p);
-#ifdef WIN32	
+#ifdef WIN32
 	EnterCriticalSection(&(p->m_csCriticalSection));
-	//	ªˆÙ‚È‚éƒXƒŒƒbƒh‚©‚ç‚±‚±‚É“ü‚Á‚Ä‚­‚é‚±‚Æ‚Í‚Å‚«‚È‚¢
-	//	(CriticalSection‚Ì’è‹`‚æ‚è)
 #else
 	pthread_mutex_lock(&(p->mMutex));
-	
+
 #endif
 	p->mLockedThread = dkcGetThreadID();
 
@@ -73,25 +74,39 @@ void WINAPI dkcThreadLock_Unlock(DKC_THREAD_LOCK *p){
 	dkcmFORCE_NOT_ASSERT(NULL==p);
 
 	if (p->mLockCount==0){
-		dkcmNOT_ASSERT("CriticalSectionManager‚ðEnter‚µ‚Ä‚¢‚È‚¢‚Ì‚ÉLeave‚µ‚Ä‚¢‚é");
+		dkcmNOT_ASSERT("CriticalSectionManagerã«Enterã—ã¦ã„ãªã„ã®ã«Leaveã—ã¦ã„ã‚‹");
 	}
 
 	if ((--(p->mLockCount))==0) {
 		p->mLockedThread = dkcdINVALID_THREAD_ID;
 	}
-#ifdef WIN32	
-	//	ªLeave‚µ‚½’¼Œã‚É‘¼ƒXƒŒƒbƒh‚ªEnter‚·‚é‰Â”\«‚ª‚ ‚é
+#ifdef WIN32
 	LeaveCriticalSection(&(p->m_csCriticalSection));
 #else
 	pthread_mutex_unlock(&(p->mMutex));
 #endif
 }
 
-/*
-BOOL WINAPI dkcThreadLockIsInited(DKC_THREAD_LOCK *){
-
+BOOL WINAPI dkcThreadLock_TryLock(DKC_THREAD_LOCK *p)
+{
+	dkcmFORCE_NOT_ASSERT(NULL==p);
+#ifdef WIN32
+	if(TryEnterCriticalSection(&(p->m_csCriticalSection))){
+		p->mLockedThread = dkcGetThreadID();
+		p->mLockCount++;
+		return TRUE;
+	}
+	return FALSE;
+#else
+	if(pthread_mutex_trylock(&(p->mMutex)) == 0){
+		p->mLockedThread = dkcGetThreadID();
+		p->mLockCount++;
+		return TRUE;
+	}
+	return FALSE;
+#endif
 }
-*/
+
 BOOL WINAPI dkcThreadLockIsLockedByThisThread(DKC_THREAD_LOCK *p)
 {
 	dkctThreadID dw;
@@ -103,100 +118,194 @@ BOOL WINAPI dkcThreadLockIsLockedByThisThread(DKC_THREAD_LOCK *p)
 }
 
 
-/*
-static CRITICAL_SECTION g_csCriticalSection;
-static DWORD				g_dwLockedThread = 0;	//	Lock‚µ‚Ä‚¢‚éThreadId(0:”ñLock)
-static int					gLockCount = 0;		//	Lock‚³‚ê‚Ä‚¢‚é‰ñ”
-	//	(“¯ˆêƒXƒŒƒbƒh‚È‚ç‚Î•¡”‰ñLock‚Å‚«‚é‚Ì‚Å)
-//‰Šú‰»‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©ƒtƒ‰ƒOB
-static BOOL gInited = FALSE;
+/* ========================================
+ * RWLock
+ * ======================================== */
 
-
-
-static void Init(){
-	{
-		if(TRUE==gInited){return;}
-	}
-	InitializeCriticalSection(&g_csCriticalSection);
-	g_dwLockedThread = (DWORD)-1;
-	gLockCount	= 0;
-#	ifdef DEBUG
-	ODS("dkcLockThreadInit\n");
-#	endif
-	gInited = TRUE;
-}
-
-static void End(){
-	{
-		if(FALSE==gInited){return;}
-	}
-	DeleteCriticalSection(&g_csCriticalSection);
-	gInited = FALSE;
-	memset(&g_csCriticalSection,0,sizeof(g_csCriticalSection));
-	if (gLockCount!=0) {
-		dkcmNOT_ASSERT("dkcThreadLock‚ðLock‚µ‚½‰ñ”‚¾‚¯Unlock‚µ‚È‚¢‚Ü‚ÜI—¹‚µ‚Ä‚¢‚é");
-	}
-#	ifdef DEBUG
-	ODS("dkcLockThreadEnd\n");
-#	endif
-}
-
-
-///	CriticalSection‚É“ü‚é
-static void Enter(){
-	if(FALSE==gInited){
-		dkcmFORCE_NOT_ASSERT("dkcThreadLockInit()‚Å‰Šú‰»‚µ‚Ä‚¢‚È‚¢");
-		return;
-	}
-	EnterCriticalSection(&g_csCriticalSection);
-	
-	g_dwLockedThread = GetCurrentThreadId();
-	//	ªˆÙ‚È‚éƒXƒŒƒbƒh‚©‚ç‚±‚±‚É“ü‚Á‚Ä‚­‚é‚±‚Æ‚Í‚Å‚«‚È‚¢
-	//	(CriticalSection‚Ì’è‹`‚æ‚è)
-	gLockCount++;
-
-}
-
-///CriticalSection‚©‚ç”²‚¯‚é
-static void Leave(){
-	if(FALSE==gInited){
-		dkcmFORCE_NOT_ASSERT("dkcThreadLockInit()‚Å‰Šú‰»‚µ‚Ä‚¢‚È‚¢");
-		return;
-	}
-	if (gLockCount==0){
-		dkcmNOT_ASSERT("CriticalSectionManager‚ðEnter‚µ‚Ä‚¢‚È‚¢‚Ì‚ÉLeave‚µ‚Ä‚¢‚é");
-	}
-
-	if (--gLockCount==0) {
-		g_dwLockedThread = (DWORD)-1;
-	}
-	//	ªLeave‚µ‚½’¼Œã‚É‘¼ƒXƒŒƒbƒh‚ªEnter‚·‚é‰Â”\«‚ª‚ ‚é
-	LeaveCriticalSection(&g_csCriticalSection);
-}
-
-BOOL WINAPI dkcThreadLockIsLockedByThisThread(){
-	DWORD dw = GetCurrentThreadId();
-	return (g_dwLockedThread == dw);
-}
-
-BOOL WINAPI dkcThreadLockIsInited()
+DKC_THREAD_RWLOCK * WINAPI dkcAllocThreadRWLock(void)
 {
-	return gInited;
+	DKC_THREAD_RWLOCK *p = (DKC_THREAD_RWLOCK *)dkcAllocate(sizeof(DKC_THREAD_RWLOCK));
+	if(NULL == p){
+		return NULL;
+	}
+#ifdef WIN32
+	InitializeCriticalSection(&(p->cs));
+	p->reader_count = 0;
+	p->writer_event = CreateEvent(NULL, TRUE, TRUE, NULL); /* manual reset, initially signaled */
+	if(p->writer_event == NULL){
+		DeleteCriticalSection(&(p->cs));
+		dkcFree((void **)&p);
+		return NULL;
+	}
+#else
+	pthread_rwlock_init(&(p->rwlock), NULL);
+#endif
+	return p;
 }
 
-void WINAPI dkcThreadLockInit(){
-	Init();
+int WINAPI dkcFreeThreadRWLock(DKC_THREAD_RWLOCK **pp)
+{
+	if(NULL == pp || NULL == *pp){
+		return edk_ArgumentException;
+	}
+#ifdef WIN32
+	CloseHandle((*pp)->writer_event);
+	DeleteCriticalSection(&((*pp)->cs));
+#else
+	pthread_rwlock_destroy(&((*pp)->rwlock));
+#endif
+	return dkcFree((void **)pp);
 }
 
-void WINAPI dkcThreadLock_Lock(){
-	Enter();
+void WINAPI dkcThreadRWLock_ReaderLock(DKC_THREAD_RWLOCK *p)
+{
+#ifdef WIN32
+	EnterCriticalSection(&(p->cs));
+	p->reader_count++;
+	if(p->reader_count == 1){
+		/* first reader: block writers */
+		ResetEvent(p->writer_event);
+	}
+	LeaveCriticalSection(&(p->cs));
+#else
+	pthread_rwlock_rdlock(&(p->rwlock));
+#endif
 }
 
-void WINAPI dkcThreadLock_Unlock(){
-	Leave();
+void WINAPI dkcThreadRWLock_ReaderUnlock(DKC_THREAD_RWLOCK *p)
+{
+#ifdef WIN32
+	EnterCriticalSection(&(p->cs));
+	p->reader_count--;
+	if(p->reader_count == 0){
+		/* last reader: allow writers */
+		SetEvent(p->writer_event);
+	}
+	LeaveCriticalSection(&(p->cs));
+#else
+	pthread_rwlock_unlock(&(p->rwlock));
+#endif
 }
 
-void WINAPI dkcThreadLockEnd(){
-	End();
+void WINAPI dkcThreadRWLock_WriterLock(DKC_THREAD_RWLOCK *p)
+{
+#ifdef WIN32
+	/* wait until no readers */
+	WaitForSingleObject(p->writer_event, INFINITE);
+	EnterCriticalSection(&(p->cs));
+	/* prevent new readers while we hold CS */
+	ResetEvent(p->writer_event);
+#else
+	pthread_rwlock_wrlock(&(p->rwlock));
+#endif
 }
-*/
+
+void WINAPI dkcThreadRWLock_WriterUnlock(DKC_THREAD_RWLOCK *p)
+{
+#ifdef WIN32
+	SetEvent(p->writer_event);
+	LeaveCriticalSection(&(p->cs));
+#else
+	pthread_rwlock_unlock(&(p->rwlock));
+#endif
+}
+
+/* ========================================
+ * Condition Variable
+ * ======================================== */
+
+DKC_THREAD_COND * WINAPI dkcAllocThreadCond(void)
+{
+	DKC_THREAD_COND *p = (DKC_THREAD_COND *)dkcAllocate(sizeof(DKC_THREAD_COND));
+	if(NULL == p){
+		return NULL;
+	}
+#ifdef WIN32
+	p->event = CreateEvent(NULL, FALSE, FALSE, NULL); /* auto reset */
+	if(p->event == NULL){
+		dkcFree((void **)&p);
+		return NULL;
+	}
+	InitializeCriticalSection(&(p->waiter_cs));
+	p->waiter_count = 0;
+#else
+	pthread_cond_init(&(p->cond), NULL);
+#endif
+	return p;
+}
+
+int WINAPI dkcFreeThreadCond(DKC_THREAD_COND **pp)
+{
+	if(NULL == pp || NULL == *pp){
+		return edk_ArgumentException;
+	}
+#ifdef WIN32
+	CloseHandle((*pp)->event);
+	DeleteCriticalSection(&((*pp)->waiter_cs));
+#else
+	pthread_cond_destroy(&((*pp)->cond));
+#endif
+	return dkcFree((void **)pp);
+}
+
+void WINAPI dkcThreadCond_Wait(DKC_THREAD_COND *cond, DKC_THREAD_LOCK *mutex)
+{
+#ifdef WIN32
+	EnterCriticalSection(&(cond->waiter_cs));
+	cond->waiter_count++;
+	LeaveCriticalSection(&(cond->waiter_cs));
+
+	/* release the mutex, wait for signal, re-acquire mutex */
+	dkcThreadLock_Unlock(mutex);
+	WaitForSingleObject(cond->event, INFINITE);
+	dkcThreadLock_Lock(mutex);
+
+	EnterCriticalSection(&(cond->waiter_cs));
+	cond->waiter_count--;
+	LeaveCriticalSection(&(cond->waiter_cs));
+#else
+	/* must adjust lock tracking before pthread_cond_wait releases mutex */
+	mutex->mLockCount--;
+	if(mutex->mLockCount == 0){
+		mutex->mLockedThread = dkcdINVALID_THREAD_ID;
+	}
+	pthread_cond_wait(&(cond->cond), &(mutex->mMutex));
+	mutex->mLockedThread = dkcGetThreadID();
+	mutex->mLockCount++;
+#endif
+}
+
+void WINAPI dkcThreadCond_Signal(DKC_THREAD_COND *cond)
+{
+#ifdef WIN32
+	{
+		int have_waiters;
+		EnterCriticalSection(&(cond->waiter_cs));
+		have_waiters = (cond->waiter_count > 0);
+		LeaveCriticalSection(&(cond->waiter_cs));
+		if(have_waiters){
+			SetEvent(cond->event);
+		}
+	}
+#else
+	pthread_cond_signal(&(cond->cond));
+#endif
+}
+
+void WINAPI dkcThreadCond_Broadcast(DKC_THREAD_COND *cond)
+{
+#ifdef WIN32
+	{
+		int have_waiters;
+		int i;
+		EnterCriticalSection(&(cond->waiter_cs));
+		have_waiters = cond->waiter_count;
+		LeaveCriticalSection(&(cond->waiter_cs));
+		for(i = 0; i < have_waiters; i++){
+			SetEvent(cond->event);
+		}
+	}
+#else
+	pthread_cond_broadcast(&(cond->cond));
+#endif
+}

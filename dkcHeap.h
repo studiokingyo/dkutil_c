@@ -44,7 +44,7 @@ extern "C" {
 	@return 負: a<b, 0: a==b, 正: a>b
 	@note Min-Heapの場合、小さい方が優先される
 */
-typedef int (*DKC_HEAP_COMPARE)(const void *a, const void *b);
+typedef int (WINAPI *DKC_HEAP_COMPARE)(const void *a, const void *b);
 
 /*! @brief ヒープ構造体 */
 typedef struct dkc_Heap {

@@ -38,7 +38,7 @@ typedef int64 DKC_SEGTREE_VALUE;
 	@return 結合結果
 	@note 結合演算は結合則を満たす必要がある: op(op(a,b),c) = op(a,op(b,c))
 */
-typedef DKC_SEGTREE_VALUE (*DKC_SEGTREE_OP)(DKC_SEGTREE_VALUE a, DKC_SEGTREE_VALUE b);
+typedef DKC_SEGTREE_VALUE (WINAPI *DKC_SEGTREE_OP)(DKC_SEGTREE_VALUE a, DKC_SEGTREE_VALUE b);
 
 /*! @brief セグメント木構造体 */
 typedef struct dkc_SegmentTree {
@@ -81,8 +81,8 @@ DKC_EXTERN DKC_SEGTREE_VALUE WINAPI dkcSegTreeOpGcd(DKC_SEGTREE_VALUE a, DKC_SEG
 
 /* 単位元定数 */
 #define dkcd_SEGTREE_IDENTITY_SUM  0
-#define dkcd_SEGTREE_IDENTITY_MIN  LLONG_MAX
-#define dkcd_SEGTREE_IDENTITY_MAX  LLONG_MIN
+#define dkcd_SEGTREE_IDENTITY_MIN  DKINGYO_LONGLONG_MAX
+#define dkcd_SEGTREE_IDENTITY_MAX  DKINGYO_LONGLONG_MIN
 #define dkcd_SEGTREE_IDENTITY_XOR  0
 #define dkcd_SEGTREE_IDENTITY_GCD  0
 

@@ -1,13 +1,12 @@
 /*!
 @file dkcThreadLock.h
-@author dã‡ãõ
+@author dÈáëÈ≠ö
 @since 2004/3/22
 @note
-Critical SectionÇÃWrapper
-<s>Ç¢Ç∏ÇÍmulti platformÇ…ÇµÇΩÇ¢</s>
-2005/12/31Ç…POSIXÅHÇ…ëŒâûÅApthreadÇégÇ¶ÇÈÇÊÇ§Ç…ÇµÇΩÇØÇ«ÉRÉìÉpÉCÉãÇ≈Ç´ÇÈÇ©Ç«Ç§Ç©ÇÕïsñæ
+Critical Section„ÅÆWrapper
+2005/12/31„Å´POSIXÂØæÂøú„ÄÅpthread„Çí‰Ωø„Åà„Çã„Çà„ÅÜ„Å´„Åó„Åü„Åå„Ç≥„É≥„Éë„Ç§„É´„Åß„Åç„Çã„Åã„Å©„ÅÜ„Åã„ÅØ‰∏çÊòé
 
-@brief ÉXÉåÉbÉhÇÃÉçÉbÉNÅiCRITICAL_SECTION,pthread_mutex_tÅj
+@brief „Çπ„É¨„ÉÉ„Éâ„ÅÆ„É≠„ÉÉ„ÇØÔºàCRITICAL_SECTION,pthread_mutex_tÔºâ
 */
 
 #ifndef DKUTIL_C_THREAD_LOCK_H
@@ -21,11 +20,21 @@ typedef DWORD dkctThreadID;
 
 typedef struct dkc_ThreadLock{
 	CRITICAL_SECTION m_csCriticalSection;
-	///	LockÇµÇƒÇ¢ÇÈThreadId(0:îÒLock)
 	dkctThreadID	mLockedThread ;
-	///	LockÇ≥ÇÍÇƒÇ¢ÇÈâÒêî
 	int					mLockCount ;
 }DKC_THREAD_LOCK;
+
+typedef struct dkc_ThreadRWLock{
+	CRITICAL_SECTION cs;
+	int reader_count;
+	HANDLE writer_event;
+}DKC_THREAD_RWLOCK;
+
+typedef struct dkc_ThreadCond{
+	HANDLE event;
+	CRITICAL_SECTION waiter_cs;
+	int waiter_count;
+}DKC_THREAD_COND;
 
 #else
 
@@ -34,12 +43,17 @@ typedef void *dkctThreadID;
 
 typedef struct dkc_ThreadLock{
 	pthread_mutex_t mMutex;
-	///	LockÇµÇƒÇ¢ÇÈThreadId(0:îÒLock)
 	dkctThreadID				mLockedThread ;
-	///	LockÇ≥ÇÍÇƒÇ¢ÇÈâÒêî
 	int					mLockCount ;
 }DKC_THREAD_LOCK;
 
+typedef struct dkc_ThreadRWLock{
+	pthread_rwlock_t rwlock;
+}DKC_THREAD_RWLOCK;
+
+typedef struct dkc_ThreadCond{
+	pthread_cond_t cond;
+}DKC_THREAD_COND;
 
 #endif
 
@@ -51,35 +65,37 @@ DKC_INLINE dkctThreadID dkcGetThreadID(){
 #endif
 }
 
+/* Mutex */
 DKC_EXTERN DKC_THREAD_LOCK * WINAPI dkcAllocThreadLock();
 
 DKC_EXTERN int WINAPI dkcFreeThreadLock(DKC_THREAD_LOCK **);
 
 DKC_EXTERN void WINAPI dkcThreadLock_Lock(DKC_THREAD_LOCK *);
 
-
 DKC_EXTERN void WINAPI dkcThreadLock_Unlock(DKC_THREAD_LOCK *);
 
-
-//DKC_EXTERN BOOL WINAPI dkcThreadLockIsInited(DKC_THREAD_LOCK *);
+DKC_EXTERN BOOL WINAPI dkcThreadLock_TryLock(DKC_THREAD_LOCK *);
 
 DKC_EXTERN BOOL WINAPI dkcThreadLockIsLockedByThisThread(DKC_THREAD_LOCK *);
 #define dkcThreadLockIsLockedByCurrentThread(p) dkcThreadLockIsLockedByThisThread(p)
-/*
-DKC_EXTERN void WINAPI dkcThreadLockInit();
 
-DKC_EXTERN void WINAPI dkcThreadLock_Lock();
+/* RWLock */
+DKC_EXTERN DKC_THREAD_RWLOCK * WINAPI dkcAllocThreadRWLock(void);
+DKC_EXTERN int WINAPI dkcFreeThreadRWLock(DKC_THREAD_RWLOCK **pp);
+DKC_EXTERN void WINAPI dkcThreadRWLock_ReaderLock(DKC_THREAD_RWLOCK *p);
+DKC_EXTERN void WINAPI dkcThreadRWLock_ReaderUnlock(DKC_THREAD_RWLOCK *p);
+DKC_EXTERN void WINAPI dkcThreadRWLock_WriterLock(DKC_THREAD_RWLOCK *p);
+DKC_EXTERN void WINAPI dkcThreadRWLock_WriterUnlock(DKC_THREAD_RWLOCK *p);
 
-DKC_EXTERN void WINAPI dkcThreadLock_Unlock();
+/* Condition Variable */
+DKC_EXTERN DKC_THREAD_COND * WINAPI dkcAllocThreadCond(void);
+DKC_EXTERN int WINAPI dkcFreeThreadCond(DKC_THREAD_COND **pp);
+DKC_EXTERN void WINAPI dkcThreadCond_Wait(DKC_THREAD_COND *cond, DKC_THREAD_LOCK *mutex);
+DKC_EXTERN void WINAPI dkcThreadCond_Signal(DKC_THREAD_COND *cond);
+DKC_EXTERN void WINAPI dkcThreadCond_Broadcast(DKC_THREAD_COND *cond);
 
-DKC_EXTERN void WINAPI dkcThreadLockEnd();
-
-DKC_EXTERN BOOL WINAPI dkcThreadLockIsInited();
-
-DKC_EXTERN BOOL WINAPI dkcThreadLockIsLockedByThisThread();
-*/
 #if !defined( DKUTIL_C_THREAD_LOCK_C ) &&  defined(USE_DKC_INDEPENDENT_INCLUDE)
 #	include "dkcThreadLock.c"
 #endif
 
-#endif //end of include once
+#endif
