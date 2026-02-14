@@ -111,7 +111,6 @@ static void fh_consolidate(DKC_FIBHEAP_ROOT *root)
 	DKC_FIBHEAP_NODE *x;
 	DKC_FIBHEAP_NODE *y;
 	DKC_FIBHEAP_NODE *temp;
-	DKC_FIBHEAP_NODE *start;
 	int d, max_degree;
 	int i;
 	size_t root_count;

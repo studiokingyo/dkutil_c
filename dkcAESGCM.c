@@ -81,13 +81,13 @@ static void ghash_multiply(const unsigned char *X, const unsigned char *Y, unsig
 			}
 
 			/* V = V * x in GF(2^128) */
-			carry = V[15] & 1;
+			carry = (unsigned char)(V[15] & 1);
 			{
 				int k;
 				for(k = 15; k > 0; k--){
-					V[k] = (V[k] >> 1) | ((V[k-1] & 1) << 7);
+					V[k] = (unsigned char)((V[k] >> 1) | ((V[k-1] & 1) << 7));
 				}
-				V[0] = V[0] >> 1;
+				V[0] = (unsigned char)(V[0] >> 1);
 			}
 			if(carry){
 				V[0] ^= 0xE1; /* R = x^7 + x^2 + x + 1 */
@@ -148,7 +148,7 @@ static void gcm_gctr(DKC_RIJNDAEL *aes, const unsigned char *icb,
 		{
 			size_t j;
 			for(j = 0; j < blocklen; j++){
-				output[i + j] = input[i + j] ^ keystream[j];
+				output[i + j] = (unsigned char)(input[i + j] ^ keystream[j]);
 			}
 		}
 		gcm_inc32(cb);

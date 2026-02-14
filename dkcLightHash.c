@@ -6,6 +6,12 @@
 #include "dkcLightHash.h"
 #include <string.h>
 
+#ifdef _MSC_VER
+#define QW(x) x##ui64
+#else
+#define QW(x) x##ULL
+#endif
+
 /* ====================================================================
  * 内部ユーティリティ
  * ==================================================================== */
@@ -42,8 +48,8 @@ static uint16 read16_le(const uint8 *p)
 
 #define FNV1_32_INIT  0x811C9DC5UL
 #define FNV1_32_PRIME 0x01000193UL
-#define FNV1_64_INIT  0xCBF29CE484222325ULL
-#define FNV1_64_PRIME 0x00000100000001B3ULL
+#define FNV1_64_INIT  QW(0xCBF29CE484222325)
+#define FNV1_64_PRIME QW(0x00000100000001B3)
 
 /* ====================================================================
  * クラシックハッシュ関数
@@ -314,7 +320,7 @@ uint32 WINAPI dkcHashMurmur2_32(const void *data, size_t len, uint32 seed)
 
 uint64 WINAPI dkcHashMurmur2_64(const void *data, size_t len, uint64 seed)
 {
-	const uint64 m = 0xC6A4A7935BD1E995ULL;
+	const uint64 m = QW(0xC6A4A7935BD1E995);
 	const int r = 47;
 	const uint8 *p = (const uint8 *)data;
 	uint64 h = seed ^ (len * m);
@@ -366,9 +372,9 @@ static uint32 murmur3_fmix32(uint32 h)
 static uint64 murmur3_fmix64(uint64 k)
 {
 	k ^= k >> 33;
-	k *= 0xFF51AFD7ED558CCDULL;
+	k *= QW(0xFF51AFD7ED558CCD);
 	k ^= k >> 33;
-	k *= 0xC4CEB9FE1A85EC53ULL;
+	k *= QW(0xC4CEB9FE1A85EC53);
 	k ^= k >> 33;
 	return k;
 }
@@ -421,8 +427,8 @@ void WINAPI dkcHashMurmur3_128(const void *data, size_t len, uint32 seed, uint64
 	const size_t nblocks = len / 16;
 	uint64 h1 = seed;
 	uint64 h2 = seed;
-	const uint64 c1 = 0x87C37B91114253D5ULL;
-	const uint64 c2 = 0x4CF5AD432745937FULL;
+	const uint64 c1 = QW(0x87C37B91114253D5);
+	const uint64 c2 = QW(0x4CF5AD432745937F);
 	const uint8 *tail;
 	uint64 k1, k2;
 	size_t i;
@@ -510,11 +516,11 @@ void WINAPI dkcHashMurmur3_128(const void *data, size_t len, uint32 seed, uint64
 #define XXH_PRIME32_4 0x27D4EB2FU
 #define XXH_PRIME32_5 0x165667B1U
 
-#define XXH_PRIME64_1 0x9E3779B185EBCA87ULL
-#define XXH_PRIME64_2 0xC2B2AE3D27D4EB4FULL
-#define XXH_PRIME64_3 0x165667B19E3779F9ULL
-#define XXH_PRIME64_4 0x85EBCA77C2B2AE63ULL
-#define XXH_PRIME64_5 0x27D4EB2F165667C5ULL
+#define XXH_PRIME64_1 QW(0x9E3779B185EBCA87)
+#define XXH_PRIME64_2 QW(0xC2B2AE3D27D4EB4F)
+#define XXH_PRIME64_3 QW(0x165667B19E3779F9)
+#define XXH_PRIME64_4 QW(0x85EBCA77C2B2AE63)
+#define XXH_PRIME64_5 QW(0x27D4EB2F165667C5)
 
 static uint32 xxh32_round(uint32 acc, uint32 input)
 {
@@ -662,7 +668,7 @@ uint64 WINAPI dkcHashXX64(const void *data, size_t len, uint64 seed)
 /* CityHash内部関数 */
 static uint64 city_hash128to64(uint64 u, uint64 v)
 {
-	const uint64 kMul = 0x9DDFEA08EB382D69ULL;
+	const uint64 kMul = QW(0x9DDFEA08EB382D69);
 	uint64 a = (u ^ v) * kMul;
 	a ^= (a >> 47);
 	uint64 b = (v ^ a) * kMul;
@@ -693,8 +699,8 @@ static uint64 city_hashlen16_mul(uint64 u, uint64 v, uint64 mul)
 
 static uint64 city_hashlen0to16(const uint8 *s, size_t len)
 {
-	const uint64 k2 = 0x9AE16A3B2F90404FULL;
-	const uint64 k3 = 0xC949D7C7509E6557ULL;
+	const uint64 k2 = QW(0x9AE16A3B2F90404F);
+	const uint64 k3 = QW(0xC949D7C7509E6557);
 
 	if (len > 8) {
 		uint64 a = read64_le(s);
@@ -718,9 +724,9 @@ static uint64 city_hashlen0to16(const uint8 *s, size_t len)
 
 static uint64 city_hashlen17to32(const uint8 *s, size_t len)
 {
-	const uint64 k0 = 0xC3A5C85C97CB3127ULL;
-	const uint64 k1 = 0xB492B66FBE98F273ULL;
-	const uint64 k2 = 0x9AE16A3B2F90404FULL;
+	const uint64 k0 = QW(0xC3A5C85C97CB3127);
+	const uint64 k1 = QW(0xB492B66FBE98F273);
+	const uint64 k2 = QW(0x9AE16A3B2F90404F);
 
 	uint64 a = read64_le(s) * k1;
 	uint64 b = read64_le(s + 8);
@@ -730,13 +736,13 @@ static uint64 city_hashlen17to32(const uint8 *s, size_t len)
 	                      a + ROTR64(b ^ k3, 20) - c + len);
 }
 
-static const uint64 k3 = 0xC949D7C7509E6557ULL;
+static const uint64 k3 = QW(0xC949D7C7509E6557);
 
 static uint64 city_hashlen33to64(const uint8 *s, size_t len)
 {
-	const uint64 k0 = 0xC3A5C85C97CB3127ULL;
-	const uint64 k1 = 0xB492B66FBE98F273ULL;
-	const uint64 k2 = 0x9AE16A3B2F90404FULL;
+	const uint64 k0 = QW(0xC3A5C85C97CB3127);
+	const uint64 k1 = QW(0xB492B66FBE98F273);
+	const uint64 k2 = QW(0x9AE16A3B2F90404F);
 
 	uint64 z = read64_le(s + 24);
 	uint64 a = read64_le(s) + (len + read64_le(s + len - 16)) * k0;
@@ -769,9 +775,9 @@ static uint64 city_hashlen33to64(const uint8 *s, size_t len)
 uint64 WINAPI dkcHashCity64(const void *data, size_t len)
 {
 	const uint8 *s = (const uint8 *)data;
-	const uint64 k0 = 0xC3A5C85C97CB3127ULL;
-	const uint64 k1 = 0xB492B66FBE98F273ULL;
-	const uint64 k2 = 0x9AE16A3B2F90404FULL;
+	const uint64 k0 = QW(0xC3A5C85C97CB3127);
+	const uint64 k1 = QW(0xB492B66FBE98F273);
+	const uint64 k2 = QW(0x9AE16A3B2F90404F);
 
 	if (len <= 16) return city_hashlen0to16(s, len);
 	if (len <= 32) return city_hashlen17to32(s, len);
@@ -933,8 +939,8 @@ uint64 WINAPI dkcHashWy(const void *data, size_t len, uint64 seed)
 {
 	const uint8 *p = (const uint8 *)data;
 	const uint64 secret[4] = {
-		0xA0761D6478BD642FULL, 0xE7037ED1A0B428DBULL,
-		0x8EBC6AF09C88C6E3ULL, 0x589965CC75374CC3ULL
+		QW(0xA0761D6478BD642F), QW(0xE7037ED1A0B428DB),
+		QW(0x8EBC6AF09C88C6E3), QW(0x589965CC75374CC3)
 	};
 
 	seed ^= secret[0];
@@ -1026,7 +1032,7 @@ uint32 WINAPI dkcHashFx32(const void *data, size_t len)
 uint64 WINAPI dkcHashFx64(const void *data, size_t len)
 {
 	const uint8 *p = (const uint8 *)data;
-	const uint64 SEED = 0x517CC1B727220A95ULL;
+	const uint64 SEED = QW(0x517CC1B727220A95);
 	uint64 hash = 0;
 
 	while (len >= 8) {
@@ -1177,9 +1183,9 @@ uint64 WINAPI dkcHashInt64(uint64 x)
 {
 	/* SplitMix64 */
 	x ^= x >> 30;
-	x *= 0xBF58476D1CE4E5B9ULL;
+	x *= QW(0xBF58476D1CE4E5B9);
 	x ^= x >> 27;
-	x *= 0x94D049BB133111EBULL;
+	x *= QW(0x94D049BB133111EB);
 	x ^= x >> 31;
 	return x;
 }
@@ -1202,6 +1208,6 @@ uint32 WINAPI dkcHashCombine32(uint32 h1, uint32 h2)
 
 uint64 WINAPI dkcHashCombine64(uint64 h1, uint64 h2)
 {
-	h1 ^= h2 + 0x9E3779B97F4A7C15ULL + (h1 << 12) + (h1 >> 4);
+	h1 ^= h2 + QW(0x9E3779B97F4A7C15) + (h1 << 12) + (h1 >> 4);
 	return h1;
 }

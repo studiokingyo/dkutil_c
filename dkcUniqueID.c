@@ -41,7 +41,11 @@ static const char CROCKFORD_BASE32[] = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 static const char BASE62[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 static const char XID_BASE32[] = "0123456789abcdefghijklmnopqrstuv";
 
+#ifdef _MSC_VER
+#define TWITTER_EPOCH 1288834974657ui64
+#else
 #define TWITTER_EPOCH 1288834974657ULL
+#endif
 
 /* ====================================================================
  * 内部関数
@@ -65,7 +69,11 @@ static uint64 get_timestamp_ms(void)
 	GetSystemTimeAsFileTime(&ft);
 	li.LowPart = ft.dwLowDateTime;
 	li.HighPart = ft.dwHighDateTime;
+#ifdef _MSC_VER
+	return (li.QuadPart - 116444736000000000i64) / 10000;
+#else
 	return (li.QuadPart - 116444736000000000ULL) / 10000;
+#endif
 #else
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -81,7 +89,11 @@ static uint32 get_timestamp_sec(void)
 static uint64 get_uuid_timestamp(void)
 {
 	uint64 ms = get_timestamp_ms();
+#ifdef _MSC_VER
+	uint64 uuid_epoch_offset = 122192928000000000i64;
+#else
 	uint64 uuid_epoch_offset = 122192928000000000ULL;
+#endif
 	return ms * 10000 + uuid_epoch_offset;
 }
 
@@ -100,8 +112,8 @@ static int from_hex(char c)
 
 static void set_uuid_version(DKC_UUID *uuid, int version)
 {
-	uuid->bytes[6] = (uuid->bytes[6] & 0x0F) | ((version & 0x0F) << 4);
-	uuid->bytes[8] = (uuid->bytes[8] & 0x3F) | 0x80;
+	uuid->bytes[6] = (uint8)((uuid->bytes[6] & 0x0F) | ((version & 0x0F) << 4));
+	uuid->bytes[8] = (uint8)((uuid->bytes[8] & 0x3F) | 0x80);
 }
 
 /* ====================================================================
@@ -120,7 +132,7 @@ DKC_EXTERN int WINAPI dkcUUIDGenInit(DKC_UUID_GEN *gen, uint32 seed)
 	gen->clock_seq = (uint16)(xorshift32(&gen->rand_state) & 0x3FFF);
 
 	r = xorshift32(&gen->rand_state);
-	gen->node_id[0] = (uint8)(r) | 0x01;
+	gen->node_id[0] = (uint8)((uint8)(r) | 0x01);
 	gen->node_id[1] = (uint8)(r >> 8);
 	gen->node_id[2] = (uint8)(r >> 16);
 	gen->node_id[3] = (uint8)(r >> 24);
@@ -139,7 +151,7 @@ DKC_EXTERN int WINAPI dkcUUIDv1Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid)
 	if(!gen->initialized) dkcUUIDGenInit(gen, 0);
 
 	ts = get_uuid_timestamp();
-	gen->clock_seq = (gen->clock_seq + 1) & 0x3FFF;
+	gen->clock_seq = (uint16)((gen->clock_seq + 1) & 0x3FFF);
 
 	uuid->bytes[0] = (uint8)(ts >> 24);
 	uuid->bytes[1] = (uint8)(ts >> 16);
@@ -184,9 +196,9 @@ DKC_EXTERN int WINAPI dkcUUIDv3Generate(DKC_UUID *uuid,
 	md5 = dkcAllocMD5();
 	if(md5 == NULL) return edk_FAILED;
 
-	dkcMD5Update(md5, ns_uuid->bytes, 16);
-	dkcMD5Update(md5, (const uint8 *)name, name_len);
-	dkcMD5Final(md5, hash);
+	dkcMD5Load(md5, ns_uuid->bytes, 16);
+	dkcMD5Load(md5, (const BYTE *)name, (DWORD)name_len);
+	dkcMD5FinalDigest(md5, hash, 16);
 	dkcFreeMD5(&md5);
 
 	memcpy(uuid->bytes, hash, 16);
@@ -233,9 +245,9 @@ DKC_EXTERN int WINAPI dkcUUIDv5Generate(DKC_UUID *uuid,
 	sha1 = dkcAllocSHA1();
 	if(sha1 == NULL) return edk_FAILED;
 
-	dkcSHA1Update(sha1, ns_uuid->bytes, 16);
-	dkcSHA1Update(sha1, (const uint8 *)name, name_len);
-	dkcSHA1Final(sha1, hash);
+	dkcSHA1Load(sha1, ns_uuid->bytes, 16);
+	dkcSHA1Load(sha1, (const BYTE *)name, (DWORD)name_len);
+	dkcSHA1FinalDigest(sha1, hash, 20);
 	dkcFreeSHA1(&sha1);
 
 	memcpy(uuid->bytes, hash, 16);
@@ -260,7 +272,7 @@ DKC_EXTERN int WINAPI dkcUUIDv6Generate(DKC_UUID_GEN *gen, DKC_UUID *uuid)
 	if(!gen->initialized) dkcUUIDGenInit(gen, 0);
 
 	ts = get_uuid_timestamp();
-	gen->clock_seq = (gen->clock_seq + 1) & 0x3FFF;
+	gen->clock_seq = (uint16)((gen->clock_seq + 1) & 0x3FFF);
 
 	time_high = (uint32)(ts >> 28);
 	time_mid = (uint32)((ts >> 12) & 0xFFFF);
@@ -519,7 +531,7 @@ DKC_EXTERN int WINAPI dkcULIDToString(const DKC_ULID *ulid, char *str)
 static int crockford_decode(char c)
 {
 	if(c >= '0' && c <= '9') return c - '0';
-	c = (c >= 'a' && c <= 'z') ? (char)(c - 32) : c;
+	c = (char)((c >= 'a' && c <= 'z') ? (c - 32) : c);
 	if(c == 'O') return 0;
 	if(c == 'I' || c == 'L') return 1;
 	if(c >= 'A' && c <= 'H') return c - 'A' + 10;
@@ -603,7 +615,7 @@ DKC_EXTERN int WINAPI dkcSnowflakeGenerate(DKC_SNOWFLAKE_GEN *gen, DKC_SNOWFLAKE
 	ts = get_timestamp_ms();
 
 	if(ts == gen->last_timestamp){
-		gen->sequence = (gen->sequence + 1) & 0x0FFF;
+		gen->sequence = (uint16)((gen->sequence + 1) & 0x0FFF);
 		if(gen->sequence == 0){
 			while(ts <= gen->last_timestamp) ts = get_timestamp_ms();
 		}

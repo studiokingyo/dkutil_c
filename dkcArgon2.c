@@ -11,6 +11,13 @@
 #include "dkcBLAKE2.h"
 #include <string.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4127) /* conditional expression is constant (do-while(0)) */
+#define QW(x) x##ui64
+#else
+#define QW(x) x##ULL
+#endif
+
 /* ====================================================================
  * 内部定数
  * ==================================================================== */
@@ -55,10 +62,10 @@ static void argon2_blake2b_long(unsigned char *out, size_t outlen,
 		/* Re-init with custom outlen */
 		{
 			static const QWORD blake2b_iv[8] = {
-				0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-				0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-				0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-				0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
+				QW(0x6a09e667f3bcc908), QW(0xbb67ae8584caa73b),
+				QW(0x3c6ef372fe94f82b), QW(0xa54ff53a5f1d36f1),
+				QW(0x510e527fade682d1), QW(0x9b05688c2b3e6c1f),
+				QW(0x1f83d9abfb41bd6b), QW(0x5be0cd19137e2179)
 			};
 			memcpy(ctx->h, blake2b_iv, sizeof(blake2b_iv));
 			ctx->h[0] ^= 0x01010000 ^ (QWORD)outlen;
@@ -113,10 +120,10 @@ static void argon2_blake2b_long(unsigned char *out, size_t outlen,
 			/* Use variable output length */
 			{
 				static const QWORD blake2b_iv2[8] = {
-					0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-					0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-					0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-					0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
+					QW(0x6a09e667f3bcc908), QW(0xbb67ae8584caa73b),
+					QW(0x3c6ef372fe94f82b), QW(0xa54ff53a5f1d36f1),
+					QW(0x510e527fade682d1), QW(0x9b05688c2b3e6c1f),
+					QW(0x1f83d9abfb41bd6b), QW(0x5be0cd19137e2179)
 				};
 				ctx->outLen = remain;
 				memcpy(ctx->h, blake2b_iv2, sizeof(blake2b_iv2));
@@ -357,7 +364,6 @@ DKC_EXTERN int WINAPI dkcArgon2Hash(
 				uint32 cur_index;
 				uint32 ref_area_size;
 				QWORD pseudo_rand;
-				QWORD relative_pos;
 				int xor_mode;
 
 				cur_index = slice * segment_length + index;

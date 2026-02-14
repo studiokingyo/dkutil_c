@@ -10,6 +10,12 @@
 
 #include "../dkc.h"
 
+#ifdef _MSC_VER
+#define QW(x) x##ui64
+#else
+#define QW(x) x##ULL
+#endif
+
 /* Test result counters */
 static int g_tests_passed = 0;
 static int g_tests_failed = 0;
@@ -3419,8 +3425,8 @@ void Test_LightHash(void)
     h32_1 = dkcHashInt32(12345678);
     TEST_ASSERT(h32_1 != 12345678, "HashInt32 transforms input");
 
-    h64_1 = dkcHashInt64(0x123456789ABCDEFULL);
-    TEST_ASSERT(h64_1 != 0x123456789ABCDEFULL, "HashInt64 transforms input");
+    h64_1 = dkcHashInt64(QW(0x123456789ABCDEF));
+    TEST_ASSERT(h64_1 != QW(0x123456789ABCDEF), "HashInt64 transforms input");
 
     {
         uint32 combined = dkcHashCombine32(0x12345678, 0x9ABCDEF0);
@@ -4344,7 +4350,7 @@ void Test_UniqueID(void)
     TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 7, "UUID v7 version is 7");
 
     /* === UUID v8 Tests === */
-    result = dkcUUIDv8Generate(&uuid1, 0x123456789ABCULL, 0xDEF, 0x0123456789ABCDEFULL);
+    result = dkcUUIDv8Generate(&uuid1, QW(0x123456789ABC), 0xDEF, QW(0x0123456789ABCDEF));
     TEST_ASSERT(result == edk_SUCCEEDED, "UUID v8 generate");
     TEST_ASSERT(dkcUUIDGetVersion(&uuid1) == 8, "UUID v8 version is 8");
 

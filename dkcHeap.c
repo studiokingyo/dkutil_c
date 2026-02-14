@@ -60,7 +60,7 @@ static void heap_sift_down(DKC_HEAP *heap, size_t idx)
 	void *val = heap->data[idx];
 	size_t size = heap->size;
 
-	while (1) {
+	for (;;) {
 		size_t left = HEAP_LEFT(idx);
 		size_t right = HEAP_RIGHT(idx);
 		size_t smallest = idx;
@@ -106,7 +106,7 @@ static void typed_heap_sift_down(DKC_TYPED_HEAP *heap, size_t idx, BYTE *tmp)
 	size_t size = heap->size;
 	memcpy(tmp, TYPED_ELEM(heap, idx), heap->elem_size);
 
-	while (1) {
+	for (;;) {
 		size_t left = HEAP_LEFT(idx);
 		size_t right = HEAP_RIGHT(idx);
 		size_t smallest = idx;
@@ -442,7 +442,7 @@ DKC_EXTERN int WINAPI dkcHeapSort2(void *data, size_t count, size_t elem_size,
 		/* sift down for max-heap (ascending sort) */
 		size_t idx = (size_t)i;
 		memcpy(tmp, &a[idx * elem_size], elem_size);
-		while (1) {
+		for (;;) {
 			size_t left = HEAP_LEFT(idx);
 			size_t right = HEAP_RIGHT(idx);
 			size_t largest = idx;
@@ -471,7 +471,7 @@ DKC_EXTERN int WINAPI dkcHeapSort2(void *data, size_t count, size_t elem_size,
 		/* sift down root in reduced heap */
 		idx = 0;
 		memcpy(tmp, &a[0], elem_size);
-		while (1) {
+		for (;;) {
 			size_t left = HEAP_LEFT(idx);
 			size_t right = HEAP_RIGHT(idx);
 			size_t largest = idx;

@@ -50,7 +50,11 @@ extern "C" {
 #define dkcd_THREEFISH1024_ROUNDS       80
 
 /*! @brief Key schedule parity constant (C240) */
+#ifdef _MSC_VER
+#define dkcd_THREEFISH_PARITY           0x1BD11BDAA9FC1A22ui64
+#else
 #define dkcd_THREEFISH_PARITY           0x1BD11BDAA9FC1A22ULL
+#endif
 
 /* ====================================================================
  * 型定義

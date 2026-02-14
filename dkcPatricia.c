@@ -391,7 +391,6 @@ DKC_EXTERN int WINAPI dkcPatriciaRemove(DKC_PATRICIA *trie,
 	const BYTE *key, size_t key_len)
 {
 	DKC_PATRICIA_NODE *target;        /* 削除対象ノード */
-	DKC_PATRICIA_NODE *parent_of_target;
 	DKC_PATRICIA_NODE *leaf;          /* 上方リンクで到達するノード */
 	DKC_PATRICIA_NODE *parent_of_leaf;
 	DKC_PATRICIA_NODE *current, *prev;

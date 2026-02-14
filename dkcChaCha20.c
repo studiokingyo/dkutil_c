@@ -9,6 +9,10 @@
 #include "dkcChaCha20.h"
 #include <string.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4127) /* conditional expression is constant (do-while(0)) */
+#endif
+
 /* ====================================================================
  * 定数定義
  * ==================================================================== */
@@ -217,7 +221,7 @@ DKC_EXTERN int WINAPI dkcChaCha20Encrypt(
 		{
 			size_t j;
 			for(j = 0; j < avail; j++){
-				dest[i + j] = src[i + j] ^ p->keystream[p->position + j];
+				dest[i + j] = (unsigned char)(src[i + j] ^ p->keystream[p->position + j]);
 			}
 		}
 

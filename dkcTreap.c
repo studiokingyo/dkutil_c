@@ -144,8 +144,8 @@ DKC_EXTERN DKC_TREAP_ROOT * WINAPI dkcAllocTreapRoot(
 	root->sentinel->parent = root->sentinel;
 	root->sentinel->priority = 0;
 
-	root->node_ac = dkcAllocSameObjectPool(sizeof(DKC_TREAP_NODE), pool_num);
-	root->key_ac = dkcAllocSameObjectPool(key_size, pool_num);
+	root->node_ac = dkcAllocSameObjectPool(sizeof(DKC_TREAP_NODE), pool_num, NULL, NULL);
+	root->key_ac = dkcAllocSameObjectPool(key_size, pool_num, NULL, NULL);
 	if(root->node_ac == NULL || root->key_ac == NULL){
 		if(root->node_ac) dkcFreeSameObjectPool(&root->node_ac);
 		if(root->key_ac) dkcFreeSameObjectPool(&root->key_ac);

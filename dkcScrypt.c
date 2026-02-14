@@ -44,7 +44,7 @@ static void pbkdf2_hmac_sha256(
 		salt_block[3] = (unsigned char)(block_num);
 
 		{
-			DKC_HMAC *hmac = dkcAllocHMAC(edk_SecureHash_SHA256);
+			DKC_HMAC *hmac = dkcAllocHMAC(edkcSH_SHA256);
 			if(hmac == NULL) return;
 
 			dkcHMACInit(hmac, pwd, pwdlen);
@@ -58,7 +58,7 @@ static void pbkdf2_hmac_sha256(
 		memcpy(T, U, SCRYPT_SHA256_HASH_SIZE);
 
 		for(iter = 1; iter < iterations; iter++){
-			DKC_HMAC *hmac = dkcAllocHMAC(edk_SecureHash_SHA256);
+			DKC_HMAC *hmac = dkcAllocHMAC(edkcSH_SHA256);
 			if(hmac == NULL) return;
 
 			dkcHMACInit(hmac, pwd, pwdlen);
