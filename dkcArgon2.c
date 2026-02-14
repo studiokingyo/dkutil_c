@@ -201,6 +201,7 @@ static void argon2_compress(ARGON2_BLOCK *result,
 	QWORD *v;
 	int i;
 
+	memset(&R, 0, sizeof(ARGON2_BLOCK));
 	/* R = ref_block XOR prev_block */
 	for(i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++){
 		R.v[i] = ref_block->v[i] ^ prev_block->v[i];
