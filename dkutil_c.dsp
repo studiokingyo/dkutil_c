@@ -70,7 +70,7 @@ PostBuild_Cmds=copylib.bat
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W4 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -81,7 +81,6 @@ LIB32=link.exe -lib
 # ADD LIB32 /nologo /out:"Debug\dkutil_cd.lib"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Desc=���C�u�������R�s�[���܂��B
 PostBuild_Cmds=copylib.bat
 # End Special Build Tool
 
@@ -98,7 +97,7 @@ PostBuild_Cmds=copylib.bat
 # PROP Intermediate_Dir "DebugMT"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W4 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W4 /WX /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x411 /d "_DEBUG"
 # ADD RSC /l 0x411 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -126,7 +125,7 @@ PostBuild_Cmds=copylib.bat
 # PROP Intermediate_Dir "ReleaseMT"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /c
-# ADD CPP /nologo /MT /W4 /WX /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /FR /YX /FD /c
 # ADD BASE RSC /l 0x411 /d "NDEBUG"
 # ADD RSC /l 0x411 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -322,6 +321,38 @@ SOURCE=.\vc_asm_misc.h
 # PROP Default_Filter "c;h;"
 # Begin Source File
 
+SOURCE=.\dkcBLAKE2.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE2.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE256.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE256.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE3.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE3.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE512.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBLAKE512.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcCRC.c
 # End Source File
 # Begin Source File
@@ -335,6 +366,22 @@ SOURCE=.\dkcHash.c
 # Begin Source File
 
 SOURCE=.\dkcHash.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcKeccak.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcKeccak.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcLightHash.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcLightHash.h
 # End Source File
 # Begin Source File
 
@@ -387,6 +434,14 @@ SOURCE=.\dkcSHA256.c
 # Begin Source File
 
 SOURCE=.\dkcSHA256.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcSHA3.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcSHA3.h
 # End Source File
 # Begin Source File
 
@@ -542,6 +597,14 @@ SOURCE=.\dkcBlowfish.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcCamellia.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcCamellia.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcChaCha20.c
 # End Source File
 # Begin Source File
@@ -574,6 +637,14 @@ SOURCE=.\dkcHMAC.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcKCipher2.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcKCipher2.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcPoly1305.c
 # End Source File
 # Begin Source File
@@ -595,6 +666,22 @@ SOURCE=.\dkcSNOW20.c
 # Begin Source File
 
 SOURCE=.\dkcSNOW20.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcThreefish.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcThreefish.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcTwofish.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcTwofish.h
 # End Source File
 # Begin Source File
 
@@ -634,6 +721,22 @@ SOURCE=.\dkcArrayOneByOne.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcAVLTree.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcAVLTree.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBase64.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBase64.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcBigInteger.c
 # End Source File
 # Begin Source File
@@ -642,11 +745,27 @@ SOURCE=.\dkcBigInteger.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcBloomFilter.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBloomFilter.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcBPlusTree.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\dkcBPlusTree.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBTree.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcBTree.h
 # End Source File
 # Begin Source File
 
@@ -704,11 +823,35 @@ SOURCE=.\dkcCircularStream.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcCuckooHash.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcCuckooHash.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcDeque.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\dkcDeque.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcDoubleList.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcDoubleList.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcFenwickTree.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcFenwickTree.h
 # End Source File
 # Begin Source File
 
@@ -720,6 +863,38 @@ SOURCE=.\dkcFibonacciHeap.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcHashMap.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashMap.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashMultiMap.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashMultiMap.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashMultiSet.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashMultiSet.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashSet.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHashSet.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcHeap.c
 # End Source File
 # Begin Source File
@@ -728,11 +903,43 @@ SOURCE=.\dkcHeap.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcLRUCache.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcLRUCache.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcLRUCache2.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcLRUCache2.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcMemoryStream.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\dkcMemoryStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcMPH.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcMPH.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcNaryTree.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcNaryTree.h
 # End Source File
 # Begin Source File
 
@@ -776,6 +983,14 @@ SOURCE=.\dkcScrypt.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dkcSegmentTree.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcSegmentTree.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\dkcSingleList.c
 # End Source File
 # Begin Source File
@@ -789,6 +1004,14 @@ SOURCE=.\dkcSkipList.c
 # Begin Source File
 
 SOURCE=.\dkcSkipList.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcSparseSet.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcSparseSet.h
 # End Source File
 # Begin Source File
 
@@ -829,6 +1052,14 @@ SOURCE=.\dkcTreap.c
 # Begin Source File
 
 SOURCE=.\dkcTreap.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcUnionFind.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcUnionFind.h
 # End Source File
 # End Group
 # Begin Group "routine"

@@ -101,7 +101,7 @@ static uint32 murmur3_32(const void *key, size_t len, uint32 seed)
 
 static void set_bit(uint8 *bits, size_t index)
 {
-	bits[index >> 3] |= (1 << (index & 7));
+	bits[index >> 3] |= (uint8)(1 << (index & 7));
 }
 
 static int get_bit(const uint8 *bits, size_t index)
@@ -385,9 +385,9 @@ static void set_counter(uint8 *counters, size_t index, uint8 value)
 	size_t byte_idx = index / 2;
 	if (value > 15) value = 15; /* 4bit最大値 */
 	if (index & 1) {
-		counters[byte_idx] = (counters[byte_idx] & 0x0F) | (value << 4);
+		counters[byte_idx] = (uint8)((counters[byte_idx] & 0x0F) | (value << 4));
 	} else {
-		counters[byte_idx] = (counters[byte_idx] & 0xF0) | value;
+		counters[byte_idx] = (uint8)((counters[byte_idx] & 0xF0) | value);
 	}
 }
 
@@ -395,7 +395,7 @@ static void inc_counter(uint8 *counters, size_t index)
 {
 	uint8 val = get_counter(counters, index);
 	if (val < 15) {
-		set_counter(counters, index, val + 1);
+		set_counter(counters, index, (uint8)(val + 1));
 	}
 }
 
@@ -403,7 +403,7 @@ static int dec_counter(uint8 *counters, size_t index)
 {
 	uint8 val = get_counter(counters, index);
 	if (val > 0) {
-		set_counter(counters, index, val - 1);
+		set_counter(counters, index, (uint8)(val - 1));
 		return 1;
 	}
 	return 0;

@@ -122,7 +122,7 @@ static void threefish256_encrypt_block(DKC_THREEFISH256 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[4];
-	int d, r;
+	int d, r, idx;
 
 	/* 入力をコピー */
 	v[0] = in[0];
@@ -140,7 +140,7 @@ static void threefish256_encrypt_block(DKC_THREEFISH256 *p,
 
 		/* 4ラウンド */
 		for(r = 0; r < 4; r++){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 			if(r % 2 == 0){
 				MIX256(v[0], v[1], ROT_256[idx][0]);
 				MIX256(v[2], v[3], ROT_256[idx][1]);
@@ -164,7 +164,7 @@ static void threefish256_decrypt_block(DKC_THREEFISH256 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[4];
-	int d, r;
+	int d, r, idx;
 
 	/* 最終サブキー除去 */
 	v[0] = in[0] - p->key[18 % 5];
@@ -176,7 +176,7 @@ static void threefish256_decrypt_block(DKC_THREEFISH256 *p,
 	for(d = 17; d >= 0; d--){
 		/* 4ラウンド逆変換 */
 		for(r = 3; r >= 0; r--){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 			if(r % 2 == 0){
 				UNMIX256(v[2], v[3], ROT_256[idx][1]);
 				UNMIX256(v[0], v[1], ROT_256[idx][0]);
@@ -259,7 +259,7 @@ static void threefish512_encrypt_block(DKC_THREEFISH512 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[8];
-	int d, r, i;
+	int d, r, i, idx;
 
 	/* 入力をコピー */
 	for(i = 0; i < 8; i++){
@@ -278,7 +278,7 @@ static void threefish512_encrypt_block(DKC_THREEFISH512 *p,
 
 		/* 4ラウンド */
 		for(r = 0; r < 4; r++){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 
 			if(r % 2 == 0){
 				/* Even: (0,1), (2,3), (4,5), (6,7) */
@@ -311,7 +311,7 @@ static void threefish512_decrypt_block(DKC_THREEFISH512 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[8];
-	int d, r, i;
+	int d, r, i, idx;
 
 	/* 最終サブキー除去 */
 	for(i = 0; i < 8; i++){
@@ -325,7 +325,7 @@ static void threefish512_decrypt_block(DKC_THREEFISH512 *p,
 	for(d = 17; d >= 0; d--){
 		/* 4ラウンド逆変換 */
 		for(r = 3; r >= 0; r--){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 
 			if(r % 2 == 0){
 				UNMIX512(v[6], v[7], ROT_512[idx][3]);
@@ -393,7 +393,7 @@ static void threefish1024_encrypt_block(DKC_THREEFISH1024 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[16];
-	int d, r, i;
+	int d, r, i, idx;
 
 	/* 入力をコピー */
 	for(i = 0; i < 16; i++){
@@ -412,7 +412,7 @@ static void threefish1024_encrypt_block(DKC_THREEFISH1024 *p,
 
 		/* 4ラウンド */
 		for(r = 0; r < 4; r++){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 
 			if(r % 2 == 0){
 				/* Even round pairs: (0,1), (2,3), (4,5), (6,7), (8,9), (10,11), (12,13), (14,15) */
@@ -453,7 +453,7 @@ static void threefish1024_decrypt_block(DKC_THREEFISH1024 *p,
 	uint64 *out, const uint64 *in)
 {
 	uint64 v[16];
-	int d, r, i;
+	int d, r, i, idx;
 
 	/* 最終サブキー除去 */
 	for(i = 0; i < 16; i++){
@@ -467,7 +467,7 @@ static void threefish1024_decrypt_block(DKC_THREEFISH1024 *p,
 	for(d = 19; d >= 0; d--){
 		/* 4ラウンド逆変換 */
 		for(r = 3; r >= 0; r--){
-			int idx = (d * 4 + r) % 8;
+			idx = (d * 4 + r) % 8;
 
 			if(r % 2 == 0){
 				UNMIX512(v[14], v[15], ROT_1024[idx][7]);

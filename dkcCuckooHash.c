@@ -176,7 +176,6 @@ static int cuckoo_insert_internal(DKC_CUCKOO_HASH *hash,
 	uint32 h1, h2;
 	size_t idx;
 	DKC_CUCKOO_ENTRY temp;
-	int i;
 
 	if (depth > dkcd_CUCKOO_MAX_KICKS) {
 		/* リハッシュが必要 */

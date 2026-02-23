@@ -3,13 +3,13 @@
 
 
 
-///DKC_SAME_OBJECT_POOL‚Ì–{‘Ì‚ğŠm•Û‚µ‚Ü‚·B
+///DKC_SAME_OBJECT_POOLï¿½Ì–{ï¿½Ì‚ï¿½ï¿½mï¿½Û‚ï¿½ï¿½Ü‚ï¿½ï¿½B
 static DKC_INLINE DKC_SAME_OBJECT_POOL *alloc_sameobjectpool(){
 	return dkcAllocate(sizeof(DKC_SAME_OBJECT_POOL));
 
 }
 
-///DKC_SAME_OBJECT_POOL–{‘Ì‚ğŠJ•ú‚µ‚Ü‚·B
+///DKC_SAME_OBJECT_POOLï¿½{ï¿½Ì‚ï¿½ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 static DKC_INLINE int free_sameobjectpool(DKC_SAME_OBJECT_POOL *p){
 	return dkcFree(&p);
 }
@@ -40,7 +40,7 @@ DKC_INLINE int WINAPI dkcSameObjectPoolInit(
 	}
 	af = (NULL==alloc_f);
 	ff = (NULL==free_f);
-	if(af && ff){//“ñ‚Â‚Æ‚àNULL‚¾‚Á‚½‚ç‚Å‚Ó‚§‚é‚ÆƒAƒƒP[ƒ^‚ğ“ü‚ê‚éB
+	if(af && ff){//ï¿½ï¿½Â‚Æ‚ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚Ó‚ï¿½ï¿½ï¿½ÆƒAï¿½ï¿½ï¿½Pï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		alloc_f = dkcMallocAdapter;
 		free_f = dkcFreeAdapter;
 		goto PROC;
@@ -59,7 +59,7 @@ PROC:
 	return edk_SUCCEEDED;
 }																			
 
-///dkcFreeSameObjectPool()“à‚ÅŒÄ‚Î‚ê‚Ä‚¢‚é DKC_SAME_OBJECT_POOL \‘¢‘Ì‚Ìg—pŒã‚ÌŒãn––ŠÖ”
+///dkcFreeSameObjectPool()ï¿½ï¿½ï¿½ÅŒÄ‚Î‚ï¿½Ä‚ï¿½ï¿½ï¿½ DKC_SAME_OBJECT_POOL ï¿½\ï¿½ï¿½ï¿½Ì‚Ìgï¿½pï¿½ï¿½ÌŒï¿½nï¿½ï¿½ï¿½Öï¿½
 DKC_INLINE void WINAPI dkcSameObjectPoolUninit(DKC_SAME_OBJECT_POOL *p)
 {
 	DKC_SAME_OBJECT_POOL_NODE *t;		
@@ -95,6 +95,10 @@ DKC_INLINE DKC_SAME_OBJECT_POOL *WINAPI dkcAllocSameObjectPoolDynamic(size_t obj
 	return dkcAllocSameObjectPool(object_size,256,NULL,NULL);
 }
 
+DKC_SAME_OBJECT_POOL *WINAPI dkcAllocSameObjectPoolAuto(size_t object_size){
+	return dkcAllocSameObjectPool(object_size,256,NULL,NULL);
+}
+
 
 
 
@@ -103,11 +107,11 @@ int WINAPI dkcFreeSameObjectPool(DKC_SAME_OBJECT_POOL **pp){
 	if(NULL==pp || NULL==p){
 		return edk_FAILED;
 	}
-	//ƒm[ƒh‚ğŠJ•ú
+	//ï¿½mï¿½[ï¿½hï¿½ï¿½ï¿½Jï¿½ï¿½
 	dkcSameObjectPoolUninit(p);
 
 
-	//ÅI—Ìˆæ‚ğŠJ•ú
+	//ï¿½ÅIï¿½Ìˆï¿½ï¿½ï¿½Jï¿½ï¿½
 	return free_sameobjectpool(p);
 }
 
@@ -158,7 +162,7 @@ DKC_INLINE BOOL WINAPI dkcSameObjectPoolReserveFast(DKC_SAME_OBJECT_POOL *p)
 }
 
 
-///@return dkcAllocSameObjectPool()‚Ìobject_size‚Åw’è‚µ‚½ƒTƒCƒY‚Ìƒƒ‚ƒŠ—Ìˆæ
+///@return dkcAllocSameObjectPool()ï¿½ï¿½object_sizeï¿½Åwï¿½è‚µï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½Ìƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìˆï¿½
 DKC_INLINE void *dkcSameObjectPoolAlloc(DKC_SAME_OBJECT_POOL *p){
 	DKC_SAME_OBJECT_POOL_NODE *n = p->root;
 	int tr;
@@ -179,7 +183,7 @@ DKC_INLINE void *dkcSameObjectPoolAlloc(DKC_SAME_OBJECT_POOL *p){
 
 	p->root = n->next;
 
-	//ƒ}ƒCƒiƒX
+	//ï¿½}ï¿½Cï¿½iï¿½X
 	p->now_num--;
 
 	return n;

@@ -399,7 +399,6 @@ static int btree_delete_from_node(DKC_BTREE_ROOT *root,
 	DKC_BTREE_NODE *node,const void *key)
 {
 	int idx;
-	int cmp;
 	int t = root->min_degree;
 
 	idx = btree_find_key_index(root, node, key);
@@ -408,6 +407,7 @@ static int btree_delete_from_node(DKC_BTREE_ROOT *root,
 		/* key found in this node */
 		if(node->is_leaf){
 			/* Case 1: key is in a leaf - simply remove */
+			{
 			int j;
 			if(node->keys[idx]) free(node->keys[idx]);
 			if(node->data[idx]) free(node->data[idx]);
@@ -423,45 +423,76 @@ static int btree_delete_from_node(DKC_BTREE_ROOT *root,
 			node->num_keys--;
 			root->now_num--;
 			return edk_SUCCEEDED;
+			}
 		}
 		else if(node->children[idx]->num_keys >= t){
-			/* Case 2a: predecessor child has enough keys */
-			DKC_BTREE_NODE *pred_node = node->children[idx];
-			void *pred_key;
+			/* Case 2a: predecessor child has enough keys.
+			   Copy predecessor key/data into this node, then
+			   recursively delete the predecessor from the child subtree. */
+			DKC_BTREE_NODE *pred_node;
+			void *pred_key_copy;
+			pred_node = node->children[idx];
 			while(!pred_node->is_leaf){
 				pred_node = pred_node->children[pred_node->num_keys];
 			}
-			pred_key = pred_node->keys[pred_node->num_keys - 1];
 
-			/* swap key/data with predecessor */
+			/* allocate copies of predecessor key/data for this slot */
+			pred_key_copy = dkcAllocateFast(root->key_size);
+			if(NULL == pred_key_copy) return edk_OutOfMemory;
+			memcpy(pred_key_copy, pred_node->keys[pred_node->num_keys - 1], root->key_size);
+
 			if(node->keys[idx]) free(node->keys[idx]);
 			if(node->data[idx]) free(node->data[idx]);
 
-			node->keys[idx] = pred_node->keys[pred_node->num_keys - 1];
-			node->data[idx] = pred_node->data[pred_node->num_keys - 1];
-			node->data_sizes[idx] = pred_node->data_sizes[pred_node->num_keys - 1];
+			node->keys[idx] = pred_key_copy;
+			if(pred_node->data[pred_node->num_keys - 1]){
+				node->data[idx] = dkcAllocateFast(pred_node->data_sizes[pred_node->num_keys - 1]);
+				if(node->data[idx]){
+					memcpy(node->data[idx], pred_node->data[pred_node->num_keys - 1],
+						pred_node->data_sizes[pred_node->num_keys - 1]);
+				}
+				node->data_sizes[idx] = pred_node->data_sizes[pred_node->num_keys - 1];
+			}else{
+				node->data[idx] = NULL;
+				node->data_sizes[idx] = 0;
+			}
 
-			/* delete predecessor from child subtree using the key we just found */
-			return btree_delete_from_node(root, node->children[idx], pred_key);
+			/* recursively delete the original predecessor key */
+			return btree_delete_from_node(root, node->children[idx], pred_key_copy);
 		}
 		else if(node->children[idx + 1]->num_keys >= t){
-			/* Case 2b: successor child has enough keys */
-			DKC_BTREE_NODE *succ_node = node->children[idx + 1];
-			void *succ_key;
+			/* Case 2b: successor child has enough keys.
+			   Copy successor key/data into this node, then
+			   recursively delete the successor from the child subtree. */
+			DKC_BTREE_NODE *succ_node;
+			void *succ_key_copy;
+			succ_node = node->children[idx + 1];
 			while(!succ_node->is_leaf){
 				succ_node = succ_node->children[0];
 			}
-			succ_key = succ_node->keys[0];
 
-			/* swap key/data with successor */
+			/* allocate copies of successor key/data for this slot */
+			succ_key_copy = dkcAllocateFast(root->key_size);
+			if(NULL == succ_key_copy) return edk_OutOfMemory;
+			memcpy(succ_key_copy, succ_node->keys[0], root->key_size);
+
 			if(node->keys[idx]) free(node->keys[idx]);
 			if(node->data[idx]) free(node->data[idx]);
 
-			node->keys[idx] = succ_node->keys[0];
-			node->data[idx] = succ_node->data[0];
-			node->data_sizes[idx] = succ_node->data_sizes[0];
+			node->keys[idx] = succ_key_copy;
+			if(succ_node->data[0]){
+				node->data[idx] = dkcAllocateFast(succ_node->data_sizes[0]);
+				if(node->data[idx]){
+					memcpy(node->data[idx], succ_node->data[0], succ_node->data_sizes[0]);
+				}
+				node->data_sizes[idx] = succ_node->data_sizes[0];
+			}else{
+				node->data[idx] = NULL;
+				node->data_sizes[idx] = 0;
+			}
 
-			return btree_delete_from_node(root, node->children[idx + 1], succ_key);
+			/* recursively delete the original successor key */
+			return btree_delete_from_node(root, node->children[idx + 1], succ_key_copy);
 		}
 		else{
 			/* Case 2c: both children have t-1 keys - merge */
@@ -679,7 +710,8 @@ int WINAPI dkcBTreeErase(DKC_BTREE_ROOT *ptr,const void *key)
 
 	/* if root has no keys and has a child, shrink the tree */
 	if(ptr->root->num_keys == 0 && !ptr->root->is_leaf){
-		DKC_BTREE_NODE *old_root = ptr->root;
+		DKC_BTREE_NODE *old_root;
+		old_root = ptr->root;
 		ptr->root = old_root->children[0];
 		/* free old root shell only */
 		free(old_root->keys);

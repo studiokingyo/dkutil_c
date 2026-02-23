@@ -1,7 +1,7 @@
 
 /*!
 @file dkcSJISFileSystem.c
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @
 */
 
@@ -28,19 +28,19 @@ static DKC_INLINE BOOL jms2(int c){
 }
 
 /*!
- •¶š—ñ str ‚Ì str[nPos] ‚É‚Â‚¢‚ÄA<br>
+ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ str ï¿½ï¿½ str[nPos] ï¿½É‚Â‚ï¿½ï¿½ÄA<br>
  @return
-   ‚O cc ‚PƒoƒCƒg•¶š<br>
-   ‚P cc ‚QƒoƒCƒg•¶š‚Ìˆê•”i‘æ‚PƒoƒCƒgj<br>
-   ‚Q cc ‚QƒoƒCƒg•¶š‚Ìˆê•”i‘æ‚QƒoƒCƒgj<br>
+   ï¿½O ï¿½cï¿½c ï¿½Pï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½<br>
+   ï¿½P ï¿½cï¿½c ï¿½Qï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Ìˆê•”ï¿½iï¿½ï¿½Pï¿½oï¿½Cï¿½gï¿½j<br>
+   ï¿½Q ï¿½cï¿½c ï¿½Qï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Ìˆê•”ï¿½iï¿½ï¿½Qï¿½oï¿½Cï¿½gï¿½j<br>
 <br>
 
-ƒVƒtƒg‚i‚h‚r•¶š—ñ‚Ì”»’è‚ğ‚µ‚Ü‚·B
+ï¿½Vï¿½tï¿½gï¿½iï¿½hï¿½rï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 */ 
 DKC_EXTERN int WINAPI dkcIsShiftJIS( const char *str, int nPos )
 {
 	int i;
-	int state; // { 0, 1, 2 } = { ‚PƒoƒCƒg•¶š, ‚QƒoƒCƒg•¶š‚Ì‘æ‚PƒoƒCƒg, ‚QƒoƒCƒg•¶š‚Ì‘æ‚QƒoƒCƒg }
+	int state; // { 0, 1, 2 } = { ï¿½Pï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½, ï¿½Qï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Ì‘ï¿½Pï¿½oï¿½Cï¿½g, ï¿½Qï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Ì‘ï¿½Qï¿½oï¿½Cï¿½g }
 
 	state = 0;
 	for( i = 0; str[i] != '\0'; i++ )
@@ -48,9 +48,9 @@ DKC_EXTERN int WINAPI dkcIsShiftJIS( const char *str, int nPos )
 		if      ( ( state == 0 ) && ( jms1( str[i] ) ) ) state = 1; // 0 -> 1
 		else if ( ( state == 1 ) && ( jms2( str[i] ) ) ) state = 2; // 1 -> 2
 		else if ( ( state == 2 ) && ( jms1( str[i] ) ) ) state = 1; // 2 -> 1
-		else                                             state = 0; // 2 -> 0, ‚»‚Ì‘¼
+		else                                             state = 0; // 2 -> 0, ï¿½ï¿½ï¿½Ì‘ï¿½
 
-		// str[nPos] ‚Å‚Ìó‘Ô‚ğ•Ô‚·B
+		// str[nPos] ï¿½Å‚Ìï¿½Ô‚ï¿½Ô‚ï¿½ï¿½B
 		if ( i == nPos ) return state;
 	}
 	return 0;
@@ -58,16 +58,16 @@ DKC_EXTERN int WINAPI dkcIsShiftJIS( const char *str, int nPos )
 static DKC_INLINE int isJMS(const char *str, int nPos ){
 	return dkcIsShiftJIS(str,nPos);
 }
-/// •¶š—ñ––”ö‚Ì•¶š '\0' ‚ÌˆÊ’u‚ğ•Ô‚·
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ñ––”ï¿½ï¿½Ì•ï¿½ï¿½ï¿½ '\0' ï¿½ÌˆÊ’uï¿½ï¿½Ô‚ï¿½
 static DKC_INLINE char *strtail( const char *stringg )
 {
 	return strchr( stringg, '\0' );
 }//strtail
 
-/// ƒpƒX–¼‚©‚çAŠg’£q‚ÌŠJnˆÊ’u‚ğæ“¾‚·‚é
-/// ƒtƒ@ƒCƒ‹–¼‚Ì––”ö‚©‚çƒtƒ@ƒCƒ‹–¼‚ÌÅŒã‚Ì '.' ‚Ü‚Å‚ğAŠg’£q‚Æ”»’f‚·‚é
-///@return NULL‚¾‚ÆŠg’£q‚Í”»•Ê•s”\B‚Ü‚½A—^‚¦‚ç‚ê‚½•¶š—ñ‚ÌÅ‰‚ÌƒAƒhƒŒƒX‚ª•Ô‚³‚ê‚½ê‡‚à”»•Ê•s”\
-///@note SJIS‘ÎôÏ‚İH
+/// ï¿½pï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½gï¿½ï¿½ï¿½qï¿½ÌŠJï¿½nï¿½Ê’uï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
+/// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Ì–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ÌÅŒï¿½ï¿½ '.' ï¿½Ü‚Å‚ï¿½ï¿½Aï¿½gï¿½ï¿½ï¿½qï¿½Æ”ï¿½ï¿½fï¿½ï¿½ï¿½ï¿½
+///@return NULLï¿½ï¿½ï¿½ÆŠgï¿½ï¿½ï¿½qï¿½Í”ï¿½ï¿½Ê•sï¿½\ï¿½Bï¿½Ü‚ï¿½ï¿½Aï¿½^ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌÅï¿½ï¿½ÌƒAï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½Ô‚ï¿½ï¿½ê‚½ï¿½ê‡ï¿½ï¿½ï¿½ï¿½ï¿½Ê•sï¿½\
+///@note SJISï¿½Îï¿½Ï‚İH
 const char * WINAPI dkcGetFileExtension( const char *PathName )
 {
 
@@ -75,15 +75,15 @@ const char * WINAPI dkcGetFileExtension( const char *PathName )
 	char *get_tail;
 
 	get_tail = strtail( PathName );
-	for( p = get_tail; p >= PathName; p-- ) // •¶š—ñ‚ÌÅŒã‚©‚çÅ‰‚Ü‚Å
+	for( p = get_tail; p >= PathName; p-- ) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌÅŒã‚©ï¿½ï¿½Åï¿½ï¿½Ü‚ï¿½
 	{
 		if ( ('\\'==*p) && !isJMS(PathName,p-PathName) )
-			return get_tail; // ƒtƒ@ƒCƒ‹–¼‚Í‚±‚±‚Ü‚Å
+			return get_tail; // ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
 
 		if ( '.' == *p )
-			return p+1; // '.' ‚ğ”­Œ©
+			return p+1; // '.' ï¿½ğ”­Œï¿½
 	}
-	return get_tail; // Šg’£q‚È‚µ
+	return get_tail; // ï¿½gï¿½ï¿½ï¿½qï¿½È‚ï¿½
 }//GetFileExtension
 
 
@@ -91,15 +91,15 @@ BOOL WINAPI dkcIsEffectivePath(const char *path,size_t size){
 	char dest[dkcdMAXPATH_BUFFER];
 	const size_t dsize = dkcdMAXPATH_BUFFER;
 
-	//‘Š‘ÎƒpƒXHâ‘ÎƒpƒXH‚Å‚à‚»‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©H
+	//ï¿½ï¿½ï¿½Îƒpï¿½Xï¿½Hï¿½ï¿½Îƒpï¿½Xï¿½Hï¿½Å‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½é‚©ï¿½H
 	if(FALSE==dkcFileExist(path)){
 		return FALSE;
 	}
-	//path‚ğ³‹K‰»
+	//pathï¿½ğ³‹Kï¿½ï¿½
 	if(DKUTIL_FAILED(dkcToAbsolutelyPath(dest,dsize,path,size))){
 		return FALSE;
 	}
-	//³‹K‰»‚µ‚ÄAƒtƒ@ƒCƒ‹‚Ég—p‚µ‚Ä—Ç‚¢•¶š—ñ‚ğg‚Á‚Ä‚¢‚é‚©H
+	//ï¿½ï¿½ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½ÄAï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Égï¿½pï¿½ï¿½ï¿½Ä—Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½H
 	if(FALSE==dkcIsNativePathString(dest,strlen(dest))){
 		return FALSE;
 	}
@@ -119,26 +119,26 @@ BOOL WINAPI dkcIsAbsolutelyPath(const char *path)
 	return !dkcIsRelativityPath(path);
 }
 
-///•¶š—ñ‚ÌŒã‚ë‚ªPathSeparator‚¾‚Á‚½‚çTRUE
+///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ë‚ªPathSeparatorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TRUE
 BOOL WINAPI dkcIsTailPathSep(const char *src,size_t dlen){
 	int point;
 	point = dkcSJIS_SearchPathSepLast(src);
 	//if(point != -1 && (size_t)point == dlen - 1/*&& (size_t)point != dlen*/)
 	if((size_t)point == dlen - 1)
-	{	//‚İ‚Â‚©‚Á‚½B
+	{	//ï¿½İ‚Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		return TRUE;
 	}
-	//‚İ‚Â‚©‚ç‚È‚¢B
+	//ï¿½İ‚Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 	return FALSE;
 }
-///@return path separator‚ğ‘}“ü‚·‚é•K—v‚ª‚ ‚èA‘}“üo—ˆ‚½‚çTRUE
+///@return path separatorï¿½ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½}ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TRUE
 int WINAPI dkcPushBackPathSep(char *dest,size_t dlen,size_t size){
 	if(FALSE==dkcIsTailPathSep(dest,dlen)){
 		if(size < dlen + 2){
-			return edk_OutputBufferWasLost;//ƒoƒbƒtƒ@‚ª‘«‚ç‚ñ‚æI
+			return edk_OutputBufferWasLost;//ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
 		}
 		dest[dlen ] = dkcdPATH_SEP;
-		dest[dlen + 1] = '\0';//‚±‚¢‚Â‚ğ–Y‚ê‚Ä‚Í‚¢‚¯‚È‚¢B
+		dest[dlen + 1] = '\0';//ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½Yï¿½ï¿½Ä‚Í‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 		return edk_SUCCEEDED;
 	}
 	return edk_EndProcess;
@@ -154,12 +154,12 @@ int WINAPI dkcDirectoryConcatenate(char *dest,size_t dlen,size_t dsize,const cha
 	
 	/*point = dkcSJIS_StrChrSearchTail(dest,dlen,dkcdPATH_SEP);
 	if(point != -1 && (size_t)point != dlen)
-	{//path separator‚ªŒ©‚Â‚©‚èA‚»‚ê‚ªdest‚ÌÅŠú‚É–³‚¢
+	{//path separatorï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ê‚ªdestï¿½ÌÅŠï¿½ï¿½É–ï¿½ï¿½ï¿½ï¿½ï¿½
 		if(!dkcmIS_PATH_SEP(src[0]) )
-		{//path separator‚Å–³‚¢
-			//path ‹æØ‚è•¶š‚ğ•t‰Á‚µ‚Ä‚â‚éB
+		{//path separatorï¿½Å–ï¿½ï¿½ï¿½ï¿½ï¿½
+			//path ï¿½ï¿½Ø‚è•¶ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½B
 			dest[dlen ] = dkcdPATH_SEP;
-			dest[dlen + 1] = '\0';//‚±‚¢‚Â‚ğ–Y‚ê‚Ä‚Í‚¢‚¯‚È‚¢B
+			dest[dlen + 1] = '\0';//ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½Yï¿½ï¿½Ä‚Í‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 		}
 	}*/
 	dkcPushBackPathSep(dest,dlen,dsize);
@@ -171,7 +171,7 @@ int WINAPI dkcCurrentDirectoryConcatenate(char *dest,size_t dsize,const char *sr
 	//size_t len;
 	//int point;
 	
-	dkcmNOT_ASSERT(dsize <= dkcdMAXPATH_LEN);//<=‚ÍNULL•¶š‚àŠÜ‚Ş‚½‚ßB
+	dkcmNOT_ASSERT(dsize <= dkcdMAXPATH_LEN);//<=ï¿½ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚Ş‚ï¿½ï¿½ßB
 	
 	dkcGetCurrentDirectory(dest,dsize);
 	
@@ -188,7 +188,7 @@ int WINAPI dkcCurrentDirectoryConcatenate(char *dest,size_t dsize,const char *sr
 
 static int ToAbsolutelyLogic(char *dest,size_t dsize,const char *src)
 {
-	/*if(dsize < dkcdMAXPATH_BUFFER){//‚±‚ñ‚Èƒoƒbƒtƒ@‚¶‚á‚Ç‚¤‚È‚é‚©•ª‚©‚ç‚È‚¢‚æOOG
+	/*if(dsize < dkcdMAXPATH_BUFFER){//ï¿½ï¿½ï¿½ï¿½Èƒoï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½È‚é‚©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½Oï¿½Oï¿½G
 		return edk_BufferOverFlow;
 	}*/
 	MAX_PATH_CHECK(dsize);
@@ -204,7 +204,7 @@ static int ToAbsolutelyLogic(char *dest,size_t dsize,const char *src)
 #	endif
 	return edk_SUCCEEDED;	
 }
-//ƒpƒX‚ğ³‹K‰»‚·‚éŠÖ”
+//ï¿½pï¿½Xï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ssize)
 {
 	char *tp = NULL;
@@ -215,7 +215,7 @@ int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ss
 	if(NULL==dest) return edk_FAILED;
 
 	if(dkcIsRelativityPath(src)==TRUE)
-	{//ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğ•t‰Á‚·‚éB
+	{//ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½gï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 
 		tp = (char *)malloc(dkcdMAXPATH_BUFFER);
 		if(NULL==tp) return edk_OutOfMemory;
@@ -231,7 +231,7 @@ int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ss
 
 	
 	/*
-	ó‘Ô‘@ˆÛ
+	ï¿½ï¿½Ô‘@ï¿½ï¿½
 	PATH_SEP
 	.
 	sjis
@@ -257,11 +257,11 @@ int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ss
 	if(dsize < ssize){
 		return edk_ArgumentException;
 	}
-	//listŠm•Û
+	//listï¿½mï¿½ï¿½
 	plo = dkcAllocSingleListObject(NULL,20);
 	if(NULL==plo) return edk_FAILED;
 
-	//directory‚ğƒp[ƒX
+	//directoryï¿½ï¿½ï¿½pï¿½[ï¿½X
 	for(i=0;;){
 		point = dkcSJIS_StrChrSearchInStr(&src[i],pathsep);
 		if(point < 0){
@@ -274,7 +274,7 @@ int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ss
 		}
 		
 		if(FALSE
-			==plo->push_back(plo,&src[i],point - 1)//Œ©‚Â‚©‚Á‚½‚Æ‚±‚ë‚Ü‚Å‚¾‚©‚ç-1
+			==plo->push_back(plo,&src[i],point - 1)//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½Ü‚Å‚ï¿½ï¿½ï¿½ï¿½ï¿½-1
 			)
 		{
 			return edk_FAILED;
@@ -287,7 +287,7 @@ int WINAPI dkcToAbsolutelyPath(char *dest,size_t dsize,const char *src,size_t ss
 
 
 		if(dkcmIsSJIS1(src[i]) && dkcmIsSJIS2(src[i + 1]))
-		{//SJIS”²‚©‚µ
+		{//SJISï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			i++;
 			i++;
 			continue;
@@ -335,13 +335,13 @@ DKC_PATHSTRING * WINAPI dkcAllocPathString(const char *path)
 	p = (DKC_PATHSTRING *)dkcAllocate(sizeof(DKC_PATHSTRING));
 	if(NULL==p) return NULL;
 
-	p->mString = dkcAllocString(dkcdMAXPATH_BUFFER + 1);//‚±‚ÌƒTƒCƒY‚¶‚á‚È‚¢‚Æƒ_ƒ
+	p->mString = dkcAllocString(dkcdMAXPATH_BUFFER + 1);//ï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æƒ_ï¿½ï¿½
 	if(NULL==p->mString) goto Error;
 
-	//ƒpƒX–¼‚ğƒRƒs[
+	//ï¿½pï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Rï¿½sï¿½[
 	if(path){
 		len = strlen(path);
-		//ƒlƒCƒeƒBƒu‚ÈƒpƒX‚ğ“ü‚ê‚éB
+		//ï¿½lï¿½Cï¿½eï¿½Bï¿½uï¿½Èƒpï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		if(FALSE==dkcIsNativePathString(path,len)){
 			goto Error;
 		}
@@ -369,7 +369,7 @@ int WINAPI dkcFreePathString(DKC_PATHSTRING **ptr)
 	return dkcFree((void **)ptr);
 }
 
-//ƒpƒX‚Ìƒf[ƒ^‚ğ“¾‚éB
+//ï¿½pï¿½Xï¿½Ìƒfï¿½[ï¿½^ï¿½ğ“¾‚ï¿½B
 size_t WINAPI dkcPathStringSize(const DKC_PATHSTRING *p)
 {
 	return dkcStringSize(p->mString);
@@ -381,7 +381,7 @@ const char *WINAPI dkcPathStringPointer(const DKC_PATHSTRING *p)
 }
 
 
-//ƒpƒX‚ğ‹æØ‚éB
+//ï¿½pï¿½Xï¿½ï¿½ï¿½ï¿½Ø‚ï¿½B
 
 int WINAPI dkcPathStringDevideBegin(DKC_PATHSTRING *ptr,char *buff,size_t size)
 {
@@ -411,7 +411,7 @@ int WINAPI dkcPathStringDevideBegin_Logic(DKC_PATHSTRING *ptr,size_t *count,char
 	point = dkcSJIS_StrChrSearch(p,'\\');
 	if(-1==point){return edk_EndProcess;}
 
-	for(i=0;i<point;i++){//drivew’è‚Ì‚à‚Ì‚ª‚ ‚é‚©‚Ç‚¤‚©B
+	for(i=0;i<point;i++){//driveï¿½wï¿½ï¿½Ì‚ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½B
 		if(':'==p[i]){
 			if(DKUTIL_FAILED(dkc_strcpy(
 				buff,size,p,(size_t)i//-1
@@ -419,9 +419,9 @@ int WINAPI dkcPathStringDevideBegin_Logic(DKC_PATHSTRING *ptr,size_t *count,char
 			{
 				return edk_BufferOverFlow;
 			}
-			point = dkcSJIS_StrChrSearch(&p[i],'\\');//Ÿ‚Ì•¨‚ğŒ©‚Â‚¯‚éB
-			//i‚Ü‚Ÿ:‚ÌŸ‚Í\\‚ÆŒ¾‚¤–‚ªŒˆ‚Ü‚Á‚Ä‚¢‚é‚¯‚ÇA‚¢‚¿‚¨‚¤B
-			*count = (size_t)i + point + 1;//Ÿ‚Én‚ß‚é‚Ì‚Í
+			point = dkcSJIS_StrChrSearch(&p[i],'\\');//ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½B
+			//ï¿½iï¿½Ü‚ï¿½:ï¿½Ìï¿½ï¿½ï¿½\\ï¿½ÆŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Ä‚ï¿½ï¿½é‚¯ï¿½ÇAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+			*count = (size_t)i + point + 1;//ï¿½ï¿½ï¿½Énï¿½ß‚ï¿½Ì‚ï¿½
 			return edk_SUCCEEDED;
 		}
 	}
@@ -431,7 +431,7 @@ int WINAPI dkcPathStringDevideBegin_Logic(DKC_PATHSTRING *ptr,size_t *count,char
 	{
 		return edk_FAILED;
 	}
-	*count = (size_t)point + 1;//Ÿ‚Én‚ß‚é‚Ì‚Í
+	*count = (size_t)point + 1;//ï¿½ï¿½ï¿½Énï¿½ß‚ï¿½Ì‚ï¿½
 	return edk_SUCCEEDED;
 }
 
@@ -444,16 +444,16 @@ int WINAPI dkcPathStringDevideNext_Logic(DKC_PATHSTRING *ptr,size_t *count,char 
 	p = dkcPathStringPointer(ptr);
 	len = dkcStringSize(ptr->mString);
 	if(len <= *count)
-	{//‚à‚¤‚±‚ÌŠÖ”‚ğŒÄ‚Ño‚·‚Ì‚ÍI‚í‚è‚¾‚Á‚¿‚ã‚¤‚ÉII
+	{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŠÖï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½Ì‚ÍIï¿½ï¿½è‚¾ï¿½ï¿½ï¿½ï¿½ï¿½ã‚¤ï¿½ÉIï¿½I
 		return edk_EndProcess;
 	}
 	point = dkcSJIS_StrChrSearch(&p[*count],'\\');
 	if(-1==point)
-	{//ÅŒã‚Ü‚Å—ˆ‚¿‚Ü‚Á‚½B
+	{//ï¿½ÅŒï¿½Ü‚Å—ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B
 
 	
 		len -= *count;
-		if(DKUTIL_FAILED(dkc_strcpy(//c‚è•¨‚ğ‘S•”ƒRƒs[
+		if(DKUTIL_FAILED(dkc_strcpy(//ï¿½cï¿½è•¨ï¿½ï¿½Sï¿½ï¿½ï¿½Rï¿½sï¿½[
 			buff,size,&p[*count],len
 		)))
 		{
@@ -468,7 +468,7 @@ int WINAPI dkcPathStringDevideNext_Logic(DKC_PATHSTRING *ptr,size_t *count,char 
 	{
 		return edk_FAILED;
 	}
-	*count += (size_t)point + 1;//Ÿ‚Én‚ß‚é‚Ì‚Í
+	*count += (size_t)point + 1;//ï¿½ï¿½ï¿½Énï¿½ß‚ï¿½Ì‚ï¿½
 	return edk_SUCCEEDED;//out
 }
 
@@ -487,12 +487,12 @@ int WINAPI dkcPathStringElementInsert_Logic(DKC_PATHSTRING *ptr,size_t count,
 	{
 		return edk_FAILED;
 	}
-	if(FALSE==dkcIsTailPathSep(src,len))//Œã‚ë‚ÉPathSeparator‚ª–³‚¢II
+	if(FALSE==dkcIsTailPathSep(src,len))//ï¿½ï¿½ï¿½ï¿½PathSeparatorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½I
 	{
 		p = (char *)malloc(size);
 	
 		if(!p) return edk_OutOfMemory;
-		strcpy(p,src);//‚ ‚Ü‚èg‚¢‚½‚­‚È‚¢‚¯‚Ç‚·‚Å‚Éƒoƒbƒtƒ@‚Í•ÛØ‚³‚ê‚Ä‚¢‚é‚Ì‚Åstrcpy
+		strcpy(p,src);//ï¿½ï¿½ï¿½Ü‚ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½Å‚Éƒoï¿½bï¿½tï¿½@ï¿½Í•ÛØ‚ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Ì‚ï¿½strcpy
 		dkcPushBackPathSep(p,len,size);
 
 		r = dkcStringInsert(ptr->mString,count,p,strlen(p));
@@ -513,9 +513,9 @@ int WINAPI dkcPathStringElementErase_Logic(
 		endlen = dkcPathStringSize(ptr);
 		endlen = endlen - count;
 	}else{
-		//endlen;//ƒ}ƒCƒiƒX‚µ‚Ä‚¨‚­ \\‚ğReplace‚µ‚È‚¢‚½‚ß
+		//endlen;//ï¿½}ï¿½Cï¿½iï¿½Xï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ \\ï¿½ï¿½Replaceï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
-	return dkcStringErase(ptr->mString,count - 1,(size_t)endlen + 1);//count -1‚Í‘O‚Ì\\‚ğÁ‚·‚½‚ßendlen + 1‚Í-1‚µ‚½ˆ×
+	return dkcStringErase(ptr->mString,count - 1,(size_t)endlen + 1);//count -1ï¿½Í‘Oï¿½ï¿½\\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½endlen + 1ï¿½ï¿½-1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }
 
 
@@ -529,13 +529,13 @@ int WINAPI dkcPathStringElementReplace_Logic(DKC_PATHSTRING *ptr,size_t count,
 	{
 		return edk_FAILED;
 	}
-	endlen = dkcSJIS_SearchPathSep(&p[count]);//count‚©‚çŒŸõ‚µ‚Ä‚¢‚é
+	endlen = dkcSJIS_SearchPathSep(&p[count]);//countï¿½ï¿½ï¿½çŒŸï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
 	if(-1==endlen){
 		endlen = dkcPathStringSize(ptr);
 		endlen = endlen - count;
 	}else{
 		if(0 != endlen)
-			endlen--;//ƒ}ƒCƒiƒX‚µ‚Ä‚¨‚­ \\‚ğReplace‚µ‚È‚¢‚½‚ß
+			endlen--;//ï¿½}ï¿½Cï¿½iï¿½Xï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ \\ï¿½ï¿½Replaceï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
 	return dkcStringReplace(ptr->mString,count,count + endlen,src,len);
 	/*
@@ -544,9 +544,9 @@ int WINAPI dkcPathStringElementReplace_Logic(DKC_PATHSTRING *ptr,size_t count,
 //	int point;
 	const char *pointer;
 	char *p ;
-	if(FALSE==dkcIsTailPathSep(src,len))//Œã‚ë‚ÉPathSeparator‚ª–³‚¢II
+	if(FALSE==dkcIsTailPathSep(src,len))//ï¿½ï¿½ï¿½ï¿½PathSeparatorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½I
 	{
-		//•¶š—ñ‚ğ‚¿‚Æ•ÏX
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ•ÏX
 		p = malloc(size);
 		if(!p) return edk_OutOfMemory;
 		strcpy(p,src);
@@ -555,7 +555,7 @@ int WINAPI dkcPathStringElementReplace_Logic(DKC_PATHSTRING *ptr,size_t count,
 		p = (char *)src;
 	}
 	pointer = dkcPathStringPointer(ptr);
-	//count‚©‚ç’²‚×‚éB
+	//countï¿½ï¿½ï¿½ç’²ï¿½×‚ï¿½B
 	dkcSJIS_SearchPathSep(&pointer[count]);
 	*/
 	
@@ -569,7 +569,7 @@ int WINAPI dkcPathStringElementReplace_Logic(DKC_PATHSTRING *ptr,size_t count,
 
 
 
-//ƒpƒX‚ğ³‹K‰»‚µ‚Ä“ü‚ê‚éB
+//ï¿½pï¿½Xï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½Ä“ï¿½ï¿½ï¿½ï¿½B
 static int dkcPathStringNormalizeCopyLogic(DKC_PATHSTRING *ptr,const char *buff,size_t size,
 																						 int (WINAPI *function__)(DKC_STRING *,const char *,size_t))
 {
@@ -586,9 +586,9 @@ static int dkcPathStringNormalizeCopyLogic(DKC_PATHSTRING *ptr,const char *buff,
 
 	len = strlen(pb);
 
-#	ifdef DEBUG //‚ ‚è‚¦‚È‚¢‚æ`ƒGƒ‰[ƒ`ƒFƒbƒN
+#	ifdef DEBUG //ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½ï¿½`ï¿½Gï¿½ï¿½ï¿½[ï¿½`ï¿½Fï¿½bï¿½N
 	dkcmNOT_ASSERT(DKUTIL_FAILED(result));	
-	dkcmNOT_ASSERT(len >= bsize);// >=‚É‚·‚é‚Ì‚ÍNULL•¶š‚ª’×‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©B
+	dkcmNOT_ASSERT(len >= bsize);// >=ï¿½É‚ï¿½ï¿½ï¿½Ì‚ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×‚ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½B
 	dkcmNOT_ASSERT(NULL==function__);
 #	endif
 	if(DKUTIL_FAILED(result)){
@@ -600,13 +600,13 @@ Error:
 	//if(pb){free(pb);pb=NULL;}
 	return result;
 }
-//ƒpƒX‚ğ³‹K‰»‚µ‚Ä“ü‚ê‚éB
+//ï¿½pï¿½Xï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½Ä“ï¿½ï¿½ï¿½ï¿½B
 int WINAPI dkcPathStringCopy(DKC_PATHSTRING *ptr,const char *buff,size_t size)
 {
 	
 	dkcmNOT_ASSERT(ptr->mString->mByteSize + size >= dkcdMAXPATH);
 	if(ptr->mString->mByteSize + size >= dkcdMAXPATH)
-	{//‚±‚êˆÈã‚Í“ü‚ê‚ç‚ê‚È‚¢B
+	{//ï¿½ï¿½ï¿½ï¿½Èï¿½Í“ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 		return edk_FAILED;
 	}
 	return dkcPathStringNormalizeCopyLogic(ptr,buff,size,dkcStringCopy);
@@ -639,23 +639,23 @@ int WINAPI dkcPathStringNormalizeConcatenateLogic(
 	return dkcPathStringCopy(ptr,dest,strlen(dest));
 }
 
-//ƒpƒX‚ğ³‹K‰»‚µ‚ÄŒq‚°‚éB
+//ï¿½pï¿½Xï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½ÄŒqï¿½ï¿½ï¿½ï¿½B
 int WINAPI dkcPathStringConcatenate(DKC_PATHSTRING *ptr,const char *buff,size_t size)
 {
 	int result;
 
 	dkcmNOT_ASSERT(ptr->mString->mByteSize + size >= dkcdMAXPATH);
 	if(ptr->mString->mByteSize + size >= dkcdMAXPATH)
-	{//‚±‚êˆÈã‚Í“ü‚ê‚ç‚ê‚È‚¢B
+	{//ï¿½ï¿½ï¿½ï¿½Èï¿½Í“ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 		return edk_FAILED;
 	}
 
 	if(ptr->mString->mByteSize)
-	{//‚·‚Å‚É“ü‚Á‚Ä‚¢‚é‚à‚Ì‚ª‚ ‚éB
+	{//ï¿½ï¿½ï¿½Å‚É“ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½B
 		result = dkcPathStringNormalizeConcatenateLogic(ptr,buff,size);
 	}
 	else
-	{//‰½‚à–³‚¢‚Í‚±‚¿‚ç‚Å
+	{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		result =  dkcPathStringCopy(ptr,buff,size);
 	}
 	//return dkcPathStringNormalizeInsertLogic(ptr,buff,size,dkcStringConcatenate);	
@@ -667,9 +667,9 @@ int WINAPI dkcPathStringConcatenate(DKC_PATHSTRING *ptr,const char *buff,size_t 
 int WINAPI dkcPathStringGetDrive(DKC_PATHSTRING *ptr,char *buff,size_t size){
 	const char *p = dkcStringPointer(ptr->mString);
 	int point = dkcSJIS_StrChrSearch(p,':');
-	if(-1 == point) return edk_Not_Found;//Œ©‚Â‚©‚ç‚È‚¢B
+	if(-1 == point) return edk_Not_Found;//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 	//return dkc_memcpy(buff,size,p,(size_t)point - 1);
-	return dkc_strcpy(buff,size,p,(size_t)1);//drive‚È‚ç1•¶š‚Å\•ª‚¾‚æ‚ËOOG
+	return dkc_strcpy(buff,size,p,(size_t)1);//driveï¿½È‚ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Å\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ËOï¿½Oï¿½G
 }
 
 int WINAPI dkcPathStringGetFileExtension(DKC_PATHSTRING *ptr,char *buff,size_t size)
@@ -679,16 +679,16 @@ int WINAPI dkcPathStringGetFileExtension(DKC_PATHSTRING *ptr,char *buff,size_t s
 	const char *p = dkcStringPointer(ptr->mString);
 	int point = dkcSJIS_StrChrSearchLast(p,'.');
 
-	if(point < 0) return edk_Not_Found;//Œ©‚Â‚©‚ç‚È‚¢B
+	if(point < 0) return edk_Not_Found;//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 	
 	point2 = dkcSJIS_SearchPathSep(&p[point]);
-	if(point < point2){//C:\ok.OK\folder‚Ì‚æ‚¤‚Èó‹µ‚É‚È‚Á‚Ä‚¢‚éB
+	if(point < point2){//C:\ok.OK\folderï¿½Ì‚æ‚¤ï¿½Èó‹µ‚É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½B
 		return edk_Not_Found;
 	}
 	len = dkcStringSize(ptr->mString);
 	//if(point - 1 <= 0) return edk_FAILED;
 
-	if((size_t)(point + 1) > len) return edk_FAILED;//Logical‚ÈƒGƒ‰[HH
+	if((size_t)(point + 1) > len) return edk_FAILED;//Logicalï¿½ÈƒGï¿½ï¿½ï¿½[ï¿½Hï¿½H
 	return dkc_strcpy(buff,size,&p[point + 1],(size_t)len - (size_t)point );
 
 }
@@ -701,9 +701,9 @@ int WINAPI dkcPathStringGetFileName(DKC_PATHSTRING *ptr,char *buff,size_t size)
 	size_t len = dkcStringSize(ptr->mString);
 	//if(point - 1 <= 0) return edk_FAILED;
 #if 0
-	if(point < 0) return edk_Not_Found;//Œ©‚Â‚©‚ç‚È‚¢B
+	if(point < 0) return edk_Not_Found;//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
 	if((size_t)(point + 1) > len) return edk_FAILED;
-	if((size_t)point == len) return edk_FAILED;//ƒtƒ@ƒCƒ‹–¼‚ª–³‚¢B
+	if((size_t)point == len) return edk_FAILED;//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 
 #else
 	printf("%d",point);
@@ -725,8 +725,8 @@ int WINAPI dkcPathStringGetDirectory(DKC_PATHSTRING *ptr,char *buff,size_t size)
 	//if(point - 1 <= 0) return edk_FAILED;
 	if(point < 0) return edk_FAILED;
 	if((size_t)(point + 1) > len) return edk_FAILED;
-	//if((size_t)point == len) return edk_FAILED;//ƒtƒ@ƒCƒ‹–¼‚ª–³‚¢B
-	return dkc_strcpy(buff,size,p,point);//\\‚àŠÜ‚ß‚éB
+	//if((size_t)point == len) return edk_FAILED;//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+	return dkc_strcpy(buff,size,p,point);//\\ï¿½ï¿½ï¿½Ü‚ß‚ï¿½B
 
 }
 
@@ -776,12 +776,12 @@ BOOL WINAPI dkcFileSize64(const char *str,DWORD *high,DWORD *low){
 #ifdef WIN32
 	WIN32_FIND_DATA findData;
 	HANDLE hFind=NULL;
-	// ƒtƒ@ƒCƒ‹ƒTƒCƒYæ“¾
+	// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½æ“¾
 	if((hFind = FindFirstFile(str,&findData)) == INVALID_HANDLE_VALUE){
 		return FALSE;
 	}
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğƒ”‚¿‚±‚Ş
+	//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	*high = findData.nFileSizeHigh;
 	*low = findData.nFileSizeLow;
 	FindClose(hFind);
@@ -821,7 +821,7 @@ BOOL WINAPI dkcGetCurrentDirectory(char *buff,size_t size){
 	return TRUE;
 
 #if 0
-	/* ‚Ç‚¤‚¢‚¤À‘•‚É‚È‚Á‚Ä‚¢‚é‚©•ª‚©‚ç‚È‚¢‚Ì‚Å‚Æ‚è‚ ‚¦‚¸+1 */
+	/* ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Ì‚Å‚Æ‚è‚ ï¿½ï¿½ï¿½ï¿½+1 */
 	char path[dkcdMAXPATH_BUFFER + 1];
 	size_t len;
 #	ifdef WIN32
@@ -866,48 +866,48 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 
 	//error check
 	if(dkcdMAXPATH_LEN < len){
-		dkcmNOT_ASSERT_MESSAGE("path‚ª’·‚·‚¬‚éB",pPath);
+		dkcmNOT_ASSERT_MESSAGE("pathï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B",pPath);
 		return edk_FAILED;
 	}
 	if(0==len ){
 		return edk_ArgumentException;
 	}
 
-	//‚Ü‚¸‚Íˆê‚Â–Ú‚ğŒ‚”j
+	//ï¿½Ü‚ï¿½ï¿½Íˆï¿½Â–Ú‚ï¿½ï¿½ï¿½ï¿½j
 	if ( dkcmIsSJIS1(pPath[n]) || ! dkcmIS_INVALID_FOLDERNAME_CHAR(pPath[n]) )
-	{//SJIS‚Ì‚P•¶š–Ú‚©INVALID‚È’l‚Å‚Í–³‚©‚Á‚½‚çB
+	{//SJISï¿½Ì‚Pï¿½ï¿½ï¿½ï¿½ï¿½Ú‚ï¿½INVALIDï¿½È’lï¿½Å‚Í–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		work[n] = pPath[n];
 		if(1==len){
-			//ƒtƒHƒ‹ƒ_ì¬
+			//ï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½ì¬
 			attr.nLength = sizeof(SECURITY_ATTRIBUTES);
 			attr.lpSecurityDescriptor = NULL;
 			attr.bInheritHandle = FALSE;
 
 			result = dkcCreateDirectoryLogic( work, &attr );
 			
-			dkcmNOT_ASSERT(FALSE==result && "directory‚ğì‚ê‚È‚©‚Á‚½" );
+			dkcmNOT_ASSERT(FALSE==result && "directoryï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½" );
 			return edk_SUCCEEDED;
 		}
 	}
 	n++;
-	//“ñ‚Â–Ú‚©‚çŠJn
+	//ï¿½ï¿½Â–Ú‚ï¿½ï¿½ï¿½Jï¿½n
 	while ( n < len )
 	{
-		 //ƒtƒHƒ‹ƒ_–¼æ“¾
+		 //ï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½æ“¾
 		while ( n < len )
 		{
 			
 			if(! dkcmIsSJIS1(pPath[n - 1]) && ! dkcmIsSJIS2(pPath[n]) )
-			{//SJIS‚Å‚Í‚È‚¢II
+			{//SJISï¿½Å‚Í‚È‚ï¿½ï¿½Iï¿½I
 				if ( ( dkcmIS_PATH_SEP(pPath[n]) ) /*&& pPath[n] != '\0'*//*(n != '\0')*/ )
 				{
 					if ( work[n-1] != ':' )
-					{//drive‚ğ“Ç‚İ‚Ü‚¹‚½‚­‚È‚¢‚ç‚µ‚¢B
+					{//driveï¿½ï¿½Ç‚İï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ç‚µï¿½ï¿½ï¿½B
 						break;
 					}
 				}
 				else if(dkcmIS_INVALID_FOLDERNAME_CHAR(pPath[n]))
-				{//SJIS–â‘è‚ğƒNƒŠƒA‚µ‚½‚Ì‚ÉŠÔˆá‚¢‚¾‚Á‚½
+				{//SJISï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ÉŠÔˆá‚¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 					return edk_FAILED;
 				}
 			}
@@ -917,7 +917,7 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 		}
 		work[n] = '\0';
 
-		//ƒtƒHƒ‹ƒ_ì¬
+		//ï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½ì¬
 		attr.nLength = sizeof(SECURITY_ATTRIBUTES);
 		attr.lpSecurityDescriptor = NULL;
 		attr.bInheritHandle = FALSE;
@@ -926,7 +926,7 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 
 		result = dkcCreateDirectoryLogic( work, &attr );
 		
-		//dkcmNOT_ASSERT("directory‚ğì‚ê‚È‚©‚Á‚½" && FALSE==result);
+		//dkcmNOT_ASSERT("directoryï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½" && FALSE==result);
 		if(FALSE==result){
 			return edk_FAILED;
 		}
@@ -937,7 +937,7 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 	
 		//error check
 	if(dkcdMAXPATH_LEN < len){
-		dkcmNOT_ASSERT_MESSAGE("path‚ª’·‚·‚¬‚éB",pPath);
+		dkcmNOT_ASSERT_MESSAGE("pathï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B",pPath);
 		return edk_FAILED;
 	}
 	if(0==len ){
@@ -946,12 +946,12 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 
 	while ( n < len )
 	{
-		 //ƒtƒHƒ‹ƒ_–¼æ“¾
+		 //ï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½æ“¾
 		while ( n < len )
 		{
 			if ( ( dkcmIS_PATH_SEP(pPath[n]) ) && (n != '\0') )
 			{
-				if ( work[n-1] != ':' )//Linux‚Ìƒhƒ‰ƒCƒu‚ÌƒpƒX‚ÍƒRƒŒƒf‚¢‚¢‚Ì‚©‚ÈH
+				if ( work[n-1] != ':' )//Linuxï¿½Ìƒhï¿½ï¿½ï¿½Cï¿½uï¿½Ìƒpï¿½Xï¿½ÍƒRï¿½ï¿½ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ÈH
 				{
 					break;
 				}
@@ -963,7 +963,7 @@ int WINAPI dkcCreateDirectory(const char *pPath)
 
 		result = dkcCreateDirectoryLogic( work,NULL );
 
-		//dkcmNOT_ASSERT("directory‚ğì‚ê‚È‚©‚Á‚½" && FALSE==result);
+		//dkcmNOT_ASSERT("directoryï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½" && FALSE==result);
 		if(FALSE==result){
 			return edk_FAILED;
 		}
@@ -986,12 +986,12 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 {
 	void *buff;
 	FILE *srcf,*destf;
-	size_t filesize;//ƒtƒ@ƒCƒ‹ƒTƒCƒY
-	size_t readed;//“Ç‚İ‚ñ‚¾ƒf[ƒ^
+	size_t filesize;//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+	size_t readed;//ï¿½Ç‚İï¿½ï¿½ñ‚¾ƒfï¿½[ï¿½^
 	size_t count;//count
 	size_t i;
-	size_t rest;//c‚è
-	int result = FALSE;//–ß‚è’l
+	size_t rest;//ï¿½cï¿½ï¿½
+	int result = FALSE;//ï¿½ß‚ï¿½l
 	DKC_THREAD_LOCK *lock = NULL;
 	DKC_FILECOPY_CALLBACK_STRUCT cbdata;
 
@@ -1003,7 +1003,7 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 		inner_buffer_size = 1024;
 	}
 
-	//ƒoƒbƒtƒ@‚Ì€”õ
+	//ï¿½oï¿½bï¿½tï¿½@ï¿½Ìï¿½ï¿½ï¿½
 	buff = malloc(inner_buffer_size);
 	if(NULL==buff){
 		inner_buffer_size = 1024 * 256;
@@ -1012,6 +1012,7 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 			return FALSE;
 	}
 	//thread lock
+#ifdef _MT
 	if(bThreadLock){
 		lock = dkcAllocThreadLock();
 		if(NULL==lock){
@@ -1019,9 +1020,10 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 		}
 		dkcThreadLock_Lock(lock);
 	}
-	//‚¿‚Á‚¿‚á‚¢ê‡
+#endif
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á‚¢ï¿½ê‡
 	filesize = dkcFileSize(src);
-	//dest‚ª‘¶İ‚·‚é
+	//destï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½ï¿½
 	if(FALSE==bReWrite && TRUE==dkcFileExist(dest)){
 		goto Error;
 	}
@@ -1030,7 +1032,7 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 	for(;;)
 	{//non loop 
 		if(0 == filesize)
-		{//ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ª‚O‚Ìê‡
+		{//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½Oï¿½Ìê‡
 			if(TRUE==dkcCreateEmptyFile(dest))
 			{
 				result = TRUE;
@@ -1038,7 +1040,7 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 			break;
 		}
 		if(filesize < inner_buffer_size)
-		{//ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ªƒoƒbƒtƒ@‚Éû‚Ü‚Á‚Ä‚µ‚Ü‚¤ê‡B
+		{//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½Éï¿½ï¿½Ü‚ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½ê‡ï¿½B
 			if(DKUTIL_FAILED(dkcLoadBinary(buff,filesize,src,&readed)))
 			{
 				goto Error;
@@ -1054,14 +1056,14 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 			}
 			break;
 		}
-		//ƒoƒbƒtƒ@‚ğg‚í‚È‚¯‚ê‚ÎƒRƒs[‚Å‚«‚È‚¢ê‡B
+		//ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½gï¿½ï¿½È‚ï¿½ï¿½ï¿½ÎƒRï¿½sï¿½[ï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½B
 
 		srcf = dkcFOpen(src,"rb");
 		if(NULL==srcf) goto Error;
 		destf = dkcFOpen(dest,"wb");
 		if(NULL==destf) goto Close;
 
-		//ƒ‹[ƒv‚·‚é‰ñ”‚ğŒvZ
+		//ï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ñ”‚ï¿½ï¿½vï¿½Z
 		count = filesize / inner_buffer_size;
 
 		for(i=0;i<count;i++){
@@ -1069,7 +1071,7 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 			dkcmFORCE_NOT_ASSERT(1 != fwrite(buff,inner_buffer_size,1,destf));
 			
 			cbdata.count += inner_buffer_size;
-			if(pfcallback){//ƒR[ƒ‹ƒoƒbƒN‚Å‘Šè•û‚É“`‚¦‚éB
+			if(pfcallback){//ï¿½Rï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½Nï¿½Å‘ï¿½ï¿½ï¿½ï¿½ï¿½É“`ï¿½ï¿½ï¿½ï¿½B
 				if(FALSE==pfcallback(&cbdata,parg)){
 					goto Close;
 				}
@@ -1078,14 +1080,14 @@ BOOL WINAPI dkcFileCopyEx(const char *dest,const char *src,
 
 		rest = filesize - (count * inner_buffer_size);
 		
-		//c‚è‚ğo—Í
+		//ï¿½cï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
 		dkcmFORCE_NOT_ASSERT(rest != fread(buff,1,rest,srcf));
 		dkcmFORCE_NOT_ASSERT(rest != fwrite(buff,1,rest,destf));
 		
 		
 		cbdata.count += rest;
 		dkcmNOT_ASSERT(cbdata.count != cbdata.filesize);
-		if(pfcallback){//ƒR[ƒ‹ƒoƒbƒN‚Å‘Šè•û‚É“`‚¦‚éB
+		if(pfcallback){//ï¿½Rï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½Nï¿½Å‘ï¿½ï¿½ï¿½ï¿½ï¿½É“`ï¿½ï¿½ï¿½ï¿½B
 			if(FALSE==pfcallback(&cbdata,parg)){
 				goto Close;
 			}
@@ -1103,12 +1105,14 @@ Close:
 
 
 Error:
+#ifdef _MT
 	if(bThreadLock){
 		if(lock){
 			dkcThreadLock_Unlock(lock);
 			dkcFreeThreadLock(&lock);
 		}
 	}
+#endif
 	if(buff){
 		free(buff);buff=NULL;
 	}
@@ -1153,7 +1157,7 @@ int WINAPI dkcFileBinaryCompare(const char *filename1,const char *filename2)
 {
 	BOOL r = FALSE;
 	
-	//ƒtƒ@ƒCƒ‹‚Ì‘¶İ‚ğŠm‚©‚ß‚é
+	//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì‘ï¿½ï¿½İ‚ï¿½ï¿½mï¿½ï¿½ï¿½ß‚ï¿½
 	r = dkcFileExist(filename1);
 	if(r==FALSE){
 		return edk_ArgumentException;
@@ -1163,7 +1167,7 @@ int WINAPI dkcFileBinaryCompare(const char *filename1,const char *filename2)
 		return edk_ArgumentException;
 	}
 
-	//ƒtƒ@ƒCƒ‹‚ÌƒTƒCƒY‚ğŠm‚©‚ß‚é
+	//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½mï¿½ï¿½ï¿½ß‚ï¿½
 	{
 		DWORD high = 0,low = 0,high2 = 0,low2 = 0;
 		r = dkcFileSize64(filename1,&high,&low);
@@ -1175,7 +1179,7 @@ int WINAPI dkcFileBinaryCompare(const char *filename1,const char *filename2)
 			return edk_ArgumentException;
 		}
 		r = (high==high2 && low==low2);
-		if(FALSE==r){//ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ªˆá‚Á‚½
+		if(FALSE==r){//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			return edk_FAILED;
 		}
 
@@ -1190,7 +1194,7 @@ int WINAPI dkcFileBinaryCompare(const char *filename1,const char *filename2)
 
 		//initialize
 
-		//ƒtƒ@ƒCƒ‹‚ğƒI[ƒvƒ“
+		//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½
 		r = edk_LogicError;
 
 		s1 = dkcAllocStreamFileType( 
@@ -1208,7 +1212,7 @@ int WINAPI dkcFileBinaryCompare(const char *filename1,const char *filename2)
 			goto Error;
 		}
 
-		//ƒoƒbƒtƒ@‚ğ—pˆÓ
+		//ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½pï¿½ï¿½
 		r = edk_OutOfMemory;
 
 		buffer1 = malloc(buffsize);
@@ -1284,7 +1288,7 @@ int WINAPI dkcMemoryToFile(const char *filename,const void *buff,size_t size,UIN
 	if(!(edkcFileRewrite & flag))
 	{
 
-		//ƒtƒ@ƒCƒ‹‚Ì‘¶İ‚ğŠm‚©‚ß‚é
+		//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì‘ï¿½ï¿½İ‚ï¿½ï¿½mï¿½ï¿½ï¿½ß‚ï¿½
 		r = dkcFileExist(filename);
 		if(r==TRUE){
 			return edk_ArgumentException;
@@ -1319,7 +1323,7 @@ int WINAPI dkcFileToMemory(const char *filename,void *buff,size_t size)
 	}
 
 	if(h != 0 || ( (size_t)(l) > size ))
-	{//DWORD_MAXˆÈã‚ÌƒTƒCƒY‚Ìƒtƒ@ƒCƒ‹‚ğƒƒ‚ƒŠ‚É‚Í“Ç‚İ‚±‚ß‚È‚¢‚Å‚·‚æ^^;
+	{//DWORD_MAXï¿½Èï¿½ÌƒTï¿½Cï¿½Yï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‚Í“Ç‚İ‚ï¿½ï¿½ß‚È‚ï¿½ï¿½Å‚ï¿½ï¿½ï¿½^^;
 		return edk_BufferOverFlow;
 	}
 
@@ -1376,26 +1380,26 @@ DKC_FILE_FINDER * WINAPI dkcAllocFileFinder(
 	p = dkcAllocate(sizeof(DKC_FILE_FINDER));
 	if(NULL==p) return NULL;
 
-	//ƒfƒBƒŒƒNƒgƒŠ
+	//ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½
 	p->mDir = dkcAllocPathString(dir);//allocate and copy 
 	if(NULL==p->mDir){
 		goto Error;
 	}
-	//Ä‹A—pƒXƒ^ƒbƒN
+	//ï¿½Ä‹Aï¿½pï¿½Xï¿½^ï¿½bï¿½N
 	p->mStack = dkcAllocStack(10,sizeof(DKC_PATHSTRING *));
 	if(NULL==p->mStack){
 		goto Error;
 	}
-	//target•¶š—ñ
+	//targetï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	p->mTarget = dkcAllocString(128);
 	if(NULL==p->mTarget){
 		goto Error;
 	}
-	//target•¶š—ñ‚ğƒRƒs[
+	//targetï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Rï¿½sï¿½[
 	dkcStringCopy(p->mTarget,target,strlen(target));
 
-	p->mState = edkcFileFinderEmpty;//‰½‚à‚µ‚Ä‚¢‚È‚¢B
-	p->mbSubDir = bSubDir;//ƒTƒudirectory‚àŒŸõ‚·‚é‚©‚Ç‚¤‚©
+	p->mState = edkcFileFinderEmpty;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½B
+	p->mbSubDir = bSubDir;//ï¿½Tï¿½udirectoryï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½
 
 	return p;
 Error:
@@ -1503,15 +1507,15 @@ static int ReflexiveSearch(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopySu
 {*/
 #define FFCHECKING(p,path,bCopySucceeded)\
 	if(TRUE==isDot(p))\
-	{/*‚±‚ñ‚È‚Ì‚¶‚á•¶š—ñ‚Í‚¢‚½‚¾‚¯‚È‚¢‚È‚ŸB*/\
+	{/*ï¿½ï¿½ï¿½ï¿½È‚Ì‚ï¿½ï¿½á•¶ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½È‚ï¿½ï¿½B*/\
 		p->mState = edkcFileFinderSearching;\
 		return WithFolderSearch(p,path,bCopySucceeded);\
 	}\
 	if(TRUE==isFolder(p))\
-	{/*‚¨‚âHƒtƒHƒ‹ƒ_[‚¾B*/\
+	{/*ï¿½ï¿½ï¿½ï¿½Hï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½[ï¿½ï¿½ï¿½B*/\
 		dkcFileFinderReferenceFileName(p,path);\
 		p->mState = edkcFileFinderSearching;\
-		FFPushStack(p);/*folder‚ğƒXƒ^ƒbƒN‚É‹l‚ß‚éB*/\
+		FFPushStack(p);/*folderï¿½ï¿½ï¿½Xï¿½^ï¿½bï¿½Nï¿½É‹lï¿½ß‚ï¿½B*/\
 		return WithFolderSearch(p,path,bCopySucceeded);\
 	}
 /*}*/
@@ -1526,75 +1530,75 @@ static int WithFolderSearch(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopyS
 	*bCopySucceeded = FALSE;
 
 	if(edkcFileFinderEmpty == p->mState)
-	{//ŒÄ‚Ño‚µ‚ÄÅ‰‚¾‚Á‚½‚çA
+	{//ï¿½Ä‚Ñoï¿½ï¿½ï¿½ÄÅï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A
 		r = dkcFindFirstFile(p);
 		if(DKUTIL_FAILED(r)) return edk_FAILED;
-#	ifdef WIN32 //windows‚Ìê‡‚Í“à•”‚ÉŠi”[‚µ‚Ä‚¢‚é¥¥¥B
+#	ifdef WIN32 //windowsï¿½Ìê‡ï¿½Í“ï¿½ï¿½ï¿½ï¿½ÉŠiï¿½[ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é¥¥ï¿½ï¿½B
 		if(TRUE==isDot(p))
-		{//‚±‚ñ‚È‚Ì‚¶‚á•¶š—ñ‚Í‚¢‚½‚¾‚¯‚È‚¢‚È‚ŸB
+		{//ï¿½ï¿½ï¿½ï¿½È‚Ì‚ï¿½ï¿½á•¶ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½È‚ï¿½ï¿½B
 			p->mState = edkcFileFinderSearching;
 			return WithFolderSearch(p,path,bCopySucceeded);
 		}
 		if(TRUE==isFolder(p))
-		{//‚¨‚âHƒtƒHƒ‹ƒ_[‚¾B
+		{//ï¿½ï¿½ï¿½ï¿½Hï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½[ï¿½ï¿½ï¿½B
 			dkcFileFinderReferenceFileName(p,path);
 			p->mState = edkcFileFinderSearching;
-			FFPushStack(p);//folder‚ğƒXƒ^ƒbƒN‚É‹l‚ß‚éB
+			FFPushStack(p);//folderï¿½ï¿½ï¿½Xï¿½^ï¿½bï¿½Nï¿½É‹lï¿½ß‚ï¿½B
 			return WithFolderSearch(p,path,bCopySucceeded);
 		}
 		//FFCHECKING(p,path,bCopySucceeded)
 
 		r = dkcFileFinderReferenceFileName(p,path);
 			
-		if(DKUTIL_SUCCEEDED(r)){//ƒRƒs[‚à¬Œ÷
+		if(DKUTIL_SUCCEEDED(r)){//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			*bCopySucceeded = TRUE;
 		}
 #	endif
 		p->mState = edkcFileFinderSearching;
 		return r;
 	}else if(edkcFileFinderSearching == p->mState)
-	{//ŒŸõ’†‚¾‚Á‚½‚çB
+	{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		r = dkcFindNextFile(p);
 		if(edk_SUCCEEDED == r)
-		{//¬Œ÷‚¾B
+		{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			if(TRUE==isDot(p))
-			{//‚±‚ñ‚È‚Ì‚¶‚á•¶š—ñ‚Í‚¢‚½‚¾‚¯‚È‚¢‚È‚ŸB
+			{//ï¿½ï¿½ï¿½ï¿½È‚Ì‚ï¿½ï¿½á•¶ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½È‚ï¿½ï¿½B
 				p->mState = edkcFileFinderSearching;
 				return WithFolderSearch(p,path,bCopySucceeded);
 			}
 			if(TRUE==isFolder(p))
-			{//‚¨‚âHƒtƒHƒ‹ƒ_[‚¾B
+			{//ï¿½ï¿½ï¿½ï¿½Hï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½[ï¿½ï¿½ï¿½B
 				dkcFileFinderReferenceFileName(p,path);
 				p->mState = edkcFileFinderSearching;
-				FFPushStack(p);//folder‚ğƒXƒ^ƒbƒN‚É‹l‚ß‚éB
+				FFPushStack(p);//folderï¿½ï¿½ï¿½Xï¿½^ï¿½bï¿½Nï¿½É‹lï¿½ß‚ï¿½B
 				return WithFolderSearch(p,path,bCopySucceeded);
 			}
 
 			r = dkcFileFinderReferenceFileName(p,path);
 			
-			if(DKUTIL_SUCCEEDED(r)){//ƒRƒs[‚à¬Œ÷
+			if(DKUTIL_SUCCEEDED(r)){//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				*bCopySucceeded = TRUE;
-			}/*else{//ƒRƒs[¸”sIHH
+			}/*else{//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½sï¿½Iï¿½Hï¿½H
 				*bCopySucceeded = FALSE;
 			}*/
 		}else if(edk_EndProcess == r)
-		{//ŒŸõ‚ªI‚í‚Á‚½B
+		{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			if(FALSE==FFIsStackEmpty(p))
-			{//‹ó‚Å‚Í‚È‚¢B
+			{//ï¿½ï¿½Å‚Í‚È‚ï¿½ï¿½B
 				FFReSearch(p);
 				return WithFolderSearch(p,path,bCopySucceeded);
 			}else{
-				dkcFindClose(p);//I—¹ƒiƒŠBi“à•”‚Åp->mState = edkcFileFinderFinish;‚ğ‚â‚Á‚Ä‚¢‚éB
+				dkcFindClose(p);//ï¿½Iï¿½ï¿½ï¿½iï¿½ï¿½ï¿½Bï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½p->mState = edkcFileFinderFinish;ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½B
 			}
 		}else{
-			dkcmNOT_ASSERT("‚»‚ñ‚È‚Î‚©‚È`");
+			dkcmNOT_ASSERT("ï¿½ï¿½ï¿½ï¿½È‚Î‚ï¿½ï¿½È`");
 		}
 		return r;
 	}else if(edkcFileFinderFinish == p->mState)
 	{
 		return edk_EndProcess;
 	}
-	dkcmNOT_ASSERT("dkcFileFinderNext‚ÌƒvƒƒOƒ‰ƒ€‚ª‚¨‚©‚µ‚¢Bƒ`[ƒg‚³‚ê‚Ä‚¢‚é‚©‚àIH");
+	dkcmNOT_ASSERT("dkcFileFinderNextï¿½Ìƒvï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½`ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½Iï¿½H");
 	return edk_FAILED;
 
 }
@@ -1607,30 +1611,30 @@ static int NormalSearch(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopySucce
 	*bCopySucceeded = FALSE;
 
 	if(edkcFileFinderEmpty == p->mState)
-	{//ŒÄ‚Ño‚µ‚ÄÅ‰‚¾‚Á‚½‚çA
+	{//ï¿½Ä‚Ñoï¿½ï¿½ï¿½ÄÅï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A
 		r = dkcFindFirstFile(p);
 		if(DKUTIL_FAILED(r)) return edk_FAILED;
-#	ifdef WIN32 //windows‚Ìê‡‚Í“à•”‚ÉŠi”[‚µ‚Ä‚¢‚é¥¥¥B
+#	ifdef WIN32 //windowsï¿½Ìê‡ï¿½Í“ï¿½ï¿½ï¿½ï¿½ÉŠiï¿½[ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é¥¥ï¿½ï¿½B
 		if(TRUE==isDot(p) || TRUE==isFolder(p))
-		{//‚±‚ñ‚È‚Ì‚¶‚á•¶š—ñ‚Í‚¢‚½‚¾‚¯‚È‚¢‚È‚ŸB
+		{//ï¿½ï¿½ï¿½ï¿½È‚Ì‚ï¿½ï¿½á•¶ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½È‚ï¿½ï¿½B
 			p->mState = edkcFileFinderSearching;
 			return NormalSearch(p,path,bCopySucceeded);
 		}
 		r = dkcFileFinderReferenceFileName(p,path);
 			
-		if(DKUTIL_SUCCEEDED(r)){//ƒRƒs[‚à¬Œ÷
+		if(DKUTIL_SUCCEEDED(r)){//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			*bCopySucceeded = TRUE;
 		}
 #	endif
 		p->mState = edkcFileFinderSearching;
 		return r;
 	}else if(edkcFileFinderSearching == p->mState)
-	{//ŒŸõ’†‚¾‚Á‚½‚çB
+	{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		r = dkcFindNextFile(p);
 		if(edk_SUCCEEDED == r)
-		{//¬Œ÷‚¾B
+		{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			if(TRUE==isDot(p) || TRUE==isFolder(p))
-			{//‚±‚ñ‚È‚Ì‚¶‚á•¶š—ñ‚Í‚¢‚½‚¾‚¯‚È‚¢‚È‚ŸB
+			{//ï¿½ï¿½ï¿½ï¿½È‚Ì‚ï¿½ï¿½á•¶ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½È‚ï¿½ï¿½B
 
 
 
@@ -1639,16 +1643,16 @@ static int NormalSearch(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopySucce
 			}
 			r = dkcFileFinderReferenceFileName(p,path);
 			
-			if(DKUTIL_SUCCEEDED(r)){//ƒRƒs[‚à¬Œ÷
+			if(DKUTIL_SUCCEEDED(r)){//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				*bCopySucceeded = TRUE;
-			}/*else{//ƒRƒs[¸”sIHH
+			}/*else{//ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½sï¿½Iï¿½Hï¿½H
 				*bCopySucceeded = FALSE;
 			}*/
 		}else if(edk_EndProcess == r)
-		{//ŒŸõ‚ªI‚í‚Á‚½B
-			dkcFindClose(p);//I—¹ƒiƒŠBi“à•”‚Åp->mState = edkcFileFinderFinish;‚ğ‚â‚Á‚Ä‚¢‚éB
+		{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+			dkcFindClose(p);//ï¿½Iï¿½ï¿½ï¿½iï¿½ï¿½ï¿½Bï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½p->mState = edkcFileFinderFinish;ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½B
 		}else{
-			dkcmNOT_ASSERT("‚»‚ñ‚È‚Î‚©‚È`");
+			dkcmNOT_ASSERT("ï¿½ï¿½ï¿½ï¿½È‚Î‚ï¿½ï¿½È`");
 		}
 		return r;
 	}else if(edkcFileFinderFinish == p->mState)
@@ -1657,21 +1661,21 @@ static int NormalSearch(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopySucce
 	}/*else{
 		return edk_FAILED;
 	}*/
-	dkcmNOT_ASSERT("dkcFileFinderNext‚ÌƒvƒƒOƒ‰ƒ€‚ª‚¨‚©‚µ‚¢Bƒ`[ƒg‚³‚ê‚Ä‚¢‚é‚©‚àIH");
+	dkcmNOT_ASSERT("dkcFileFinderNextï¿½Ìƒvï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½`ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½Iï¿½H");
 	return edk_FAILED;
 
 }
 
 /*!
-@param ptr[in] dkcAllocFileFinder()‚Åæ“¾‚µ‚½ƒ|ƒCƒ“ƒ^
-@return edk_SUCCEEDED‚È‚çdkcFileFinderGetResult()‚ğŒÄ‚Ño‚µ‚Ä—Ç‚¢B
-‚»‚êˆÈŠO‚È‚çdkcFreeFileFinder()‚ÅI—¹‚³‚¹‚È‚¯‚ê‚Î‚È‚ç‚È‚¢B
+@param ptr[in] dkcAllocFileFinder()ï¿½Åæ“¾ï¿½ï¿½ï¿½ï¿½ï¿½|ï¿½Cï¿½ï¿½ï¿½^
+@return edk_SUCCEEDEDï¿½È‚ï¿½dkcFileFinderGetResult()ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½Ä—Ç‚ï¿½ï¿½B
+ï¿½ï¿½ï¿½ï¿½ÈŠOï¿½È‚ï¿½dkcFreeFileFinder()ï¿½ÅIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½Î‚È‚ï¿½È‚ï¿½ï¿½B
 */
 int WINAPI dkcFileFinderNext(DKC_FILE_FINDER *p,DKC_PATHSTRING *path,BOOL *bCopySucceeded)
 {
 	if(FALSE==p->mbSubDir){
 		return NormalSearch(p,path,bCopySucceeded);
-	}else{//sub directory‚àŒŸõ
+	}else{//sub directoryï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		return WithFolderSearch(p,path,bCopySucceeded);
 	}
 	//return ReflexiveSearch(p,path,bCopySucceeded);
@@ -1714,10 +1718,10 @@ int WINAPI dkcFindNextFile(DKC_FINDFILE *ptr){
 	if ( 0 == FindNextFileA( ptr->mHandle, &(ptr->mFindData) ))
 	{
 		if ( GetLastError() == ERROR_NO_MORE_FILES )
-		{//‚È‚ñ‚¾A‚à‚¤–³‚¢‚¶‚á‚ñB
+		{//ï¿½È‚ñ‚¾Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			return edk_EndProcess;
 		}
-		else//Åˆ«‚Ìƒpƒ^[ƒ“
+		else//ï¿½Åˆï¿½ï¿½Ìƒpï¿½^ï¿½[ï¿½ï¿½
 		{
 			return edk_FAILED;
 		}
@@ -1728,10 +1732,10 @@ int WINAPI dkcFindNextFile(DKC_FINDFILE *ptr){
   if ( ptr->mDirent == 0 )
   {
     if ( errno == 0 )
-    {//‚à‚¤–³‚¢‚æOOG
+    {//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Oï¿½G
 			return edk_EndProcess;
     }
-		else//Åˆ«‚Ìƒpƒ^[ƒ“
+		else//ï¿½Åˆï¿½ï¿½Ìƒpï¿½^ï¿½[ï¿½ï¿½
 		{
 			return edk_FAILED;
 		}
@@ -1747,13 +1751,13 @@ int WINAPI dkcFindClose(DKC_FINDFILE *ptr)
 		return edk_FAILED;
 	}
 	FindClose(ptr->mHandle);
-	ptr->mHandle = INVALID_HANDLE_VALUE;//‚µ‚Á‚©‚èƒŠƒZƒbƒg
+	ptr->mHandle = INVALID_HANDLE_VALUE;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½èƒŠï¿½Zï¿½bï¿½g
 #else
 	if(0 == ptr->mHandle){
 		return edk_FAILED;
 	}
 	closedir(ptr->mHandle);
-	ptr->mHandle = 0;//‚µ‚Á‚©‚èƒŠƒZƒbƒg
+	ptr->mHandle = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½èƒŠï¿½Zï¿½bï¿½g
 	ptr->mDirent = NULL;
 #endif
 
@@ -1771,7 +1775,7 @@ int WINAPI dkcFindFileGetFileName(DKC_FINDFILE *ptr,char *buff,size_t buffsize)
 	r = dkc_strcpy(buff,buffsize,ptr->mFindData.cFileName,len);
 #else
 	if(NULL==ptr->mDirent)
-	{//ŒÄ‚Ño‚µ‚ªŠÔˆá‚Á‚Ä‚¢‚é‚æOOG
+	{//ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½Ôˆï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½Oï¿½Oï¿½G
 		return edk_LogicError;
 	}
 	len = strlen(ptr->mDirent.d_name);
@@ -1856,16 +1860,16 @@ int WINAPI dkcFindFirstFile(DKC_FILE_FINDER *ptr){
 int WINAPI dkcFindNextFile(DKC_FILE_FINDER *ptr)
 {
 	if(edkcFileFinderFinish == ptr->mState){
-		return edk_LogicError;//ŒÄ‚Ño‚µ‚ªŠÔˆá‚Á‚Ä‚¢‚éƒiƒŠI
+		return edk_LogicError;//ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½Ôˆï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½I
 	}
 #	ifdef WIN32
 	if ( 0 == FindNextFileA( ptr->mHandle, &(ptr->mFindData) ))
 	{
 		if ( GetLastError() == ERROR_NO_MORE_FILES )
-		{//‚È‚ñ‚¾A‚à‚¤–³‚¢‚¶‚á‚ñB
+		{//ï¿½È‚ñ‚¾Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			return edk_EndProcess;
 		}
-		else//Åˆ«‚Ìƒpƒ^[ƒ“
+		else//ï¿½Åˆï¿½ï¿½Ìƒpï¿½^ï¿½[ï¿½ï¿½
 		{
 			return edk_FAILED;
 		}
@@ -1876,10 +1880,10 @@ int WINAPI dkcFindNextFile(DKC_FILE_FINDER *ptr)
   if ( ptr->mDirent == 0 )
   {
     if ( errno == 0 )
-    {//‚à‚¤–³‚¢‚æOOG
+    {//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Oï¿½G
 			return edk_EndProcess;
     }
-		else//Åˆ«‚Ìƒpƒ^[ƒ“
+		else//ï¿½Åˆï¿½ï¿½Ìƒpï¿½^ï¿½[ï¿½ï¿½
 		{
 			return edk_FAILED;
 		}
@@ -1894,16 +1898,16 @@ int WINAPI dkcFindClose(DKC_FILE_FINDER *ptr){
 		return edk_FAILED;
 	}
 	FindClose(ptr->mHandle);
-	ptr->mHandle = INVALID_HANDLE_VALUE;//‚µ‚Á‚©‚èƒŠƒZƒbƒg
+	ptr->mHandle = INVALID_HANDLE_VALUE;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½èƒŠï¿½Zï¿½bï¿½g
 #else
 	if(0 == ptr->mHandle){
 		return edk_FAILED;
 	}
 	closedir(ptr->mHandle);
-	ptr->mHandle = 0;//‚µ‚Á‚©‚èƒŠƒZƒbƒg
+	ptr->mHandle = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½èƒŠï¿½Zï¿½bï¿½g
 	ptr->mDirent = NULL;
 #endif
-	//I—¹II
+	//ï¿½Iï¿½ï¿½ï¿½Iï¿½I
 	ptr->mState = edkcFileFinderFinish;
 
 	return edk_SUCCEEDED;
@@ -1920,7 +1924,7 @@ int WINAPI dkcFileFinderReferenceFileName(DKC_FILE_FINDER *ptr,DKC_PATHSTRING *p
 	r = dkcPathStringCopy(path,ptr->mFindData.cFileName,len);
 #else
 	if(NULL==ptr->mDirent)
-	{//ŒÄ‚Ño‚µ‚ªŠÔˆá‚Á‚Ä‚¢‚é‚æOOG
+	{//ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½Ôˆï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½Oï¿½Oï¿½G
 		return edk_LogicError;
 	}
 	len = strlen(ptr->mDirent.d_name);

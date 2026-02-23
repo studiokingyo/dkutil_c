@@ -57,6 +57,8 @@ typedef struct dkc_ThreadCond{
 
 #endif
 
+#ifdef _MT
+
 DKC_INLINE dkctThreadID dkcGetThreadID(){
 #ifdef WIN32
 	return GetCurrentThreadId();
@@ -97,5 +99,7 @@ DKC_EXTERN void WINAPI dkcThreadCond_Broadcast(DKC_THREAD_COND *cond);
 #if !defined( DKUTIL_C_THREAD_LOCK_C ) &&  defined(USE_DKC_INDEPENDENT_INCLUDE)
 #	include "dkcThreadLock.c"
 #endif
+
+#endif /* _MT */
 
 #endif

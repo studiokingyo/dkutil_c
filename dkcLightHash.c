@@ -39,7 +39,7 @@ static uint64 read64_le(const uint8 *p)
 
 static uint16 read16_le(const uint8 *p)
 {
-	return (uint16)p[0] | ((uint16)p[1] << 8);
+	return (unsigned short)((uint16)p[0] | ((uint16)p[1] << 8));
 }
 
 /* ====================================================================
@@ -669,9 +669,10 @@ uint64 WINAPI dkcHashXX64(const void *data, size_t len, uint64 seed)
 static uint64 city_hash128to64(uint64 u, uint64 v)
 {
 	const uint64 kMul = QW(0x9DDFEA08EB382D69);
-	uint64 a = (u ^ v) * kMul;
+	uint64 a, b;
+	a = (u ^ v) * kMul;
 	a ^= (a >> 47);
-	uint64 b = (v ^ a) * kMul;
+	b = (v ^ a) * kMul;
 	b ^= (b >> 47);
 	b *= kMul;
 	return b;
@@ -689,9 +690,10 @@ static uint64 city_hashlen16(uint64 u, uint64 v)
 
 static uint64 city_hashlen16_mul(uint64 u, uint64 v, uint64 mul)
 {
-	uint64 a = (u ^ v) * mul;
+	uint64 a, b;
+	a = (u ^ v) * mul;
 	a ^= (a >> 47);
-	uint64 b = (v ^ a) * mul;
+	b = (v ^ a) * mul;
 	b ^= (b >> 47);
 	b *= mul;
 	return b;
@@ -722,6 +724,8 @@ static uint64 city_hashlen0to16(const uint8 *s, size_t len)
 	return k2;
 }
 
+static const uint64 k3 = QW(0xC949D7C7509E6557);
+
 static uint64 city_hashlen17to32(const uint8 *s, size_t len)
 {
 	const uint64 k0 = QW(0xC3A5C85C97CB3127);
@@ -735,8 +739,6 @@ static uint64 city_hashlen17to32(const uint8 *s, size_t len)
 	return city_hashlen16(ROTR64(a - b, 43) + ROTR64(c, 30) + d,
 	                      a + ROTR64(b ^ k3, 20) - c + len);
 }
-
-static const uint64 k3 = QW(0xC949D7C7509E6557);
 
 static uint64 city_hashlen33to64(const uint8 *s, size_t len)
 {
@@ -768,8 +770,10 @@ static uint64 city_hashlen33to64(const uint8 *s, size_t len)
 	wf = a + z;
 	ws = b + ROTR64(a, 31) + c;
 
-	uint64 r = city_shiftmix((vf + ws) * k2 + (wf + vs) * k0);
-	return city_shiftmix(r * k0 + vs) * k2;
+	{
+		uint64 r = city_shiftmix((vf + ws) * k2 + (wf + vs) * k0);
+		return city_shiftmix(r * k0 + vs) * k2;
+	}
 }
 
 uint64 WINAPI dkcHashCity64(const void *data, size_t len)
@@ -800,9 +804,10 @@ uint64 WINAPI dkcHashCity64(const void *data, size_t len)
 			uint64 xx = read64_le(ss + 8);
 			uint64 yy = read64_le(ss + 16);
 			uint64 zz = read64_le(ss + 24);
+			uint64 cc;
 			wa += ww;
 			wb = ROTR64(wb + wa + zz, 21);
-			uint64 cc = wa;
+			cc = wa;
 			wa += xx;
 			wa += yy;
 			wb += ROTR64(wa, 44);
@@ -819,9 +824,10 @@ uint64 WINAPI dkcHashCity64(const void *data, size_t len)
 			uint64 xx = read64_le(ss + 8);
 			uint64 yy = read64_le(ss + 16);
 			uint64 zz = read64_le(ss + 24);
+			uint64 cc;
 			wa += ww;
 			wb = ROTR64(wb + wa + zz, 21);
-			uint64 cc = wa;
+			cc = wa;
 			wa += xx;
 			wa += yy;
 			wb += ROTR64(wa, 44);
@@ -850,9 +856,10 @@ uint64 WINAPI dkcHashCity64(const void *data, size_t len)
 					uint64 xx = read64_le(ss + 8);
 					uint64 yy = read64_le(ss + 16);
 					uint64 zz = read64_le(ss + 24);
+					uint64 cc;
 					wa += ww;
 					wb = ROTR64(wb + wa + zz, 21);
-					uint64 cc = wa;
+					cc = wa;
 					wa += xx;
 					wa += yy;
 					wb += ROTR64(wa, 44);
@@ -868,9 +875,10 @@ uint64 WINAPI dkcHashCity64(const void *data, size_t len)
 					uint64 xx = read64_le(ss + 8);
 					uint64 yy = read64_le(ss + 16);
 					uint64 zz = read64_le(ss + 24);
+					uint64 cc;
 					wa += ww;
 					wb = ROTR64(wb + wa + zz, 21);
-					uint64 cc = wa;
+					cc = wa;
 					wa += xx;
 					wa += yy;
 					wb += ROTR64(wa, 44);

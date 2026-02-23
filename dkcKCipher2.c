@@ -142,8 +142,6 @@ static void kcipher2_clock(DKC_KCIPHER2 *p, uint32 *zH, uint32 *zL)
 {
 	uint32 A0 = p->A[0];
 	uint32 A1 = p->A[1];
-	uint32 A2 = p->A[2];
-	uint32 A3 = p->A[3];
 	uint32 A4 = p->A[4];
 
 	uint32 B0 = p->B[0];

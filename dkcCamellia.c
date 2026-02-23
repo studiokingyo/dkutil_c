@@ -81,7 +81,7 @@ static void Camellia_WordByte( const uint32 *x, Byte *y )
 static void Camellia_XorBlock( const Byte *x, const Byte *y, Byte *z )
 {
 	int i;
-	for( i=0; i<16; i++ ) z[i] = x[i] ^ y[i];
+	for( i=0; i<16; i++ ) z[i] = (Byte)(x[i] ^ y[i]);
 }
 
 static void Camellia_SwapHalf( Byte *x )
@@ -122,14 +122,14 @@ static void Camellia_Feistel( const Byte *x, const Byte *k, Byte *y )
 	t[6] = SBOX4(x[6]^k[6]);
 	t[7] = SBOX1(x[7]^k[7]);
 
-	y[0] ^= t[0]^t[2]^t[3]^t[5]^t[6]^t[7];
-	y[1] ^= t[0]^t[1]^t[3]^t[4]^t[6]^t[7];
-	y[2] ^= t[0]^t[1]^t[2]^t[4]^t[5]^t[7];
-	y[3] ^= t[1]^t[2]^t[3]^t[4]^t[5]^t[6];
-	y[4] ^= t[0]^t[1]^t[5]^t[6]^t[7];
-	y[5] ^= t[1]^t[2]^t[4]^t[6]^t[7];
-	y[6] ^= t[2]^t[3]^t[4]^t[5]^t[7];
-	y[7] ^= t[0]^t[3]^t[4]^t[5]^t[6];
+	y[0] = (Byte)(y[0] ^ t[0]^t[2]^t[3]^t[5]^t[6]^t[7]);
+	y[1] = (Byte)(y[1] ^ t[0]^t[1]^t[3]^t[4]^t[6]^t[7]);
+	y[2] = (Byte)(y[2] ^ t[0]^t[1]^t[2]^t[4]^t[5]^t[7]);
+	y[3] = (Byte)(y[3] ^ t[1]^t[2]^t[3]^t[4]^t[5]^t[6]);
+	y[4] = (Byte)(y[4] ^ t[0]^t[1]^t[5]^t[6]^t[7]);
+	y[5] = (Byte)(y[5] ^ t[1]^t[2]^t[4]^t[6]^t[7]);
+	y[6] = (Byte)(y[6] ^ t[2]^t[3]^t[4]^t[5]^t[7]);
+	y[7] = (Byte)(y[7] ^ t[0]^t[3]^t[4]^t[5]^t[6]);
 }
 
 static void Camellia_FLlayer( Byte *x, const Byte *kl, const Byte *kr )
@@ -160,7 +160,7 @@ static void Camellia_Ekeygen( const int n, const Byte *k, Byte *e )
 	}
 	else if( n == 192 ){
 		for( i=0 ; i<24; i++ ) t[i] = k[i];
-		for( i=24; i<32; i++ ) t[i] = k[i-8]^0xff;
+		for( i=24; i<32; i++ ) t[i] = (Byte)(k[i-8]^0xff);
 	}
 	else if( n == 256 ){
 		for( i=0 ; i<32; i++ ) t[i] = k[i];

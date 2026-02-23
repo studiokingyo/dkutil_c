@@ -12,6 +12,8 @@
 
 #include "dkcThreadLock.h"
 
+#ifdef _MT
+
 #ifdef WIN32
 #include <process.h>
 
@@ -98,5 +100,7 @@ DKC_EXTERN int WINAPI dkcSetProcessPriority(DKC_THREAD *p,int priority);
 
 DKC_EXTERN int WINAPI dkcGetCurrentProcessPriority(int *priority);
 DKC_EXTERN int WINAPI dkcSetCurrentProcessPriority(int priority);
+
+#endif /* _MT */
 
 #endif

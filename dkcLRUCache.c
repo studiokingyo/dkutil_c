@@ -485,7 +485,6 @@ int WINAPI dkcLRUCacheResize(DKC_LRU_CACHE *cache, size_t new_capacity)
 	DKC_LRU_NODE **new_hash_table;
 	size_t new_hash_size;
 	DKC_LRU_NODE *node;
-	size_t i;
 
 	if (!cache || new_capacity == 0) return edk_FAILED;
 

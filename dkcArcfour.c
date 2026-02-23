@@ -1,8 +1,8 @@
 
 /*!
 @file dkcArcfour.c
-@brief RC4ŒİŠ·ƒAƒ‹ƒSƒŠƒYƒ€ Arcfour stream cipher algorithm
-@author d‹à‹›
+@brief RC4ï¿½İŠï¿½ï¿½Aï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½ Arcfour stream cipher algorithm
+@author dï¿½ï¿½ï¿½ï¿½
 */
 #define  DKUTIL_C_ARCFOUR_C
 #include "dkcArcfour.h"
@@ -33,7 +33,7 @@ DKC_ARCFOUR_STATE *WINAPI dkcAllocArcfour(
 	//initialize
 	for(i=0;i<256;i++){
 		sb1[i] = (unsigned char)i;
-		//šk‚¬‰ñ‚ç‚ê‚È‚¢‚æ‚¤‚É(‚È‚ñ‚©AˆÓ–¡‚ ‚é‚Ì‚©H‚È‚¢ƒiƒ@H
+		//ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½ï¿½(ï¿½È‚ñ‚©Aï¿½Ó–ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½Hï¿½È‚ï¿½ï¿½iï¿½@ï¿½H
 		//p->msbox2[i] = key [i % keylen];
 	}
 	j=i=0;
@@ -71,7 +71,7 @@ DKC_INLINE unsigned char WINAPI dkcArcfourProcess(DKC_ARCFOUR_STATE *p){
   j = (unsigned char )(p->mj + sb1[i]);// % 256;
   
 	 //swap
-	SWAP_FAST8( sb1 [i],sb1 [j]);
+	{ unsigned char _t = sb1[i]; sb1[i] = sb1[j]; sb1[j] = _t; }
   /*temp = sb1 [i];
   sb1 [i] = sb1 [j];
   sb1 [j] = temp;
@@ -106,7 +106,7 @@ static DKC_INLINE void dkcArcfourEncrypt_Base(DKC_ARCFOUR_STATE *p,
   
 		 //swap
 		
-		SWAP_FAST8(sb1 [i],sb1 [j]);
+		{ unsigned char _t = sb1[i]; sb1[i] = sb1[j]; sb1[j] = _t; }
 		/*temp = sb1 [i];
 		sb1 [i] = sb1 [j];
 		sb1 [j] = temp;
@@ -162,7 +162,7 @@ int WINAPI dkcFreeArcfour(DKC_ARCFOUR_STATE **p){
 
 
 //**********************************************************
-//2byteƒo[ƒWƒ‡ƒ“
+//2byteï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½
 
 DKC_ARCFOUR2BYTE_STATE *WINAPI dkcAllocArcfour2Byte(
 	const unsigned char *key,size_t keylen)
@@ -187,7 +187,7 @@ DKC_ARCFOUR2BYTE_STATE *WINAPI dkcAllocArcfour2Byte(
 	//initialize
 	for(i=0;i<USHRT_MAX;i++){
 		sb1[i] = (unsigned short)i;
-		//šk‚¬‰ñ‚ç‚ê‚È‚¢‚æ‚¤‚É(‚È‚ñ‚©AˆÓ–¡‚ ‚é‚Ì‚©H‚È‚¢ƒiƒ@H
+		//ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½ï¿½(ï¿½È‚ñ‚©Aï¿½Ó–ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½Hï¿½È‚ï¿½ï¿½iï¿½@ï¿½H
 		//p->msbox2[i] = key [i % keylen];
 	}
 	j=i=0;
@@ -240,7 +240,7 @@ DKC_INLINE unsigned short WINAPI dkcArcfour2ByteProcess(DKC_ARCFOUR2BYTE_STATE *
 }
 
 /**
-@param srcsize[in] ƒoƒCƒg’PˆÊ‚ÌƒTƒCƒY‚Å‚Í‚È‚­Aunsigned short’PˆÊ‚Ì”
+@param srcsize[in] ï¿½oï¿½Cï¿½gï¿½Pï¿½Ê‚ÌƒTï¿½Cï¿½Yï¿½Å‚Í‚È‚ï¿½ï¿½Aunsigned shortï¿½Pï¿½Ê‚Ìï¿½
 */
 static DKC_INLINE void dkcArcfour2ByteEncrypt_Base(DKC_ARCFOUR2BYTE_STATE *p,
 	unsigned short *dest,unsigned const short *src,size_t srcsize)
@@ -290,7 +290,7 @@ int WINAPI dkcArcfour2ByteEncrypt(DKC_ARCFOUR2BYTE_STATE *p,
 	if(destsize < srcsize){
 		return edk_BufferOverFlow;
 	}
-	if(srcsize % 2 != 0){//2‚Ì”{”‚¶‚á‚È‚¢‚Æ‚Ë‚¥
+	if(srcsize % 2 != 0){//2ï¿½Ì”{ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚Ë‚ï¿½
 		return edk_ArgumentException;
 	}
 
@@ -311,7 +311,7 @@ int WINAPI dkcArcfour2ByteEncrypt(DKC_ARCFOUR2BYTE_STATE *p,
 int WINAPI dkcArcfour2ByteEncryptNoDest(DKC_ARCFOUR2BYTE_STATE *p,
 	unsigned char *dest_and_src,size_t dest_and_srcsize)
 {
-	if(dest_and_srcsize % 2 != 0){//2‚Ì”{”‚¶‚á‚È‚¢‚Æ‚Ë‚¥
+	if(dest_and_srcsize % 2 != 0){//2ï¿½Ì”{ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚Ë‚ï¿½
 		return edk_ArgumentException;
 	}
 	dkcArcfour2ByteEncrypt_Base(p,

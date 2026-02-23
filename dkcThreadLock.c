@@ -10,6 +10,8 @@
 #include "dkcThreadLock.h"
 #include "dkcStdio.h"
 
+#ifdef _MT
+
 
 /* ========================================
  * Mutex
@@ -309,3 +311,5 @@ void WINAPI dkcThreadCond_Broadcast(DKC_THREAD_COND *cond)
 	pthread_cond_broadcast(&(cond->cond));
 #endif
 }
+
+#endif /* _MT */

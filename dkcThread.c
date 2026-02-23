@@ -10,6 +10,8 @@
 #include "dkcThread.h"
 #include "dkcStdio.h"
 
+#ifdef _MT
+
 
 DKC_INLINE DKC_THREAD *WINAPI dkcAllocThread()
 {
@@ -332,3 +334,5 @@ int WINAPI dkcSetCurrentProcessPriority(int priority){
 	r = dkcSetProcessPriority(&t,priority);
 	return r;
 }
+
+#endif /* _MT */

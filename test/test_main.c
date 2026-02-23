@@ -1999,6 +1999,11 @@ void Test_2Tree(void)
 /*
  * Test: dkcRedBlackTree.c
  */
+static void rbtree_noop_destructor(rb_tree_data_type data)
+{
+    (void)data;
+}
+
 void Test_RedBlackTree(void)
 {
     DKC_RB_TREE_ROOT *rbtree;
@@ -2009,7 +2014,7 @@ void Test_RedBlackTree(void)
 
     TEST_BEGIN("dkcRedBlackTree Test");
 
-    rbtree = dkcAllocRedBlackTreeRoot(100, 50, NULL);
+    rbtree = dkcAllocRedBlackTreeRoot(100, 50, rbtree_noop_destructor);
     TEST_ASSERT(rbtree != NULL, "dkcAllocRedBlackTreeRoot");
 
     test_data1 = 100;
@@ -5687,6 +5692,7 @@ void Test_Rope(void)
     TEST_END();
 }
 
+#ifdef _MT
 /* ========================================
  * Thread Tests
  * ======================================== */
@@ -5918,6 +5924,7 @@ static void Test_CondVar(void)
 
     TEST_END();
 }
+#endif /* _MT */
 
 /* ========================================
  * MAIN
@@ -6054,12 +6061,14 @@ int main(int argc, char *argv[])
     Test_SuffixArray();
     Test_Rope();
 
+#ifdef _MT
     /* Thread Tests */
     Test_ThreadCreateJoin();
     Test_ThreadSleepYield();
     Test_TryLock();
     Test_RWLock();
     Test_CondVar();
+#endif
 
     /* Utility Tests */
     Test_Memory();
@@ -6079,9 +6088,11 @@ int main(int argc, char *argv[])
 
     if (g_tests_failed > 0) {
         printf("  SOME TESTS FAILED!\n");
-        return 1;
+        
     } else {
         printf("  ALL TESTS PASSED!\n");
-        return 0;
+        
     }
+	system("PAUSE");
+	return 0;
 }

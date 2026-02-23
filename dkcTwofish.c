@@ -50,17 +50,17 @@ static unsigned char tf_q0(unsigned char x)
 {
 	unsigned char a0, b0, a1, b1, a2, b2, a3, b3, a4, b4;
 
-	a0 = (x >> 4) & 0x0F;
-	b0 = x & 0x0F;
+	a0 = (unsigned char)((x >> 4) & 0x0F);
+	b0 = (unsigned char)(x & 0x0F);
 
-	a1 = a0 ^ b0;
-	b1 = (a0 ^ ((b0 >> 1) | (b0 << 3)) ^ ((a0 << 3) & 0x0F)) & 0x0F;
+	a1 = (unsigned char)(a0 ^ b0);
+	b1 = (unsigned char)((a0 ^ ((b0 >> 1) | (b0 << 3)) ^ ((a0 << 3) & 0x0F)) & 0x0F);
 
 	a2 = Q0_T0[a1];
 	b2 = Q0_T1[b1];
 
-	a3 = a2 ^ b2;
-	b3 = (a2 ^ ((b2 >> 1) | (b2 << 3)) ^ ((a2 << 3) & 0x0F)) & 0x0F;
+	a3 = (unsigned char)(a2 ^ b2);
+	b3 = (unsigned char)((a2 ^ ((b2 >> 1) | (b2 << 3)) ^ ((a2 << 3) & 0x0F)) & 0x0F);
 
 	a4 = Q0_T2[a3];
 	b4 = Q0_T3[b3];
@@ -73,17 +73,17 @@ static unsigned char tf_q1(unsigned char x)
 {
 	unsigned char a0, b0, a1, b1, a2, b2, a3, b3, a4, b4;
 
-	a0 = (x >> 4) & 0x0F;
-	b0 = x & 0x0F;
+	a0 = (unsigned char)((x >> 4) & 0x0F);
+	b0 = (unsigned char)(x & 0x0F);
 
-	a1 = a0 ^ b0;
-	b1 = (a0 ^ ((b0 >> 1) | (b0 << 3)) ^ ((a0 << 3) & 0x0F)) & 0x0F;
+	a1 = (unsigned char)(a0 ^ b0);
+	b1 = (unsigned char)((a0 ^ ((b0 >> 1) | (b0 << 3)) ^ ((a0 << 3) & 0x0F)) & 0x0F);
 
 	a2 = Q1_T0[a1];
 	b2 = Q1_T1[b1];
 
-	a3 = a2 ^ b2;
-	b3 = (a2 ^ ((b2 >> 1) | (b2 << 3)) ^ ((a2 << 3) & 0x0F)) & 0x0F;
+	a3 = (unsigned char)(a2 ^ b2);
+	b3 = (unsigned char)((a2 ^ ((b2 >> 1) | (b2 << 3)) ^ ((a2 << 3) & 0x0F)) & 0x0F);
 
 	a4 = Q1_T2[a3];
 	b4 = Q1_T3[b3];
@@ -102,13 +102,13 @@ static unsigned char tf_gf_mult(unsigned char a, unsigned char b)
 
 	for (i = 0; i < 8; i++) {
 		if (bb & 1) {
-			result ^= aa;
+			result = (unsigned char)(result ^ aa);
 		}
-		bb >>= 1;
+		bb = (unsigned char)(bb >> 1);
 		if (aa & 0x80) {
 			aa = (unsigned char)((aa << 1) ^ 0x69);
 		} else {
-			aa <<= 1;
+			aa = (unsigned char)(aa << 1);
 		}
 	}
 	return result;
@@ -149,13 +149,13 @@ static unsigned char tf_rs_gf_mult(unsigned char a, unsigned char b)
 
 	for (i = 0; i < 8; i++) {
 		if (bb & 1) {
-			result ^= aa;
+			result = (unsigned char)(result ^ aa);
 		}
-		bb >>= 1;
+		bb = (unsigned char)(bb >> 1);
 		if (aa & 0x80) {
 			aa = (unsigned char)((aa << 1) ^ 0x4D);
 		} else {
-			aa <<= 1;
+			aa = (unsigned char)(aa << 1);
 		}
 	}
 	return result;
@@ -176,7 +176,7 @@ static void tf_rs_mult(const unsigned char *in8, unsigned char *out4)
 	for (i = 0; i < 4; i++) {
 		out4[i] = 0;
 		for (j = 0; j < 8; j++) {
-			out4[i] ^= tf_rs_gf_mult(RS[i][j], in8[j]);
+			out4[i] = (unsigned char)(out4[i] ^ tf_rs_gf_mult(RS[i][j], in8[j]));
 		}
 	}
 }
@@ -194,23 +194,23 @@ static uint32 tf_h(uint32 X, const uint32 *L, int k)
 	y[3] = (unsigned char)(X >> 24);
 
 	if (k == 4) {
-		y[0] = tf_q1(y[0]) ^ (unsigned char)(L[3]);
-		y[1] = tf_q0(y[1]) ^ (unsigned char)(L[3] >> 8);
-		y[2] = tf_q0(y[2]) ^ (unsigned char)(L[3] >> 16);
-		y[3] = tf_q1(y[3]) ^ (unsigned char)(L[3] >> 24);
+		y[0] = (unsigned char)(tf_q1(y[0]) ^ (unsigned char)(L[3]));
+		y[1] = (unsigned char)(tf_q0(y[1]) ^ (unsigned char)(L[3] >> 8));
+		y[2] = (unsigned char)(tf_q0(y[2]) ^ (unsigned char)(L[3] >> 16));
+		y[3] = (unsigned char)(tf_q1(y[3]) ^ (unsigned char)(L[3] >> 24));
 	}
 	if (k >= 3) {
-		y[0] = tf_q1(y[0]) ^ (unsigned char)(L[2]);
-		y[1] = tf_q1(y[1]) ^ (unsigned char)(L[2] >> 8);
-		y[2] = tf_q0(y[2]) ^ (unsigned char)(L[2] >> 16);
-		y[3] = tf_q0(y[3]) ^ (unsigned char)(L[2] >> 24);
+		y[0] = (unsigned char)(tf_q1(y[0]) ^ (unsigned char)(L[2]));
+		y[1] = (unsigned char)(tf_q1(y[1]) ^ (unsigned char)(L[2] >> 8));
+		y[2] = (unsigned char)(tf_q0(y[2]) ^ (unsigned char)(L[2] >> 16));
+		y[3] = (unsigned char)(tf_q0(y[3]) ^ (unsigned char)(L[2] >> 24));
 	}
 
 	/* Always at least k=2 */
-	y[0] = tf_q0(tf_q0(y[0]) ^ (unsigned char)(L[1])) ^ (unsigned char)(L[0]);
-	y[1] = tf_q0(tf_q1(y[1]) ^ (unsigned char)(L[1] >> 8)) ^ (unsigned char)(L[0] >> 8);
-	y[2] = tf_q1(tf_q0(y[2]) ^ (unsigned char)(L[1] >> 16)) ^ (unsigned char)(L[0] >> 16);
-	y[3] = tf_q1(tf_q1(y[3]) ^ (unsigned char)(L[1] >> 24)) ^ (unsigned char)(L[0] >> 24);
+	y[0] = (unsigned char)(tf_q0((unsigned char)(tf_q0(y[0]) ^ (unsigned char)(L[1]))) ^ (unsigned char)(L[0]));
+	y[1] = (unsigned char)(tf_q0((unsigned char)(tf_q1(y[1]) ^ (unsigned char)(L[1] >> 8))) ^ (unsigned char)(L[0] >> 8));
+	y[2] = (unsigned char)(tf_q1((unsigned char)(tf_q0(y[2]) ^ (unsigned char)(L[1] >> 16))) ^ (unsigned char)(L[0] >> 16));
+	y[3] = (unsigned char)(tf_q1((unsigned char)(tf_q1(y[3]) ^ (unsigned char)(L[1] >> 24))) ^ (unsigned char)(L[0] >> 24));
 
 	return tf_mds_column_mult(y[0], y[1], y[2], y[3]);
 }
@@ -288,27 +288,27 @@ static void Twofish_KeySchedule(DKC_TWOFISH *ctx,
 
 		/* Column 0 */
 		b[0] = (unsigned char)i;
-		if (k == 4) b[0] = tf_q1(b[0]) ^ (unsigned char)(S_vec[3]);
-		if (k >= 3) b[0] = tf_q1(b[0]) ^ (unsigned char)(S_vec[2]);
-		b[0] = tf_q0(tf_q0(b[0]) ^ (unsigned char)(S_vec[1])) ^ (unsigned char)(S_vec[0]);
+		if (k == 4) b[0] = (unsigned char)(tf_q1(b[0]) ^ (unsigned char)(S_vec[3]));
+		if (k >= 3) b[0] = (unsigned char)(tf_q1(b[0]) ^ (unsigned char)(S_vec[2]));
+		b[0] = (unsigned char)(tf_q0((unsigned char)(tf_q0(b[0]) ^ (unsigned char)(S_vec[1]))) ^ (unsigned char)(S_vec[0]));
 
 		/* Column 1 */
 		b[1] = (unsigned char)i;
-		if (k == 4) b[1] = tf_q0(b[1]) ^ (unsigned char)(S_vec[3] >> 8);
-		if (k >= 3) b[1] = tf_q1(b[1]) ^ (unsigned char)(S_vec[2] >> 8);
-		b[1] = tf_q0(tf_q1(b[1]) ^ (unsigned char)(S_vec[1] >> 8)) ^ (unsigned char)(S_vec[0] >> 8);
+		if (k == 4) b[1] = (unsigned char)(tf_q0(b[1]) ^ (unsigned char)(S_vec[3] >> 8));
+		if (k >= 3) b[1] = (unsigned char)(tf_q1(b[1]) ^ (unsigned char)(S_vec[2] >> 8));
+		b[1] = (unsigned char)(tf_q0((unsigned char)(tf_q1(b[1]) ^ (unsigned char)(S_vec[1] >> 8))) ^ (unsigned char)(S_vec[0] >> 8));
 
 		/* Column 2 */
 		b[2] = (unsigned char)i;
-		if (k == 4) b[2] = tf_q0(b[2]) ^ (unsigned char)(S_vec[3] >> 16);
-		if (k >= 3) b[2] = tf_q0(b[2]) ^ (unsigned char)(S_vec[2] >> 16);
-		b[2] = tf_q1(tf_q0(b[2]) ^ (unsigned char)(S_vec[1] >> 16)) ^ (unsigned char)(S_vec[0] >> 16);
+		if (k == 4) b[2] = (unsigned char)(tf_q0(b[2]) ^ (unsigned char)(S_vec[3] >> 16));
+		if (k >= 3) b[2] = (unsigned char)(tf_q0(b[2]) ^ (unsigned char)(S_vec[2] >> 16));
+		b[2] = (unsigned char)(tf_q1((unsigned char)(tf_q0(b[2]) ^ (unsigned char)(S_vec[1] >> 16))) ^ (unsigned char)(S_vec[0] >> 16));
 
 		/* Column 3 */
 		b[3] = (unsigned char)i;
-		if (k == 4) b[3] = tf_q1(b[3]) ^ (unsigned char)(S_vec[3] >> 24);
-		if (k >= 3) b[3] = tf_q0(b[3]) ^ (unsigned char)(S_vec[2] >> 24);
-		b[3] = tf_q1(tf_q1(b[3]) ^ (unsigned char)(S_vec[1] >> 24)) ^ (unsigned char)(S_vec[0] >> 24);
+		if (k == 4) b[3] = (unsigned char)(tf_q1(b[3]) ^ (unsigned char)(S_vec[3] >> 24));
+		if (k >= 3) b[3] = (unsigned char)(tf_q0(b[3]) ^ (unsigned char)(S_vec[2] >> 24));
+		b[3] = (unsigned char)(tf_q1((unsigned char)(tf_q1(b[3]) ^ (unsigned char)(S_vec[1] >> 24))) ^ (unsigned char)(S_vec[0] >> 24));
 
 		/* Store per-column MDS results */
 		ctx->S[0][i] = tf_mds_column_mult(b[0], 0, 0, 0);
