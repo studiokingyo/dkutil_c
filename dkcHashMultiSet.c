@@ -186,7 +186,7 @@ int WINAPI dkcHashMultiSetErase(DKC_HASHMULTISET *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			/* remove first match only */
 			if(prev != NULL){
 				prev->next = node->next;
@@ -218,7 +218,7 @@ size_t WINAPI dkcHashMultiSetEraseAll(DKC_HASHMULTISET *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			DKC_HASHMULTISET_NODE *to_free = node;
 			if(prev != NULL){
 				prev->next = node->next;
@@ -249,7 +249,7 @@ BOOL WINAPI dkcHashMultiSetContains(const DKC_HASHMULTISET *ptr, const void *key
 	bucket = hmset_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			return TRUE;
 		}
 		node = node->next;
@@ -268,7 +268,7 @@ size_t WINAPI dkcHashMultiSetCount(const DKC_HASHMULTISET *ptr, const void *key)
 	bucket = hmset_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			n++;
 		}
 		node = node->next;

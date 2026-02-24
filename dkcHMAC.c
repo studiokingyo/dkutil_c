@@ -1,6 +1,6 @@
 
 /**
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @file dkcHMAC.c
 @brief HMAC: Keyed-Hashing for Message Authentication
 
@@ -77,7 +77,7 @@ void WINAPI dkcHMAC_SHA384Init(DKC_HMAC *p){
 }
 
 
-///‚±‚ê‚É‚æ‚éHMAC‚Ì¶¬‚ğ§—ã‚·‚éB
+///ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½HMACï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã‚·ï¿½ï¿½B
 void WINAPI dkcHMAC_SHA512Init(DKC_HMAC *p){
 
 	p->Init = (DKC_WINAPI_PROC_F_TYPE)dkcSHA512Init;
@@ -114,10 +114,10 @@ DKC_HMAC *WINAPI dkcAllocHMAC(UINT option)
 
 
 
-	//‰Šú‰»‚µ‚½’l‚©‚ç•K—v‚Èƒpƒbƒh‚ğŠm•Û
-	p->pad_size = p->sho->digest_binary_size * 4;
+	/* pad size must equal the hash function's block size (RFC 2104) */
+	p->pad_size = p->sho->block_size;
 
-	padsize = p->pad_size + 1;// + 1‚Í•¶š—ñ‚È‚Ì‚Å¥¥¥
+	padsize = p->pad_size + 1;// + 1ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½È‚Ì‚Å¥ï¿½ï¿½
 
 	p->ipad_init = 0x36;
 	p->opad_init = 0x5c;
@@ -164,15 +164,15 @@ void WINAPI dkcHMACInit(DKC_HMAC *p,const BYTE *key,size_t key_length)
 
 	if (TRUE==p->mInnerHashKeyed)
 	{
-		//’†g‚ÌƒnƒbƒVƒ…’l‚ğ‰Šú‰»
+		//ï¿½ï¿½ï¿½gï¿½Ìƒnï¿½bï¿½Vï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		dkcSHOInit(p->sho);
-		//¬Œ÷OO ’†g‚Í‚È‚¢‚æƒtƒ‰ƒO‚ğ‚·‚éB
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½O ï¿½ï¿½ï¿½gï¿½Í‚È‚ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		p->mInnerHashKeyed = FALSE;
 	}
 
 	
 
-	//ƒpƒbƒhì‚è
+	//ï¿½pï¿½bï¿½hï¿½ï¿½ï¿½
 	if(key_length <= padsize)
 	{
 		memcpy(p->ipad,key,key_length);
@@ -180,7 +180,7 @@ void WINAPI dkcHMACInit(DKC_HMAC *p,const BYTE *key,size_t key_length)
 	else
 	{
 
-#if dkcdHMAC_IMPL_STRING //•¶š—ñ”Å
+#if dkcdHMAC_IMPL_STRING //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		dkcSecureHashCalculateStringDigest(
 			p->sho->mOption,
 			(char *)p->ipad,p->pad_size,
@@ -190,7 +190,7 @@ void WINAPI dkcHMACInit(DKC_HMAC *p,const BYTE *key,size_t key_length)
 		key_length = p->sho->digest_string_size;
 		dkcmASSERT(key_length <= p->sho->digest_string_size);
 
-#else //binary”Å
+#else //binaryï¿½ï¿½
 	dkcSecureHashCalculateBinaryDigest(
 			p->sho->mOption,
 			p->ipad,p->pad_size,
@@ -204,10 +204,10 @@ void WINAPI dkcHMACInit(DKC_HMAC *p,const BYTE *key,size_t key_length)
 
 
 	dkcmASSERT(key_length <= padsize);
-	//ƒoƒbƒtƒ@‚Ì–„‚ß‡‚í‚¹
+	//ï¿½oï¿½bï¿½tï¿½@ï¿½Ì–ï¿½ï¿½ßï¿½ï¿½í‚¹
 	memset(p->ipad + key_length, 0, padsize - key_length);
 		
-	//pad‰Šú‰»
+	//padï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		BYTE *ipad,*opad,iv,ov;
 		size_t i;
@@ -230,7 +230,7 @@ void WINAPI dkcHMACInit(DKC_HMAC *p,const BYTE *key,size_t key_length)
 
 }
 
-///ipad‚ğƒnƒbƒVƒ…ŠÖ”‚É’Ê‰ß‚³‚¹‚éˆ—
+///ipadï¿½ï¿½ï¿½nï¿½bï¿½Vï¿½ï¿½ï¿½Öï¿½ï¿½É’Ê‰ß‚ï¿½ï¿½ï¿½ï¿½éˆï¿½ï¿½
 void DKC_INLINE WINAPI dkcHMACKeyInner(DKC_HMAC *p)
 {
 	dkcmASSERT(!p->mInnerHashKeyed);
@@ -261,7 +261,7 @@ int WINAPI dkcHMACFinal(DKC_HMAC *p){
 	char *temp = malloc(tempsize);
 
 #else
-	size_t tempsize = p->pad_size / 4;
+	size_t tempsize = p->sho->digest_binary_size;
 	char *temp = malloc(tempsize);
 
 #endif
@@ -290,9 +290,9 @@ int WINAPI dkcHMACFinal(DKC_HMAC *p){
 
 	dkcSHOFinal(pt);
 
-	//ƒRƒRƒoƒO‚Á‚Ä‚¢‚é‚©‚àH
+	//ï¿½Rï¿½Rï¿½oï¿½Oï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½H
 	//p->mInnerHashKeyed = FALSE;
-	//state ‚ğ 2‚É‚·‚é
+	//state ï¿½ï¿½ 2ï¿½É‚ï¿½ï¿½ï¿½
 	p->mInited = 2;
 
 	free(temp); 

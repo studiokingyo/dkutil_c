@@ -179,10 +179,10 @@ int blockEncrypt(cipherInstance *cipher, keyInstance *key,
 				rijndaelEncrypt(key->ek, key->Nr, iv, block);
                 outBuffer[k >> 3] ^= (block[0] & 0x80U) >> (k & 7);
                 for (t = 0; t < 15; t++) {
-									//d‹à‹›‰üF‘åä•v‚©‚ÈHby d‹à‹›
+									//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Fï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ÈHby dï¿½ï¿½ï¿½ï¿½
                 	iv[t] = (u8)((iv[t] << 1) | (iv[t + 1] >> 7));
                 }
-								//d‹à‹›‰üF(u8)‚Å‚­‚­‚Á‚½
+								//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½F(u8)ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                	iv[15] = (u8)( (iv[15] << 1) | ((outBuffer[k >> 3] >> (7 - (k & 7))) & 1) );
             }
             outBuffer += 16;
@@ -251,11 +251,11 @@ int padEncrypt(cipherInstance *cipher, keyInstance *key,
 		padLen = 16 - (inputOctets - 16*numBlocks);
 		assert(padLen > 0 && padLen <= 16);
 		for (i = 0; i < 16 - padLen; i++) {
-			//d‹à‹›‰üF(u8)‚Å‚­‚­‚Á‚½
+			//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½F(u8)ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			block[i] = (u8)(input[i] ^ iv[i]);
 		}
 		for (i = 16 - padLen; i < 16; i++) {
-			//d‹à‹›‰üF(u8)‚Å‚­‚­‚Á‚½
+			//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½F(u8)ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			block[i] = (u8)( (u8)padLen ^ iv[i] );
 		}
 		rijndaelEncrypt(key->rk, key->Nr, block, outBuffer);
@@ -315,10 +315,10 @@ int blockDecrypt(cipherInstance *cipher, keyInstance *key,
             for (k = 0; k < 128; k++) {
 				rijndaelEncrypt(key->ek, key->Nr, iv, block);
                 for (t = 0; t < 15; t++) {
-									//d‹à‹›‰üF(u8)‚Å‚­‚­‚Á‚½
+									//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½F(u8)ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 	iv[t] = (u8)( (iv[t] << 1) | (iv[t + 1] >> 7) );
                 }
-								//d‹à‹›‰üF(u8)‚Å‚­‚­‚Á‚½
+								//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½F(u8)ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                	iv[15] = (u8)( (iv[15] << 1) | ((input[k >> 3] >> (7 - (k & 7))) & 1) );
                 outBuffer[k >> 3] ^= (block[0] & 0x80U) >> (k & 7);
             }
@@ -364,7 +364,7 @@ int padDecrypt(cipherInstance *cipher, keyInstance *key,
 		/* last block */
 		rijndaelDecrypt(key->rk, key->Nr, input, block);
 		padLen = block[15];
-		if (padLen >= 16) {
+		if (padLen <= 0 || padLen > 16) {
 			return BAD_DATA;
 		}
 		for (i = 16 - padLen; i < 16; i++) {

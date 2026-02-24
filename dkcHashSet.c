@@ -56,7 +56,7 @@ static DKC_INLINE DKC_HASHSET_NODE *hashset_find_node(
 {
 	DKC_HASHSET_NODE *node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			return node;
 		}
 		node = node->next;
@@ -221,7 +221,7 @@ int WINAPI dkcHashSetErase(DKC_HASHSET *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			/* found - unlink and free */
 			if(prev != NULL){
 				prev->next = node->next;

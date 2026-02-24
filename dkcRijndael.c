@@ -4,13 +4,13 @@
 @brief Rijndael Algorithm Wrapper
 @note
 
-dkcRijndael.cpp‚Íd‹à‹›‚É‚æ‚Á‚Ä‰ü•Ï‚³‚ê‚Ü‚µ‚½B
+dkcRijndael.cppï¿½ï¿½dï¿½ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½ï¿½Ä‰ï¿½ï¿½Ï‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B
 dkcRijndael.cpp - modified by d.Kingyo
 
-ƒIƒŠƒWƒiƒ‹‚ÌƒR[ƒh‚¨‚æ‚Ñ‰ü•Ï‚³‚ê‚½ƒR[ƒhi‚Ìƒ‰ƒCƒZƒ“ƒXj‚ÍƒpƒuƒŠƒbƒNƒhƒƒCƒ“‚Å‚·B
+ï¿½Iï¿½ï¿½ï¿½Wï¿½iï¿½ï¿½ï¿½ÌƒRï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½Ñ‰ï¿½ï¿½Ï‚ï¿½ï¿½ê‚½ï¿½Rï¿½[ï¿½hï¿½iï¿½Ìƒï¿½ï¿½Cï¿½Zï¿½ï¿½ï¿½Xï¿½jï¿½Íƒpï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½hï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Å‚ï¿½ï¿½B
 The original code and all modification are in the public domain.
 
-‚±‚êiˆÈ‰ºj‚ÍƒIƒŠƒWƒiƒ‹‚ÌĞ‰îi•\‹Lj‚µ‚Ä‚¢‚½ƒRƒƒ“ƒgi•¶Íj‚Å‚·B
+ï¿½ï¿½ï¿½ï¿½iï¿½È‰ï¿½ï¿½jï¿½ÍƒIï¿½ï¿½ï¿½Wï¿½iï¿½ï¿½ï¿½ÌĞ‰ï¿½iï¿½\ï¿½Lï¿½jï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½ï¿½ï¿½gï¿½iï¿½ï¿½ï¿½Íjï¿½Å‚ï¿½ï¿½B
 this is the original introductory comment:
 <PRE>
 // rijndael.cpp - modified by Chris Morgan <cmorgan@wpi.edu>
@@ -79,25 +79,82 @@ Error:
 	return NULL;
 }
 
-DKC_RIJNDAEL *WINAPI dkcAllocRijndaelEncrypt(const BYTE *key,size_t keysize)
+static void rijndael_bin_to_hex(const BYTE *src, size_t len, char *dst)
 {
-	DKC_RIJNDAEL *p = dkcAllocate(sizeof(DKC_RIJNDAEL));
-	if(NULL==p){
-		return NULL;
+	static const char hex[] = "0123456789ABCDEF";
+	size_t i;
+	for(i = 0; i < len; i++){
+		dst[i*2]   = hex[(src[i] >> 4) & 0xF];
+		dst[i*2+1] = hex[src[i] & 0xF];
 	}
+	dst[len*2] = '\0';
+}
+
+DKC_RIJNDAEL *WINAPI dkcAllocRijndaelEncrypt(const BYTE *key, size_t keysize)
+{
+	DKC_RIJNDAEL *p;
+	char hexkey[MAX_KEY_SIZE + 1];
+	int r;
+
+	if(key == NULL || keysize == 0) return NULL;
+	if(keysize * 2 > MAX_KEY_SIZE) return NULL;
+
+	p = dkcAllocate(sizeof(DKC_RIJNDAEL));
+	if(NULL == p) return NULL;
+
+	p->mKey = dkcAllocate(sizeof(keyInstance));
+	if(NULL == p->mKey) goto Error;
+
+	p->mRijndael = dkcAllocate(sizeof(cipherInstance));
+	if(NULL == p->mRijndael) goto Error;
+
+	rijndael_bin_to_hex(key, keysize, hexkey);
+	r = makeKey((keyInstance *)p->mKey, DIR_ENCRYPT, (int)(keysize * 8), hexkey);
+	if(r != TRUE) goto Error;
+
+	r = cipherInit((cipherInstance *)p->mRijndael, MODE_ECB, NULL);
+	if(r != TRUE) goto Error;
 
 	return p;
+Error:
+	dkcFree((void **)&p->mRijndael);
+	dkcFree((void **)&p->mKey);
+	dkcFree((void **)&p);
+	return NULL;
 }
 
 
-DKC_RIJNDAEL *WINAPI dkcAllocRijndaelDecrypt(const BYTE *key,size_t keysize){
-	DKC_RIJNDAEL *p = dkcAllocate(sizeof(DKC_RIJNDAEL));
-	if(NULL==p){
-		return NULL;
-	}
+DKC_RIJNDAEL *WINAPI dkcAllocRijndaelDecrypt(const BYTE *key, size_t keysize)
+{
+	DKC_RIJNDAEL *p;
+	char hexkey[MAX_KEY_SIZE + 1];
+	int r;
+
+	if(key == NULL || keysize == 0) return NULL;
+	if(keysize * 2 > MAX_KEY_SIZE) return NULL;
+
+	p = dkcAllocate(sizeof(DKC_RIJNDAEL));
+	if(NULL == p) return NULL;
+
+	p->mKey = dkcAllocate(sizeof(keyInstance));
+	if(NULL == p->mKey) goto Error;
+
+	p->mRijndael = dkcAllocate(sizeof(cipherInstance));
+	if(NULL == p->mRijndael) goto Error;
+
+	rijndael_bin_to_hex(key, keysize, hexkey);
+	r = makeKey((keyInstance *)p->mKey, DIR_DECRYPT, (int)(keysize * 8), hexkey);
+	if(r != TRUE) goto Error;
+
+	r = cipherInit((cipherInstance *)p->mRijndael, MODE_ECB, NULL);
+	if(r != TRUE) goto Error;
 
 	return p;
-
+Error:
+	dkcFree((void **)&p->mRijndael);
+	dkcFree((void **)&p->mKey);
+	dkcFree((void **)&p);
+	return NULL;
 }
 typedef int (*RIJNDAEL_CALLBACK_PROCESS)(cipherInstance *, keyInstance *,
         BYTE *, int , BYTE *);
@@ -135,14 +192,22 @@ int WINAPI dkcRijndaelBlockDecrypt(DKC_RIJNDAEL *p,
 int WINAPI dkcRijndaelPadEncrypt(DKC_RIJNDAEL *p,
 																 BYTE *dest,int dsize,const BYTE *src,int ssize)
 {
-	return ProcessCall(padEncrypt,p,dest,dsize,src,ssize);
+	int r;
+	if(p == NULL || p->mRijndael == NULL || p->mKey == NULL) return edk_FAILED;
+	r = padEncrypt((cipherInstance *)p->mRijndael, (keyInstance *)p->mKey,
+	               (BYTE *)src, ssize, dest);
+	return r; /* returns byte count on success, negative on error */
 }
 
 
 int WINAPI dkcRijndaelPadDecrypt(DKC_RIJNDAEL *p,
 																 BYTE *dest,int dsize,const BYTE *src,int ssize)
 {
-	return ProcessCall(padDecrypt,p,dest,dsize,src,ssize);
+	int r;
+	if(p == NULL || p->mRijndael == NULL || p->mKey == NULL) return edk_FAILED;
+	r = padDecrypt((cipherInstance *)p->mRijndael, (keyInstance *)p->mKey,
+	               (BYTE *)src, ssize, dest);
+	return r; /* returns byte count on success, negative on error */
 }
 
 BOOL WINAPI dkcRijndaelErrorMessage(int result,char *buff,size_t size)
@@ -150,31 +215,33 @@ BOOL WINAPI dkcRijndaelErrorMessage(int result,char *buff,size_t size)
 #define RDEM_SC(a) dkc_strcpy(buff,size,a,strlen(b))
 #if 0
 	switch(result){
-	case	edkcBAD_KEY_DIR://  Key direction is invalid, e.g., unknown value 
-    RDEM_SC("ƒL[‚Ìdirectoin‚ª•s³");break;
-	case edkcBAD_KEY_MAT://  Key material not of correct length 
-		RDEM_SC("ƒL[‚ÌŒ³ƒf[ƒ^‚Ì’·‚³‚ª‘«‚è‚È‚¢‚©‚à");break;
-	case edkcBAD_KEY_MAT://  Key passed is not valid 
-		RDEM_SC("ƒL[‚Ìpassed‚ª–³Œø‚©‚à");break;
-	case edkcBAD_KEY_INSTANCE://  Params struct passed to cipherInit invalid 
-	
+	case	edkcBAD_KEY_DIR://  Key direction is invalid, e.g., unknown value
+    RDEM_SC("ï¿½Lï¿½[ï¿½ï¿½directoinï¿½ï¿½ï¿½sï¿½ï¿½");break;
+	case edkcBAD_KEY_MAT://  Key material not of correct length
+		RDEM_SC("ï¿½Lï¿½[ï¿½ÌŒï¿½ï¿½fï¿½[ï¿½^ï¿½Ì’ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½");break;
+	case edkcBAD_KEY_MAT://  Key passed is not valid
+		RDEM_SC("ï¿½Lï¿½[ï¿½ï¿½passedï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");break;
+	case edkcBAD_KEY_INSTANCE://  Params struct passed to cipherInit invalid
+
 	edkcBAD_CIPHER_MODE =     -4 ,
-	///  Cipher in wrong state (e.g., not initialized) 
+	///  Cipher in wrong state (e.g., not initialized)
 	edkcBAD_CIPHER_STATE =    -5 ,
 	edkcBAD_BLOCK_LENGTH  =   -6,
 	edkcBAD_CIPHER_INSTANCE = -7,
-	///  Data contents are invalid, e.g., invalid padding 
+	///  Data contents are invalid, e.g., invalid padding
 	edkcBAD_DATA        =     -8 ,
-	///  Unknown error 
+	///  Unknown error
 	edkcBAD_OTHER       =     -9,
 #endif
 	return TRUE;
 }
 
 int WINAPI dkcFreeRijndael(DKC_RIJNDAEL **p){
-	if(NULL==p){
+	if(NULL == p || NULL == *p){
 		return edk_FAILED;
 	}
+	dkcFree((void **)&(*p)->mRijndael);
+	dkcFree((void **)&(*p)->mKey);
 	return dkcFree((void **)p);
 }
 
@@ -195,7 +262,7 @@ int WINAPI dkcRijndaelStringKey(DKC_RIJNDAEL *p,
 
 
 #ifdef dkcdBRIAN_GLADMAN_RIJNDAEL
-//http://fp.gladman.plus.com/cryptography_technology/index.htm‚Åƒ_ƒEƒ“‚Å‚«‚é“z
+//http://fp.gladman.plus.com/cryptography_technology/index.htmï¿½Åƒ_ï¿½Eï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½z
 #include "rijndael/aes.h"
 
 
@@ -232,7 +299,7 @@ DKC_RIJNDAEL *WINAPI dkcAllocRijndaelDecrypt(const BYTE *key,size_t keysize){
 int WINAPI dkcRijndaelEncrypt(DKC_RIJNDAEL *p,BYTE *dest,size_t dsize,const BYTE *src,size_t ssize){
 	size_t i;
 	if(ssize % BLOCK_SIZE != 0){
-		//‚¿‚å‚Á‚ÆBLOCK_SIZE‚ÅŠ„‚ê‚é”‚Å‚È‚¢‚Æ‚Ë‚¥B
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BLOCK_SIZEï¿½ÅŠï¿½ï¿½ï¿½é”ï¿½Å‚È‚ï¿½ï¿½Æ‚Ë‚ï¿½ï¿½B
 		return edk_LogicError;
 	}
 	for( i=0;i<ssize;i += BLOCK_SIZE)
@@ -252,7 +319,7 @@ int WINAPI dkcRijndaelDecrypt(DKC_RIJNDAEL *p,BYTE *dest,size_t dsize,const BYTE
 	size_t i;
 	
 	if(ssize % BLOCK_SIZE != 0){
-		//‚¿‚å‚Á‚ÆBLOCK_SIZE‚ÅŠ„‚ê‚é”‚Å‚È‚¢‚Æ‚Ë‚¥B
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BLOCK_SIZEï¿½ÅŠï¿½ï¿½ï¿½é”ï¿½Å‚È‚ï¿½ï¿½Æ‚Ë‚ï¿½ï¿½B
 		return edk_LogicError;
 	}
 

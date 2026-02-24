@@ -14,7 +14,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:www.blake2.net)",
       "WebFetch(domain:datatracker.ietf.org)",
-      "WebFetch(domain:www.ietf.org)"
+      "WebFetch(domain:www.ietf.org)",
+      "Bash(python:*)"
     ]
   }
 }

@@ -142,7 +142,7 @@ static void fh_consolidate(DKC_FIBHEAP_ROOT *root)
 		d = x->degree;
 		while(d < max_degree && A[d] != NULL){
 			y = A[d];
-			if(root->compare(x->key, y->key) > 0){
+			if(root->compare(x->key, y->key, root->key_size) > 0){
 				temp = x; x = y; y = temp;
 			}
 			fh_link(y, x);
@@ -165,7 +165,7 @@ static void fh_consolidate(DKC_FIBHEAP_ROOT *root)
 				root->min = A[i];
 			}else{
 				fh_list_insert(root->min, A[i]);
-				if(root->compare(A[i]->key, root->min->key) < 0){
+				if(root->compare(A[i]->key, root->min->key, root->key_size) < 0){
 					root->min = A[i];
 				}
 			}
@@ -271,7 +271,7 @@ DKC_EXTERN DKC_FIBHEAP_NODE * WINAPI dkcFibHeapInsert(
 		ptr->min = node;
 	}else{
 		fh_list_insert(ptr->min, node);
-		if(ptr->compare(node->key, ptr->min->key) < 0){
+		if(ptr->compare(node->key, ptr->min->key, ptr->key_size) < 0){
 			ptr->min = node;
 		}
 	}
@@ -348,17 +348,17 @@ DKC_EXTERN int WINAPI dkcFibHeapDecreaseKey(DKC_FIBHEAP_ROOT *ptr,
 
 	if(ptr == NULL || node == NULL || new_key == NULL) return edk_FAILED;
 
-	if(ptr->compare(new_key, node->key) > 0) return edk_FAILED;
+	if(ptr->compare(new_key, node->key, ptr->key_size) > 0) return edk_FAILED;
 
 	memcpy(node->key, new_key, ptr->key_size);
 	y = node->parent;
 
-	if(y != NULL && ptr->compare(node->key, y->key) < 0){
+	if(y != NULL && ptr->compare(node->key, y->key, ptr->key_size) < 0){
 		fh_cut(ptr, node, y);
 		fh_cascading_cut(ptr, y);
 	}
 
-	if(ptr->compare(node->key, ptr->min->key) < 0){
+	if(ptr->compare(node->key, ptr->min->key, ptr->key_size) < 0){
 		ptr->min = node;
 	}
 
@@ -376,7 +376,7 @@ DKC_EXTERN int WINAPI dkcFibHeapMerge(DKC_FIBHEAP_ROOT *dest,
 		dest->min = src->min;
 	}else{
 		fh_list_concat(dest->min, src->min);
-		if(dest->compare(src->min->key, dest->min->key) < 0){
+		if(dest->compare(src->min->key, dest->min->key, dest->key_size) < 0){
 			dest->min = src->min;
 		}
 	}

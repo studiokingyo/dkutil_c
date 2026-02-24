@@ -209,7 +209,7 @@ int WINAPI dkcHashMultiMapErase(DKC_HASHMULTIMAP *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			/* remove first match only */
 			if(prev != NULL){
 				prev->next = node->next;
@@ -241,7 +241,7 @@ size_t WINAPI dkcHashMultiMapEraseAll(DKC_HASHMULTIMAP *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			DKC_HASHMULTIMAP_NODE *to_free = node;
 			if(prev != NULL){
 				prev->next = node->next;
@@ -271,7 +271,7 @@ BOOL WINAPI dkcHashMultiMapContains(const DKC_HASHMULTIMAP *ptr, const void *key
 	bucket = hmmap_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			return TRUE;
 		}
 		node = node->next;
@@ -290,7 +290,7 @@ size_t WINAPI dkcHashMultiMapCount(const DKC_HASHMULTIMAP *ptr, const void *key)
 	bucket = hmmap_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			n++;
 		}
 		node = node->next;
@@ -309,7 +309,7 @@ void * WINAPI dkcHashMultiMapFind(const DKC_HASHMULTIMAP *ptr,
 	bucket = hmmap_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			if(out_data_size != NULL){
 				*out_data_size = node->data_size;
 			}
@@ -331,7 +331,7 @@ int WINAPI dkcHashMultiMapGetBuffer(const DKC_HASHMULTIMAP *ptr,
 	bucket = hmmap_bucket_index(ptr, key);
 	node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			if(node->data == NULL || node->data_size == 0){
 				return edk_NoValueToProcess;
 			}

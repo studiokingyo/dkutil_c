@@ -141,7 +141,7 @@ DKC_EXTERN int WINAPI dkcSkipListInsert(DKC_SKIPLIST_ROOT *ptr,
 	x = ptr->header;
 	for(i = ptr->current_level; i >= 0; i--){
 		while(x->forward[i] != NULL &&
-		      ptr->compare(x->forward[i]->key, key) < 0){
+		      ptr->compare(x->forward[i]->key, key, ptr->key_size) < 0){
 			x = x->forward[i];
 		}
 		update[i] = x;
@@ -150,7 +150,7 @@ DKC_EXTERN int WINAPI dkcSkipListInsert(DKC_SKIPLIST_ROOT *ptr,
 	x = x->forward[0];
 
 	/* Already exists */
-	if(x != NULL && ptr->compare(x->key, key) == 0){
+	if(x != NULL && ptr->compare(x->key, key, ptr->key_size) == 0){
 		/* Update data */
 		if(x->data) dkcFree((void **)&x->data);
 		x->data = NULL;
@@ -196,14 +196,14 @@ DKC_EXTERN int WINAPI dkcSkipListErase(DKC_SKIPLIST_ROOT *ptr, const void *key)
 	x = ptr->header;
 	for(i = ptr->current_level; i >= 0; i--){
 		while(x->forward[i] != NULL &&
-		      ptr->compare(x->forward[i]->key, key) < 0){
+		      ptr->compare(x->forward[i]->key, key, ptr->key_size) < 0){
 			x = x->forward[i];
 		}
 		update[i] = x;
 	}
 
 	x = x->forward[0];
-	if(x == NULL || ptr->compare(x->key, key) != 0){
+	if(x == NULL || ptr->compare(x->key, key, ptr->key_size) != 0){
 		return edk_Not_Found;
 	}
 
@@ -233,13 +233,13 @@ DKC_EXTERN DKC_SKIPLIST_NODE * WINAPI dkcSkipListFind(
 	x = ptr->header;
 	for(i = ptr->current_level; i >= 0; i--){
 		while(x->forward[i] != NULL &&
-		      ptr->compare(x->forward[i]->key, key) < 0){
+		      ptr->compare(x->forward[i]->key, key, ptr->key_size) < 0){
 			x = x->forward[i];
 		}
 	}
 
 	x = x->forward[0];
-	if(x != NULL && ptr->compare(x->key, key) == 0){
+	if(x != NULL && ptr->compare(x->key, key, ptr->key_size) == 0){
 		return x;
 	}
 	return NULL;

@@ -255,10 +255,11 @@ void Test_Deque(void)
 /*
  * Test: dkcHashSet.c
  */
-static int WINAPIV test_hashset_int_compare(const void *a, const void *b)
+static int WINAPIV test_hashset_int_compare(const void *a, const void *b, size_t n)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
+    (void)n;
     return va - vb;
 }
 
@@ -386,10 +387,11 @@ void Test_HashSet(void)
 /*
  * Test: dkcHashMap.c
  */
-static int WINAPIV test_hashmap_int_compare(const void *a, const void *b)
+static int WINAPIV test_hashmap_int_compare(const void *a, const void *b, size_t n)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
+    (void)n;
     return va - vb;
 }
 
@@ -565,10 +567,11 @@ void Test_HashMap(void)
 /*
  * Test: dkcHashMultiSet.c
  */
-static int WINAPIV test_hmset_int_compare(const void *a, const void *b)
+static int WINAPIV test_hmset_int_compare(const void *a, const void *b, size_t n)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
+    (void)n;
     return va - vb;
 }
 
@@ -660,10 +663,11 @@ void Test_HashMultiSet(void)
 /*
  * Test: dkcHashMultiMap.c
  */
-static int WINAPIV test_hmmap_int_compare(const void *a, const void *b)
+static int WINAPIV test_hmmap_int_compare(const void *a, const void *b, size_t n)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
+    (void)n;
     return va - vb;
 }
 
@@ -1746,7 +1750,7 @@ void Test_KCipher2(void)
 /*
  * Compare function for tree int keys (shared by 2Tree and BTree)
  */
-static int compare_2tree_int(const void *a, const void *b)
+static int compare_2tree_int(const void *a, const void *b,size_t size)
 {
     int va = *(const int*)a;
     int vb = *(const int*)b;
@@ -2580,7 +2584,7 @@ void Test_Memory(void)
 /*
  * Test: dkcSort.c
  */
-static int compare_int(const void *a, const void *b)
+static int compare_int(const void *a, const void *b,size_t size)
 {
     return (*(int*)a) - (*(int*)b);
 }
@@ -2846,10 +2850,11 @@ static BOOL WINAPI test_nary_preorder_callback(DKC_NARYTREE_NODE *node, void *us
 /*
  * Compare function for AVL Tree int keys
  */
-static int WINAPIV compare_avltree_int(const void *a, const void *b)
+static int WINAPIV compare_avltree_int(const void *a, const void *b, size_t n)
 {
     int ia = *(const int *)a;
     int ib = *(const int *)b;
+    (void)n;
     if (ia < ib) return -1;
     if (ia > ib) return 1;
     return 0;
@@ -4660,10 +4665,11 @@ void Test_HeapSortStandalone(void)
  * SPLAY TREE TESTS
  * ======================================== */
 
-static int WINAPIV compare_splaytree_int(const void *a, const void *b)
+static int WINAPIV compare_splaytree_int(const void *a, const void *b, size_t n)
 {
     int ia = *(const int *)a;
     int ib = *(const int *)b;
+    (void)n;
     if (ia < ib) return -1;
     if (ia > ib) return 1;
     return 0;
@@ -5341,7 +5347,7 @@ void Test_Argon2(void)
  * Skip List Test
  * ======================================== */
 
-static int sl_int_compare(const void *a, const void *b)
+static int sl_int_compare(const void *a, const void *b,size_t size)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
@@ -5399,7 +5405,7 @@ void Test_SkipList(void)
  * Treap Test
  * ======================================== */
 
-static int treap_int_compare(const void *a, const void *b)
+static int treap_int_compare(const void *a, const void *b,size_t size)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
@@ -5453,7 +5459,7 @@ void Test_Treap(void)
  * B+ Tree Test
  * ======================================== */
 
-static int bpt_int_compare(const void *a, const void *b)
+static int bpt_int_compare(const void *a, const void *b,size_t size)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;
@@ -5524,7 +5530,7 @@ void Test_BPlusTree(void)
  * Fibonacci Heap Test
  * ======================================== */
 
-static int fh_int_compare(const void *a, const void *b)
+static int fh_int_compare(const void *a, const void *b,size_t size)
 {
     int va = *(const int *)a;
     int vb = *(const int *)b;

@@ -31,7 +31,7 @@ typedef struct dkc_HashMultiMap{
 	size_t key_size;                        /*!< key size in bytes */
 	size_t count;                           /*!< current total entries */
 	DKC_HASH_FUNC_TYPE hash_func;           /*!< hash function */
-	DKC_COMPARE_TYPE compare;               /*!< key comparison function */
+	DKC_COMPARE_TYPE compare;          /*!< key comparison function (memcmp style) */
 }DKC_HASHMULTIMAP;
 
 /*!
@@ -49,7 +49,7 @@ typedef BOOL (WINAPI *DKC_HASHMULTIMAP_FOREACH_CALLBACK)(
 @param key_size[in] key size in bytes
 @param initial_bucket_count[in] initial buckets (0 for default=16)
 @param hash_func[in] hash function (NULL for default)
-@param compare[in] key comparison function (qsort style)
+@param compare[in] key comparison function (memcmp style)
 @return pointer (NULL on failure)
 */
 DKC_EXTERN DKC_HASHMULTIMAP * WINAPI dkcAllocHashMultiMap(

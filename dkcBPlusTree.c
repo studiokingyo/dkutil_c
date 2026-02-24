@@ -113,7 +113,7 @@ static DKC_BPLUSTREE_NODE *bpt_find_leaf(DKC_BPLUSTREE_ROOT *root, const void *k
 	node = root->root;
 	while(!node->is_leaf){
 		i = 0;
-		while(i < node->num_keys && root->compare(key, node->keys[i]) >= 0){
+		while(i < node->num_keys && root->compare(key, node->keys[i], root->key_size) >= 0){
 			i++;
 		}
 		node = node->children[i];
@@ -134,12 +134,12 @@ static DKC_BPLUSTREE_NODE *bpt_insert_into_leaf(
 
 	/* Find insertion point */
 	ins = 0;
-	while(ins < leaf->num_keys && root->compare(key, leaf->keys[ins]) > 0){
+	while(ins < leaf->num_keys && root->compare(key, leaf->keys[ins], root->key_size) > 0){
 		ins++;
 	}
 
 	/* Check duplicate */
-	if(ins < leaf->num_keys && root->compare(key, leaf->keys[ins]) == 0){
+	if(ins < leaf->num_keys && root->compare(key, leaf->keys[ins], root->key_size) == 0){
 		/* Update existing */
 		bpt_free_data(&leaf->data[ins]);
 		leaf->data[ins] = bpt_copy_data(data, data_size);
@@ -202,7 +202,7 @@ static DKC_BPLUSTREE_NODE *bpt_insert_into_internal(
 	max_keys = root->order - 1;
 
 	ins = 0;
-	while(ins < node->num_keys && root->compare(key, node->keys[ins]) > 0){
+	while(ins < node->num_keys && root->compare(key, node->keys[ins], root->key_size) > 0){
 		ins++;
 	}
 
@@ -251,9 +251,8 @@ static DKC_BPLUSTREE_NODE *bpt_insert_recursive(
 		DKC_BPLUSTREE_NODE *result;
 		int prev_count = node->num_keys;
 		result = bpt_insert_into_leaf(root, node, key, data, data_size, split_key);
-		if(node->num_keys > prev_count || *split_key == NULL){
-			*inserted = (node->num_keys > prev_count || result != NULL) ? 1 : 0;
-		}
+		/* duplicate: num_keys unchanged AND result==NULL; new key: either num_keys changed or split */
+		*inserted = (node->num_keys != prev_count || result != NULL) ? 1 : 0;
 		return result;
 	}else{
 		int i;
@@ -261,7 +260,7 @@ static DKC_BPLUSTREE_NODE *bpt_insert_recursive(
 		void *child_split_key;
 
 		i = 0;
-		while(i < node->num_keys && root->compare(key, node->keys[i]) >= 0){
+		while(i < node->num_keys && root->compare(key, node->keys[i], root->key_size) >= 0){
 			i++;
 		}
 
@@ -379,7 +378,7 @@ DKC_EXTERN int WINAPI dkcBPlusTreeFind(DKC_BPLUSTREE_ROOT *ptr,
 	if(leaf == NULL) return edk_Not_Found;
 
 	for(i = 0; i < leaf->num_keys; i++){
-		if(ptr->compare(key, leaf->keys[i]) == 0){
+		if(ptr->compare(key, leaf->keys[i], ptr->key_size) == 0){
 			if(data != NULL && leaf->data[i] != NULL){
 				size_t copy_size = (size < leaf->data_sizes[i]) ? size : leaf->data_sizes[i];
 				memcpy(data, leaf->data[i], copy_size);
@@ -402,7 +401,7 @@ DKC_EXTERN int WINAPI dkcBPlusTreeErase(DKC_BPLUSTREE_ROOT *ptr, const void *key
 	if(leaf == NULL) return edk_Not_Found;
 
 	for(i = 0; i < leaf->num_keys; i++){
-		if(ptr->compare(key, leaf->keys[i]) == 0){
+		if(ptr->compare(key, leaf->keys[i], ptr->key_size) == 0){
 			bpt_free_key(&leaf->keys[i]);
 			bpt_free_data(&leaf->data[i]);
 			for(j = i; j < leaf->num_keys - 1; j++){
@@ -476,10 +475,10 @@ DKC_EXTERN int WINAPI dkcBPlusTreeRangeForeach(DKC_BPLUSTREE_ROOT *ptr,
 	while(leaf != NULL){
 		for(i = 0; i < leaf->num_keys; i++){
 			if(!started && start_key != NULL){
-				if(ptr->compare(leaf->keys[i], start_key) < 0) continue;
+				if(ptr->compare(leaf->keys[i], start_key, ptr->key_size) < 0) continue;
 				started = 1;
 			}
-			if(end_key != NULL && ptr->compare(leaf->keys[i], end_key) > 0){
+			if(end_key != NULL && ptr->compare(leaf->keys[i], end_key, ptr->key_size) > 0){
 				return edk_SUCCEEDED;
 			}
 			if(!callback(leaf->keys[i], leaf->data[i], leaf->data_sizes[i], user)){

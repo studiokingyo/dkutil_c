@@ -18,6 +18,14 @@
 #include <string.h>
 
 /* ====================================================================
+ * HashMap用 比較関数（memcmpスタイル）
+ * ==================================================================== */
+static int WINAPIV lru2_key_compare(const void *a, const void *b, size_t key_size)
+{
+	return memcmp(a, b, key_size);
+}
+
+/* ====================================================================
  * 内部ヘルパー関数
  * ==================================================================== */
 
@@ -173,7 +181,7 @@ DKC_EXTERN DKC_LRU_CACHE2* WINAPI dkcLRUCache2Create(size_t capacity, size_t key
 	bucket_count = (capacity * 3) / 2;
 	if (bucket_count < 16) bucket_count = 16;
 
-	cache->map = dkcAllocHashMap(key_size, bucket_count, NULL, NULL);
+	cache->map = dkcAllocHashMap(key_size, bucket_count, NULL, lru2_key_compare);
 	if (!cache->map) {
 		dkcFreeDoubleListObject(&cache->list);
 		free(cache);

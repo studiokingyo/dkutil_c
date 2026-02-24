@@ -29,6 +29,8 @@ typedef struct dkc_SecureHashObject{
 	size_t digest_string_size;
 	///binary hash value size
 	size_t digest_binary_size;
+	///hash function block size (used by HMAC for pad width)
+	size_t block_size;
 	UINT mOption;
 	void *mObj;
 	BYTE mInited;

@@ -1,7 +1,7 @@
 
 /*!
 @file dkcOSIndependent.c
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @
 */
 #define DKUTIL_C_OS_INDEPENDENT_C
@@ -116,11 +116,11 @@ int WINAPI dkcErrorMessage(const char *expression,
 	{
 		LPCTSTR name="ERROR_TEMP.txt";
 		{
-			//ƒtƒ@ƒCƒ‹‚ğƒI[ƒvƒ“
+			//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½
 			FILE *fp;
 			if(NULL != (fp = fopen( name , "at" ))){
 			
-				// ƒGƒ‰[ƒƒOƒtƒ@ƒCƒ‹‚É‘‚«o‚·
+				// ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Oï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Éï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
 				fputs( ss , fp ) ;
 				fclose( fp ) ;
 				Sleep(800);
@@ -130,12 +130,12 @@ int WINAPI dkcErrorMessage(const char *expression,
 		//Sleep(1000);
 		//DeleteFile(name);
 	}
-	MB("‚±‚ÌƒeƒLƒXƒg‚ğ‚±‚Ìƒ\ƒtƒg‚ÌŠJ”­Ò‚É“n‚¹‚ÎAƒoƒO”­Œ©‚Ì‹ß“¹‚È‚è‚Ü‚·B\n \
-		ŠJ”­Ò‚É’m‚ç‚¹‚é‚Æ‚«‚Í‚±‚ÌƒeƒLƒXƒg‚ğ“]‹L‚µ‚Ä‚ ‚°‚Ü‚µ‚å‚¤B");
+	MB("ï¿½ï¿½ï¿½Ìƒeï¿½Lï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Ìƒ\ï¿½tï¿½gï¿½ÌŠJï¿½ï¿½ï¿½Ò‚É“nï¿½ï¿½ï¿½ÎAï¿½oï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Ì‹ß“ï¿½ï¿½È‚ï¿½Ü‚ï¿½ï¿½B\n \
+		ï¿½Jï¿½ï¿½ï¿½Ò‚É’mï¿½ç‚¹ï¿½ï¿½Æ‚ï¿½ï¿½Í‚ï¿½ï¿½Ìƒeï¿½Lï¿½Xï¿½gï¿½ï¿½]ï¿½Lï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½å‚¤ï¿½B");
 	
 	/*if(IDYES==MessageBox(NULL,
-		"‚±‚Ì‚Ü‚Ü‚±‚Ìƒ\ƒtƒg‚ğ‹N“®‚µ‚Â‚Ã‚¯‚é‚ÆAX‚È‚éƒGƒ‰[‚ª”­¶‚·‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B\nI—¹‚µ‚Ü‚·‚©H",
-		"‚ ‚Á‚Ä‚Í‚¢‚¯‚È‚¢ ƒGƒ‰[!!!",
+		"ï¿½ï¿½ï¿½Ì‚Ü‚Ü‚ï¿½ï¿½Ìƒ\ï¿½tï¿½gï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½Â‚Ã‚ï¿½ï¿½ï¿½ÆAï¿½Xï¿½È‚ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â”\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B\nï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½H",
+		"ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚Í‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ ï¿½Gï¿½ï¿½ï¿½[!!!",
 		MB_YESNO))
 	{
 		exit(edk_FAILED);
@@ -237,15 +237,15 @@ size_t dkcReallocateSizeFunction(size_t OldSize,size_t ExpandSize){
 	//y = 0.105263 * x * x + 10.52631
 	//double x;
 //	size_t size;
-	if(OldSize <= 1024 * 5){//5KBˆÈ“à‚È‚ç2”{
+	if(OldSize <= 1024 * 5){//5KBï¿½È“ï¿½ï¿½È‚ï¿½2ï¿½{
 		return OldSize * 2;
 	}else if(OldSize >= 1024 * 1024 * 10 || 0==OldSize)
-	{//10MBˆÈã‚È‚ç + ExpandSize
+	{//10MBï¿½Èï¿½È‚ï¿½ + ExpandSize
 		return OldSize + ExpandSize;
 	}
-	//‚»‚êˆÈŠO‚È‚çExpandSize * 3
+	//ï¿½ï¿½ï¿½ï¿½ÈŠOï¿½È‚ï¿½ExpandSize * 3
 	return OldSize + ExpandSize * 3; 
-	//return OldSize * 2;//‚Ğ‚Å‚¥ŠÖ”‚¾B
+	//return OldSize * 2;//ï¿½Ğ‚Å‚ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½B
 }
 
 int WINAPI dkcReallocate(void **NewPtr,size_t NewSize,
@@ -264,13 +264,13 @@ int WINAPI dkcReallocateEx(
 	if(NULL== your_realloc  /*|| NULL == *OldPtr ||
 		0==OldSize*/
 	){
-		return edk_ArgumentException;//ƒAƒzˆø”“ü‚ê‚é‚ÈII
+		return edk_ArgumentException;//ï¿½Aï¿½zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÈIï¿½I
 	}
 
 	ptr = your_realloc(*OldPtr,NewSize);
 	if(NULL==ptr) return edk_FAILED;
 
-	//XV
+	//ï¿½Xï¿½V
 	*OldPtr = NULL;
 	*NewPtr = ptr;
 	
@@ -295,14 +295,14 @@ int WINAPI dkcReallocateAutoExpand(
 	if(NULL== your_realloc /*|| NULL==*NewPtr*/ || NULL == *OldPtr ||
 		0==OldSize  || NULL==reallocated_size	
 	){
-		return edk_ArgumentException;//ƒAƒzˆø”“ü‚ê‚é‚ÈII
+		return edk_ArgumentException;//ï¿½Aï¿½zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÈIï¿½I
 	}
 
 	for(i=0;i<div;i++){
 		ptr = your_realloc(*OldPtr,ra_size);
 		if(NULL==ptr){
-			if(OldSize > (ra_size -= tmp_ra)){//‚Æ‚è‚ ‚¦‚¸tmp_ra•ª‚ğˆø‚­B
-				break;//‚±‚ç–]‚İ‚È‚µ‚¾‚í
+			if(OldSize > (ra_size -= tmp_ra)){//ï¿½Æ‚è‚ ï¿½ï¿½ï¿½ï¿½tmp_raï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+				break;//ï¿½ï¿½ï¿½ï¿½]ï¿½İ‚È‚ï¿½ï¿½ï¿½ï¿½ï¿½
 			}
 			continue;
 		}else{
@@ -311,7 +311,7 @@ int WINAPI dkcReallocateAutoExpand(
 	}
 	if(NULL==ptr) return edk_FAILED;
 
-	//XV
+	//ï¿½Xï¿½V
 	*NewPtr = ptr;	
 	*OldPtr = NULL;
 
@@ -415,7 +415,7 @@ DKC_EXTERN size_t WINAPI dkcFReadAll(void *buffer,size_t size,FILE *fp)
 			break;
 		}
 #	ifdef DEBUG
-		//‚ ‚è‚¦‚È‚¢ƒGƒ‰[ƒ`ƒFƒbƒN
+		//ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½Gï¿½ï¿½ï¿½[ï¿½`ï¿½Fï¿½bï¿½N
 		dkcmNOT_ASSERT(count > size);
 #	else
 		if(count > size){
@@ -458,7 +458,7 @@ DKC_EXTERN size_t WINAPI dkcFWriteAll(const void *buffer,size_t size,FILE *fp){
 			break;
 		}
 #	ifdef DEBUG
-		//‚ ‚è‚¦‚È‚¢ƒGƒ‰[ƒ`ƒFƒbƒN
+		//ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½Gï¿½ï¿½ï¿½[ï¿½`ï¿½Fï¿½bï¿½N
 		dkcmNOT_ASSERT(count > size);
 #	else
 		if(count > size){
@@ -483,7 +483,7 @@ DKC_INLINE size_t WINAPI dkcFSize(FILE *fp)
 	return len;
 }
 
-//fopen‚Ìƒtƒ@ƒCƒ‹ŠÖ”‚ğg‚Á‚ÄƒoƒCƒiƒŠƒZ[ƒu‚ğs‚¤B
+//fopenï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Äƒoï¿½Cï¿½iï¿½ï¿½ï¿½Zï¿½[ï¿½uï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
 int WINAPI dkcSaveBinary(const void *data,size_t size,const char *fname){//="wb"
 	return dkcSaveFile(data,size,fname,"wb");
 }
@@ -512,7 +512,7 @@ DKC_INLINE int WINAPI dkcLoadText(char *text,size_t length,const char *fname,siz
 DKC_INLINE int WINAPI dkcInitFileFast( const char *filename )
 {
 	FILE *fp;
-	// ƒGƒ‰[ƒƒOƒtƒ@ƒCƒ‹‚ğŠJ‚­(‰Šú‰»)
+	// ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Oï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 	if(NULL==(fp = fopen( filename , "wt" ))){
 		return edk_FAILED;
 	}
@@ -529,10 +529,10 @@ DKC_INLINE  int WINAPI dkcAddLogFile( const char *filename,const char *str , ...
 	//SET_VA_LIST_INSERT_YEN_N(s,2048,str);
 	SET_VA_LIST_C(VaList,r,s,sizeof(s),str);
 
-	//ƒtƒ@ƒCƒ‹‚ğƒI[ƒvƒ“
+	//ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½
 	if(NULL == (fp = fopen( filename , "at" )))
 		return edk_FAILED;
-	// ƒGƒ‰[ƒƒOƒtƒ@ƒCƒ‹‚É‘‚«o‚·
+	// ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Oï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Éï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
 	fputs( s , fp ) ;
 	fclose( fp ) ;
 	return edk_SUCCEEDED;
@@ -542,7 +542,7 @@ DKC_INLINE  int WINAPI dkcAddLogFile( const char *filename,const char *str , ...
 BOOL WINAPI dkcSwapFast(void *p1,void *p2,size_t size)
 {
 	void *p;
-#if 0//stack overflow —áŠO‚ª”­¶‚·‚é‚Ì‚àŒ™‚¾‚©‚ç‹““®‚Í‹¤’Ê‚ÅB
+#if 0//stack overflow ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç‹“ï¿½ï¿½ï¿½Í‹ï¿½ï¿½Ê‚ÅB
 	int state = 0;
 	p = _alloca( size );
 	if(NULL==p){
@@ -659,7 +659,7 @@ DKC_INLINE void WINAPI dkcTwoDWORDToULONGLONG(ULONGLONG *dest,DWORD high,DWORD l
 	*dest += low;
 		//( high * MAXDWORD ) + low;
 }
-///@todo ƒGƒ“ƒfƒBƒAƒ“–â‘è‚ğ‚Ç‚¤‚É‚©‚µ‚æ‚¤I(‚ ‚êH
+///@todo ï¿½Gï¿½ï¿½ï¿½fï¿½Bï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½É‚ï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½I(ï¿½ï¿½ï¿½ï¿½H
 DKC_INLINE void WINAPI dkcULONGLONGToTwoDWORD(DWORD *dhigh,DWORD *dlow,ULONGLONG src){
 	DWORD *o = (DWORD *)&src;
 	dkcmNOT_ASSERT(sizeof(DWORD) * 2 != sizeof(ULONGLONG));
@@ -703,7 +703,7 @@ DKC_INLINE void WINAPI dkcTwoLONGToLONGLONG(LONGLONG *dest,LONG high,LONG low){
 }
 
 /*
-//‚Ü‚¸‚¢A‚±‚ê‚Í“ï‚µ‚¢B
+//ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½Í“ï‚µï¿½ï¿½ï¿½B
 DKC_INLINE int WINAPI dkcDataReplace(BYTE *dest,size_t destsize,
 																		 const BYTE *src,size_t srcsize,
 																		 const BYTE *target_data,size_t target_data_size,
@@ -712,13 +712,13 @@ DKC_INLINE int WINAPI dkcDataReplace(BYTE *dest,size_t destsize,
 	
 	size_t i;
 
-	//‚Æ‚è‚ ‚¦‚¸A20ŒÂ@‚Å@offset‚Ísize_t•ª
+	//ï¿½Æ‚è‚ ï¿½ï¿½ï¿½ï¿½ï¿½A20ï¿½Â@ï¿½Å@offsetï¿½ï¿½size_tï¿½ï¿½
 	DKC_QUEUE *pq = dkcAllocQueue(20,sizeof(size_t));
 	if(NULL==pq){
 		return edk_OutOfMemory;
 	}
 
-	//‚Ü‚¸‚Í’uŠ·êŠ‚ğ’T‚·
+	//ï¿½Ü‚ï¿½ï¿½Í’uï¿½ï¿½ï¿½êŠï¿½ï¿½Tï¿½ï¿½
 	for(i=0;i<srcsize;i++){
 		memcmp(&src[i],
 
@@ -879,8 +879,8 @@ static void *get_offset(void *p,size_t offset){
 }
 
 /*!
-n:”z—ñ‚ÌÄ‘ä”
-k:’²‚×‚½‚¢”Ô†i¬‚³‚¢‚¤‚¿‚©‚çj
+n:ï¿½zï¿½ï¿½ÌÄ‘ä”
+k:ï¿½ï¿½ï¿½×‚ï¿½ï¿½ï¿½ï¿½Ôï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j
 @return offset number ,Error : UINT_MAX
 */
 int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,int k,size_t width ,DKC_COMPARE_TYPE less)
@@ -912,12 +912,12 @@ int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,int k,size_t width ,D
 
 		for ( ; ; ) {
 
-			while( less(get_offset(a,i * width),x) > 0){
+			while( less(get_offset(a,i * width),x, width) > 0){
 			//while( *(int *)get_offset(a,i * width) < *(int *)x){
 				i++;
 			}
 
-			while( less(x,get_offset(a,j * width)) > 0){
+			while( less(x,get_offset(a,j * width), width) > 0){
 			//while( *(int *)x < *(int *)get_offset(a,j * width) ){
 				j--;
 			}
@@ -944,7 +944,7 @@ int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,int k,size_t width ,D
 		}
 	}
 
-	//ƒQƒbƒg‚·‚é
+	//ï¿½Qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½
 	{
 		//printf("%d",*(int *)get_offset(a,k * width));
 
@@ -1011,9 +1011,9 @@ int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,size_t k,size_t width
 		for ( ; ; ) {
 			//while (a[i] < x) i++;
 			//while(less(a[i],x)) i++;
-//#error less ‚¶‚á‚È‚­‚Ä greater ‚Å‚àAqsort‚Æ“¯‚¶d—l‚É‚·‚é‚½‚ß¥¥¥BƒXƒ}ƒ“
-			//while( less(get_offset(a,i * width),x) < 0){
-			while( less(get_offset(a,i * width),x) ){
+//#error less ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ greater ï¿½Å‚ï¿½ï¿½Aqsortï¿½Æ“ï¿½ï¿½ï¿½ï¿½dï¿½lï¿½É‚ï¿½ï¿½é‚½ï¿½ß¥ï¿½ï¿½ï¿½Bï¿½Xï¿½}ï¿½ï¿½
+			//while( less(get_offset(a,i * width),x, width) < 0){
+			while( less(get_offset(a,i * width),x, width) ){
 				i++;
 			}
 
@@ -1033,8 +1033,8 @@ int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,size_t k,size_t width
 
 			//while (x < a[j]) j--;
 			//while(less(x,a[j]) j--;
-			//while( less(x,get_offset(a,j * width)) < 0){
-			while( less(x,get_offset(a,j * width)) ){
+			//while( less(x,get_offset(a,j * width), width) < 0){
+			while( less(x,get_offset(a,j * width), width) ){
 				j--;
 			}
 
@@ -1061,7 +1061,7 @@ int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,size_t k,size_t width
 		}
 	}
 
-	//ƒQƒbƒg‚·‚é
+	//ï¿½Qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½
 	{
 		printf("%d",*(int *)get_offset(a,k * width));
 		//memcpy(,	(const void *)get_offset(a,k * width),width);

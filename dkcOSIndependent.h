@@ -1,8 +1,8 @@
 /*!
 @file dkcOSIndependent.h
-@brief “Æ—§Œn
+@brief ï¿½Æ—ï¿½ï¿½n
 @note
-Ú‚µ‚¢à–¾‚Ídkc.h‚É‘‚¢‚Ä‚¢‚Ü‚·B
+ï¿½Ú‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dkc.hï¿½Éï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
 
 */
 #ifndef DKUTIL_C_OS_INDEPENDENT_H
@@ -14,24 +14,24 @@
 
 
 
-///@return FALSE‚È‚çNative‚Èƒtƒ@ƒCƒ‹ƒpƒX‚Å‚Í‚È‚¢B
+///@return FALSEï¿½È‚ï¿½Nativeï¿½Èƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½Å‚Í‚È‚ï¿½ï¿½B
 DKC_EXTERN BOOL WINAPI dkcIsNativePathString(const char *s,size_t size);
 
 
 
 /*
-@param OldSize[in] Œ³‚Ìƒƒ‚ƒŠ—Ìˆæ‚ÌƒTƒCƒY
-@param ExpandSize[in] ‘«‚è‚È‚¢ƒƒ‚ƒŠ—Ìˆæ‚ÌƒTƒCƒY
-@return ‘½•ªA—‘zŒn‚ÌƒTƒCƒYHƒJƒiH
-@note realloc‚·‚é‚ÌÅ“K‚Èƒƒ‚ƒŠƒTƒCƒY‚ğŒvZ‚·‚éB
-(“à•”À‘•‚Í‚¿‚å‚­‚¿‚å‚­•Ï‚í‚è‚Ü‚·B
+@param OldSize[in] ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìˆï¿½ÌƒTï¿½Cï¿½Y
+@param ExpandSize[in] ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìˆï¿½ÌƒTï¿½Cï¿½Y
+@return ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½zï¿½nï¿½ÌƒTï¿½Cï¿½Yï¿½Hï¿½Jï¿½iï¿½H
+@note reallocï¿½ï¿½ï¿½éï¿½ÌÅ“Kï¿½Èƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½B
+(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½å‚­ï¿½ï¿½ï¿½å‚­ï¿½Ï‚ï¿½ï¿½Ü‚ï¿½ï¿½B
 */
 
 DKC_EXTERN  size_t dkcReallocateSizeFunction(size_t OldSize,size_t ExpandSize);
 
-///malloc()Œn ŠÖ”‚ÌŒ^
+///malloc()ï¿½n ï¿½Öï¿½ï¿½ÌŒ^
 typedef void *( WINAPIV *DKC_ALLOC_FUNC_TYPE)(size_t);
-///free()Œn ŠÖ”‚ÌŒ^
+///free()ï¿½n ï¿½Öï¿½ï¿½ÌŒ^
 typedef void (WINAPIV *DKC_FREE_FUNC_TYPE)(void *);
 
 DKC_EXTERN void *WINAPIV dkcMallocAdapter(size_t);
@@ -51,26 +51,26 @@ DKC_EXTERN  int WINAPI dkcReallocate(
 );
 
 /*!
-@param your_realloc[in] realloc‚·‚éŠÖ”
-@param NewPtr[out] V‚µ‚¢ƒƒ‚ƒŠ‹óŠÔƒAƒhƒŒƒX
-@param NewSize[in] V‚µ‚¢ƒƒ‚ƒŠ‹óŠÔƒAƒhƒŒƒX‚ÌƒTƒCƒYB
-@param OldPtr[in][out] ŒÃ‚¢ƒƒ‚ƒŠ‹óŠÔƒAƒhƒŒƒXBŠÖ”‚ª¬Œ÷‚·‚é‚ÆAOldPtr‚Í–³Œø‚É‚È‚é
-@param OldSize[in] OldPtr‚ÌƒTƒCƒY
+@param your_realloc[in] reallocï¿½ï¿½ï¿½ï¿½Öï¿½
+@param NewPtr[out] ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔƒAï¿½hï¿½ï¿½ï¿½X
+@param NewSize[in] ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔƒAï¿½hï¿½ï¿½ï¿½Xï¿½ÌƒTï¿½Cï¿½Yï¿½B
+@param OldPtr[in][out] ï¿½Ã‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔƒAï¿½hï¿½ï¿½ï¿½Xï¿½Bï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆAOldPtrï¿½Í–ï¿½ï¿½ï¿½ï¿½É‚È‚ï¿½
+@param OldSize[in] OldPtrï¿½ÌƒTï¿½Cï¿½Y
 */
-///@return edk_SUCCEEDED‚¾‚Á‚½‚ç¬Œ÷
+///@return edk_SUCCEEDEDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç¬ï¿½ï¿½
 DKC_EXTERN int WINAPI dkcReallocateEx(
 	DKC_REALLOC_F_TYPE your_realloc,void **NewPtr,size_t NewSize,
 	void **OldPtr
 );
 
 /*!
-@param your_realloc[in] realloc‚·‚éŠÖ”
-@param NewPtr[out] V‚µ‚¢ƒƒ‚ƒŠ‹óŠÔƒAƒhƒŒƒX
-@param OldPtr[in][out] ŒÃ‚¢ƒƒ‚ƒŠ‹óŠÔƒAƒhƒŒƒXBŠÖ”‚ª¬Œ÷‚·‚é‚ÆAOldPtr‚Í–³Œø‚É‚È‚é
-@param OldSize[in] OldPtr‚ÌƒTƒCƒY
-@param reallocated_size[out] Šm•Û‚µ‚½ƒTƒCƒY
+@param your_realloc[in] reallocï¿½ï¿½ï¿½ï¿½Öï¿½
+@param NewPtr[out] ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔƒAï¿½hï¿½ï¿½ï¿½X
+@param OldPtr[in][out] ï¿½Ã‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÔƒAï¿½hï¿½ï¿½ï¿½Xï¿½Bï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆAOldPtrï¿½Í–ï¿½ï¿½ï¿½ï¿½É‚È‚ï¿½
+@param OldSize[in] OldPtrï¿½ÌƒTï¿½Cï¿½Y
+@param reallocated_size[out] ï¿½mï¿½Û‚ï¿½ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
 @note
-ƒƒ‚ƒŠƒTƒCƒYŠg’£ê—p
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½gï¿½ï¿½ï¿½ï¿½p
 */
 DKC_EXTERN int WINAPI dkcReallocateAutoExpand(
 	DKC_REALLOC_F_TYPE your_realloc,void **NewPtr,
@@ -80,24 +80,24 @@ DKC_EXTERN int WINAPI dkcReallocateAutoExpand(
 DKC_EXTERN int WINAPI dkcGetMemorySize(uint64 *pTotalMemory,uint64 *pFreeMemory);
 
 /*!
-‰‰Z‚ÅSwap‚³‚¹‚éBSWAP_NUM()ƒ}ƒNƒ‚ğQÆB
+ï¿½ï¿½ï¿½Zï¿½ï¿½Swapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BSWAP_NUM()ï¿½}ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½Qï¿½ÆB
 */
 DKC_EXTERN void WINAPI 
 	dkcSwap(void *p1,void *p2,size_t size);
 /*!
-‚Ç‚ñ‚È•û–@‚Å‚à‚¢‚¢‚©‚ç‚Æ‚à‚©‚­‘¬‚­Swap‚³‚¹‚éB
+ï¿½Ç‚ï¿½È•ï¿½ï¿½@ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Swapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 @note
-size•ª‚Ìƒƒ‚ƒŠ‚ğ“®“IŠm•Û‚µ‚ÄƒXƒƒbƒv‚µ‚Ü‚·B
+sizeï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ğ“®“Iï¿½mï¿½Û‚ï¿½ï¿½ÄƒXï¿½ï¿½ï¿½bï¿½vï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 */
 
 DKC_EXTERN BOOL WINAPI dkcSwapFast(void *p1,void *p2,size_t size);
 
 /*!
-@param p1[in] ULONGLONG *‚Ìƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-@param p2[in] ULONGLONG *‚Ìƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-@param size[in] p1,p2ƒoƒbƒtƒ@‚ÌƒTƒCƒY
+@param p1[in] ULONGLONG *ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^
+@param p2[in] ULONGLONG *ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^
+@param size[in] p1,p2ï¿½oï¿½bï¿½tï¿½@ï¿½ÌƒTï¿½Cï¿½Y
 @note
-p1,p2‹¤‚ÉULONGLONG *‚É‹­§Œ^ƒLƒƒƒXƒg‚µ‚Ä‚­‚¾‚³‚¢B
+p1,p2ï¿½ï¿½ï¿½ï¿½ULONGLONG *ï¿½É‹ï¿½ï¿½ï¿½ï¿½^ï¿½Lï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 */
 DKC_EXTERN void WINAPI dkcSwap64(ULONGLONG *p1,ULONGLONG *p2,size_t size);
 
@@ -108,37 +108,37 @@ DKC_EXTERN void WINAPI dkcSwap64(ULONGLONG *p1,ULONGLONG *p2,size_t size);
 */
 
 
-///fopen‚Ì‚Ì‘æ“ñˆø”‚ª—LŒø‚È’l‚©‚Ç‚¤‚©’²‚×‚éB
+///fopenï¿½Ìï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½È’lï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×‚ï¿½B
 DKC_EXTERN BOOL dkcIs_foepn_mode(const char *s);
-///fopen‚Ìƒ‰ƒbƒp[
+///fopenï¿½Ìƒï¿½ï¿½bï¿½pï¿½[
 DKC_EXTERN FILE * WINAPI dkcFOpen(const char *filename,const char *mode);
-///fclose‚Ìƒ‰ƒbƒp[
+///fcloseï¿½Ìƒï¿½ï¿½bï¿½pï¿½[
 DKC_EXTERN int WINAPI dkcFClose(FILE **ptr);
 
-///fread‚Ì‘S•”Ó”C‚Á‚Ä“Ç‚İ‚İ‚Ü‚·ƒo[ƒWƒ‡ƒ“B(“Ç‚İ‚ß‚È‚¢ê‡‚ÍEOF‚©error)
+///freadï¿½Ì‘Sï¿½ï¿½ï¿½Ó”Cï¿½ï¿½ï¿½ï¿½ï¿½Ä“Ç‚İï¿½ï¿½İ‚Ü‚ï¿½ï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½B(ï¿½Ç‚İï¿½ï¿½ß‚È‚ï¿½ï¿½ê‡ï¿½ï¿½EOFï¿½ï¿½error)
 DKC_EXTERN size_t WINAPI dkcFReadAll(void *,size_t size,FILE *fp);
 
 
-///@see dkcFReadAll() dkcFReadAll‚Ìfwrite”Å
+///@see dkcFReadAll() dkcFReadAllï¿½ï¿½fwriteï¿½ï¿½
 DKC_EXTERN size_t WINAPI dkcFWriteAll(const void *,size_t size,FILE *fp);
 
-///dkcFileSize()‚ğ•’i‚Í‚¨g‚¢‚­‚¾‚³‚¢BƒGƒ‰[‚Ì‚Í“®ì‚Í–¢’è‹`‚Å‚·B
+///dkcFileSize()ï¿½ğ•’iï¿½Í‚ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìï¿½ï¿½Í“ï¿½ï¿½ï¿½Í–ï¿½ï¿½ï¿½`ï¿½Å‚ï¿½ï¿½B
 DKC_EXTERN size_t WINAPI dkcFSize(FILE *fp);
 
 
-///fopen‚Ìƒtƒ@ƒCƒ‹ŠÖ”‚ğg‚Á‚ÄƒoƒCƒiƒŠƒZ[ƒu‚ğs‚¤B@note —Ş—: dkcMemoryToFile()
+///fopenï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Äƒoï¿½Cï¿½iï¿½ï¿½ï¿½Zï¿½[ï¿½uï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B@note ï¿½Şï¿½: dkcMemoryToFile()
 DKC_EXTERN int WINAPI dkcSaveBinary(const void *data,size_t size,const char *fname);
-///ƒoƒCƒiƒŠƒf[ƒ^‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚ŞBdkcSaveBinary()‚Æ‘Î @note —Ş—: dkcFileToMemory()
+///ï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É“Ç‚İï¿½ï¿½ŞBdkcSaveBinary()ï¿½Æ‘ï¿½ @note ï¿½Şï¿½: dkcFileToMemory()
 DKC_EXTERN int WINAPI dkcLoadBinary(void *data,size_t size,const char *fname,size_t *readsize);
-///fopen‚ÅƒeƒLƒXƒgƒZ[ƒu‚ğs‚¤
+///fopenï¿½Åƒeï¿½Lï¿½Xï¿½gï¿½Zï¿½[ï¿½uï¿½ï¿½ï¿½sï¿½ï¿½
 DKC_EXTERN int WINAPI dkcSaveText(const char *text,size_t length,const char *fname);
-///ƒeƒLƒXƒgƒf[ƒ^‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚ŞBdkcSaveText()‚Æ‘Î
+///ï¿½eï¿½Lï¿½Xï¿½gï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É“Ç‚İï¿½ï¿½ŞBdkcSaveText()ï¿½Æ‘ï¿½
 DKC_EXTERN int WINAPI dkcLoadText(char *text,size_t length,const char *fname,size_t *readsize);
-///‹óƒtƒ@ƒCƒ‹‚ğì‚éB
+///ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 DKC_EXTERN BOOL WINAPI dkcCreateEmptyFile(const char *filename);
-///ƒGƒ‰[ƒƒO(ƒtƒ@ƒCƒ‹)‚ğ‚‘¬‚É‰Šú‰»‚·‚éA@note Š®‘S‚É–•Á‚·‚é‚í‚¯‚Å‚Í‚È‚¢ @param filename[in] ƒtƒ@ƒCƒ‹‚Ì–¼‘O
+///ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½O(ï¿½tï¿½@ï¿½Cï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A@note ï¿½ï¿½ï¿½Sï¿½É–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½í‚¯ï¿½Å‚Í‚È‚ï¿½ @param filename[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
 DKC_EXTERN int WINAPI dkcInitFileFast( const char *filename );
-///ƒƒO‚ğ“f‚­ @param filename[in] ƒtƒ@ƒCƒ‹ƒl[ƒ€ @param str[in] “f‚­•¶š—ñ @note o—Í‘¬“x‚ª’x‚¢‚Ì‚Å‘½—p‚Í§—ã‚µ‚È‚¢
+///ï¿½ï¿½ï¿½Oï¿½ï¿½fï¿½ï¿½ @param filename[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½lï¿½[ï¿½ï¿½ @param str[in] ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ @note ï¿½oï¿½Í‘ï¿½ï¿½xï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Ì‚Å‘ï¿½ï¿½pï¿½Íï¿½ï¿½ã‚µï¿½È‚ï¿½
 DKC_EXTERN  int WINAPI dkcAddLogFile( const char *filename,const char *str , ... );
 
 DKC_EXTERN void WINAPI dkcTwoDWORDToULONGLONG(ULONGLONG *dest,DWORD high,DWORD low);
@@ -150,7 +150,7 @@ DKC_EXTERN void WINAPI dkcLONGLONGToTwoLONG(LONG *high,LONG *low,LONGLONG src);
 DKC_EXTERN void WINAPI dkcTwoLONGToLONGLONG(LONGLONG *dest,LONG high,LONG low);
 
 
-///@note ƒGƒ“ƒfƒBƒAƒ“ŠÂ‹«‚É‚æ‚Á‚Äãè‚­o—ˆ‚é‚©•ª‚©‚ç‚È‚¢
+///@note ï¿½Gï¿½ï¿½ï¿½fï¿½Bï¿½Aï¿½ï¿½ï¿½Â‹ï¿½ï¿½É‚ï¿½ï¿½ï¿½Äï¿½è‚­ï¿½oï¿½ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½
 DKC_INLINE void dkcTwoLONGToULONGLONG(ULONGLONG *dest,LONG high,LONG low){
 	ULONG *p = (ULONG *)&low,*p2;
 	*dest = *p;
@@ -185,17 +185,17 @@ DKC_EXTERN int WINAPI dkcErrorMessage(const char *expression,
 #	define dkcmFORCE_NOT_ASSERT_MESSAGE(ex,mes) ( (ex) && dkcErrorMessage(#ex,__FILE__,__LINE__,mes) )
 #	define dkcmFORCE_ASSERT_MESSAGE(ex,mes) ( (ex) || dkcErrorMessage(#ex,__FILE__,__LINE__,mes) )
 
-///@return path separator‚Ì“ü‚Á‚½•¶š—ñ(1byte–ˆ‚Épath separator‚Ì•¶š’è”‚ª“ü‚Á‚Ä‚¢‚é)‚ğƒQƒbƒg										 
+///@return path separatorï¿½Ì“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(1byteï¿½ï¿½ï¿½ï¿½path separatorï¿½Ì•ï¿½ï¿½ï¿½ï¿½è”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½)ï¿½ï¿½ï¿½Qï¿½bï¿½g										 
 DKC_EXTERN const char *WINAPI dkcGetPathSep();
 
 /**
-@param isForceExit[in] TRUE‚ğw’è‚·‚é‚Ædkutil_c‚Ì§—ãŠÂ‹«‚Æˆá‚Á‚½ê‡A‹­§I—¹‚·‚éB
+@param isForceExit[in] TRUEï¿½ï¿½ï¿½wï¿½è‚·ï¿½ï¿½ï¿½dkutil_cï¿½Ìï¿½ï¿½ï¿½Â‹ï¿½ï¿½Æˆï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 @return edk_Result
 */
 DKC_EXTERN int dkcDynamicCheckEnvironment(BOOL isForceExit);
-///@param flag[in] TRUE‚Åƒ`ƒFƒbƒN‚ğ—LŒø
+///@param flag[in] TRUEï¿½Åƒ`ï¿½Fï¿½bï¿½Nï¿½ï¿½Lï¿½ï¿½
 DKC_EXTERN void WINAPI dkcCheckMemoryLeak(BOOL flag);
-///@return MMX‚ªg‚¦‚é‚È‚çTRUE
+///@return MMXï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½È‚ï¿½TRUE
 DKC_EXTERN BOOL WINAPI dkcIsMMX();
 
 
@@ -215,16 +215,16 @@ DKC_EXTERN BOOL WINAPI dkcIsMMX();
 #	define dkcmREVERSE_ENDIAN64(x) dkcReverseEndian64(x)
 
 #endif
-///@note  General Function Library  Copyright (C) 2000,2001 SYN All Rights Reserved.‚æ‚è
+///@note  General Function Library  Copyright (C) 2000,2001 SYN All Rights Reserved.ï¿½ï¿½ï¿½
 DKC_EXTERN ULONG dkcReverseEndian32(ULONG x);
-///@note  General Function Library  Copyright (C) 2000,2001 SYN All Rights Reserved.‚æ‚è
+///@note  General Function Library  Copyright (C) 2000,2001 SYN All Rights Reserved.ï¿½ï¿½ï¿½
 DKC_EXTERN ULONGLONG dkcReverseEndian64(ULONGLONG x);
 ///endian change 16 bit version
 DKC_EXTERN USHORT dkcReverseEndian16(USHORT x);
 
-///@return little endian ‚È‚çTRUE
+///@return little endian ï¿½È‚ï¿½TRUE
 DKC_EXTERN BOOL dkcIsLittleEndian();
-///@return big endian‚È‚çTRUE
+///@return big endianï¿½È‚ï¿½TRUE
 #define dkcIsBigEndian() (!dkcIsLittleEndian())
 
 enum edkcByteOrder{
@@ -243,7 +243,7 @@ typedef union dkc_byte_order_check_union{
 ///@return enum edkcByteOrder
 DKC_EXTERN int WINAPI dkcGetByteOrder();
 
-///unsigned longŒ^‚Ì“ñ‚Â‚Ì®”‚ğƒvƒ‰ƒX‚µ‚½‚çƒI[ƒo[ƒtƒ[‚·‚é‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN‚·‚éB
+///unsigned longï¿½^ï¿½Ì“ï¿½Â‚Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½oï¿½[ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½Fï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½B
 DKC_EXTERN BOOL dkcCheckOverflowULONG(ULONG a1,ULONG a2);
 DKC_EXTERN BOOL dkcCheckOverflowULONGLONG(ULONGLONG a1,ULONGLONG a2);
 
@@ -251,19 +251,19 @@ DKC_EXTERN BOOL dkcCheckOverflowULONGLONG(ULONGLONG a1,ULONGLONG a2);
 #define dkcCheckOverflow64(a,b) dkcCheckOverflowULONGLONG(a,b)
 
 
-typedef int (WINAPIV *DKC_COMPARE_TYPE)(const void *,const void *);
+typedef int (WINAPIV *DKC_COMPARE_TYPE)(const void *, const void *, size_t);
 
 /*!
-@param dest[out] ‚”Ô–Ú‚Ìƒf[ƒ^‚ğ“ü‚ê‚é‚½‚ß‚Ìƒoƒbƒtƒ@ widthƒoƒCƒg‚Ìƒoƒbƒtƒ@‚ª•K—v
-@param a_src[in] ƒƒ‚ƒŠ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-@param n[in] ‰½ŒÂ‚Ì—v‘f‚ª‚ ‚é‚©
-@param k[in] ‰½ŒÂ–Ú‚Ì—v‘f‚ÌƒIƒtƒZƒbƒg‚ğ’m‚è‚½‚¢‚©
-@param width[in] ƒIƒtƒZƒbƒg
-@param less[in] LESS‚ÌƒRƒ“ƒyƒAŠÖ”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-@return edk_SUCCEEDED‚Å¬Œ÷
-ƒIƒtƒZƒbƒg’l‚Í (BYTE *)a_src + width * offset ‚Å‚ ‚éB
+@param dest[out] ï¿½ï¿½ï¿½Ô–Ú‚Ìƒfï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ß‚Ìƒoï¿½bï¿½tï¿½@ widthï¿½oï¿½Cï¿½gï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½Kï¿½v
+@param a_src[in] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^
+@param n[in] ï¿½ï¿½ï¿½Â‚Ì—vï¿½fï¿½ï¿½ï¿½ï¿½ï¿½é‚©
+@param k[in] ï¿½ï¿½ï¿½Â–Ú‚Ì—vï¿½fï¿½ÌƒIï¿½tï¿½Zï¿½bï¿½gï¿½ï¿½mï¿½è‚½ï¿½ï¿½ï¿½ï¿½
+@param width[in] ï¿½Iï¿½tï¿½Zï¿½bï¿½g
+@param less[in] LESSï¿½ÌƒRï¿½ï¿½ï¿½yï¿½Aï¿½Öï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^
+@return edk_SUCCEEDEDï¿½Åï¿½ï¿½ï¿½
+ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½lï¿½ï¿½ (BYTE *)a_src + width * offset ï¿½Å‚ï¿½ï¿½ï¿½B
 @note
-‚¿‚È‚İ‚Éa_src‚É“n‚µ‚½ƒ|ƒCƒ“ƒ^‚Í“à•”‚Åƒƒ‚ƒŠŠm•Û‚³‚êAƒRƒs[‚³‚ê‚Ü‚·B
+ï¿½ï¿½ï¿½È‚İ‚ï¿½a_srcï¿½É“nï¿½ï¿½ï¿½ï¿½ï¿½|ï¿½Cï¿½ï¿½ï¿½^ï¿½Í“ï¿½ï¿½ï¿½ï¿½Åƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½Û‚ï¿½ï¿½ï¿½Aï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 @code
 int greater_comp(const void *v1,const void *v2){
 	return *( ( int * ) v2 ) - *( ( int * ) v1 );
@@ -276,17 +276,17 @@ void test()
 }
 @endcode
 */
-///‚¢‚í‚¢‚éƒZƒŒƒNƒg(‘I‘ğ)ƒAƒ‹ƒSƒŠƒYƒ€
+///ï¿½ï¿½ï¿½í‚¢ï¿½ï¿½Zï¿½ï¿½ï¿½Nï¿½g(ï¿½Iï¿½ï¿½)ï¿½Aï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½
 DKC_EXTERN int WINAPI dkcSelect(void *dest,const void *a_src,size_t n,int k,size_t width ,DKC_COMPARE_TYPE comp);
 
 /*!
-Å‘å’l‚ğ‘I‘ğ‚·‚é
-@see dkcSelect() ‚Ì ˆø”k‚ª–³‚¢‚¾‚¯
+ï¿½Å‘ï¿½lï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+@see dkcSelect() ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 DKC_EXTERN int WINAPI dkcSelectMax(void *dest,const void *a, size_t n,size_t width ,DKC_COMPARE_TYPE comp);
 /*!
-Å¬’l‚ğ‘I‘ğ‚·‚é 
-@see dkcSelect() ‚Ì ˆø”k‚ª–³‚¢‚¾‚¯
+ï¿½Åï¿½ï¿½lï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+@see dkcSelect() ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 DKC_EXTERN int WINAPI dkcSelectMin(void *dest,const void *a, size_t n,size_t width ,DKC_COMPARE_TYPE comp);
 
@@ -329,7 +329,7 @@ DKC_FORCE_INLINE void *dkcSecureZeroMemory(void  *ptr, size_t cnt)
 }
 
 
-///“Ç‚İ‚ß‚È‚¢iFALSEj‚Ífeof‚âferror()‚ğg‚Á‚Ä‚­‚¾‚³‚¢B
+///ï¿½Ç‚İï¿½ï¿½ß‚È‚ï¿½ï¿½ï¿½ï¿½iFALSEï¿½ï¿½ï¿½jï¿½ï¿½feofï¿½ï¿½ferror()ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 DKC_INLINE BOOL dkcFReadAllCheck(void *buff,size_t size,FILE *fp)
 {
 	if(size != dkcFReadAll(buff,size,fp))
@@ -345,7 +345,7 @@ DKC_INLINE BOOL dkcFWriteAllCheck(const void *buff,size_t size,FILE *fp)
 
 
 
-///‘Ã“–‚Èƒeƒ“ƒ|ƒ‰ƒŠƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ•Ô‚·
+///ï¿½Ã“ï¿½ï¿½Èƒeï¿½ï¿½ï¿½|ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½Ô‚ï¿½
 DKC_INLINE size_t dkcGetProperTemporaryBufferSize(){
 	uint64 total_size,free_size;
 	if(DKUTIL_FAILED(dkcGetMemorySize(&total_size,&free_size)))
@@ -357,7 +357,7 @@ DKC_INLINE size_t dkcGetProperTemporaryBufferSize(){
 	{
 		return 1024;
 	}
-	//freespace‚ª”¼•ª‚æ‚è‚ ‚Á‚½‚ç
+	//freespaceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if(free_size > total_size / 2)
 	{
 		return total_size / 0x4000;//32768
@@ -392,14 +392,14 @@ namespace dkutil{
 
 /*!
 
-@param data[in] ƒtƒ@ƒCƒ‹‚Ìƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^(void *)‚ÉƒLƒƒƒXƒg‚µ‚Ä‚Ô‚¿‚ñ‚Å‚­‚¾‚³‚¢B
-@param size[in] ƒtƒ@ƒCƒ‹‚Ìƒf[ƒ^‚ÌƒTƒCƒY@(‘‚«‚ŞƒTƒCƒY)
-@param fname[in] ƒtƒ@ƒCƒ‹‚Ì–¼‘O
-@param mode[in] ƒfƒtƒHƒ‹ƒg‚Å="wb" ƒI[ƒvƒ“ƒ‚[ƒh Ú‚µ‚­‚ÍMSDN‚ÌfopenŠÖ”‚ğŒ©‚æI
-@return true=¬Œ÷ false=¸”s
+@param data[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^(void *)ï¿½ÉƒLï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Ä‚Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+@param size[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½ÌƒTï¿½Cï¿½Yï¿½@(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ŞƒTï¿½Cï¿½Y)
+@param fname[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
+@param mode[in] ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½="wb" ï¿½Iï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½h ï¿½Ú‚ï¿½ï¿½ï¿½ï¿½ï¿½MSDNï¿½ï¿½fopenï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+@return true=ï¿½ï¿½ï¿½ï¿½ false=ï¿½ï¿½ï¿½s
 
 */
-///fopen‚Ìƒtƒ@ƒCƒ‹ŠÖ”‚ğg‚Á‚ÄƒoƒCƒiƒŠƒZ[ƒu‚ğs‚¤B
+///fopenï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Äƒoï¿½Cï¿½iï¿½ï¿½ï¿½Zï¿½[ï¿½uï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
 inline bool SaveBinary(const void *data,size_t size,const char *fname,const char *mode="wb"){//="wb"
 	FILE *fp;
 	fp = fopen( fname , mode ) ;//wb
@@ -413,13 +413,13 @@ inline bool SaveBinary(const void *data,size_t size,const char *fname,const char
 }
 
 /*!
-@param data[out] ƒtƒ@ƒCƒ‹‚Ìƒf[ƒ^‚Ìƒoƒbƒtƒ@ (void *)‚ÉƒLƒƒƒXƒg‚µ‚Ä‚Ô‚¿‚ñ‚Å‚­‚¾‚³‚¢B
-@param size[in] ƒtƒ@ƒCƒ‹‚Ìƒf[ƒ^‚Ìƒoƒbƒtƒ@ƒTƒCƒY@(“Ç‚İ‚ŞƒTƒCƒY)
-@param fname[in] ƒtƒ@ƒCƒ‹‚Ì–¼‘O
-@param mode[in] ƒfƒtƒHƒ‹ƒg‚Å="rb" ƒI[ƒvƒ“ƒ‚[ƒh Ú‚µ‚­‚ÍMSDN‚ÌfopenŠÖ”‚ğŒ©‚æI
-@return true=¬Œ÷ false=¸”s
+@param data[out] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½Ìƒoï¿½bï¿½tï¿½@ (void *)ï¿½ÉƒLï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Ä‚Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+@param size[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½Tï¿½Cï¿½Yï¿½@(ï¿½Ç‚İï¿½ï¿½ŞƒTï¿½Cï¿½Y)
+@param fname[in] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
+@param mode[in] ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½="rb" ï¿½Iï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½h ï¿½Ú‚ï¿½ï¿½ï¿½ï¿½ï¿½MSDNï¿½ï¿½fopenï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½I
+@return true=ï¿½ï¿½ï¿½ï¿½ false=ï¿½ï¿½ï¿½s
 */
-///ƒoƒCƒiƒŠƒf[ƒ^‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚ŞBSaveBinary()‚Æ‘Î
+///ï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É“Ç‚İï¿½ï¿½ŞBSaveBinary()ï¿½Æ‘ï¿½
 inline bool LoadBinary(void *data,size_t size,const char *fname,const char *mode="rb" ){//="rb"
 	FILE *fp ;
 	fp = fopen( fname , mode ) ;//rb

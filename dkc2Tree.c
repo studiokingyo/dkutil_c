@@ -1,10 +1,10 @@
 
 /*!
 @file dkc2Tree.c
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @since 2004/12/13
 @note
-ŽQl•¶Œ£F‚bŒ¾Œê‚É‚æ‚éÅVƒAƒ‹ƒSƒŠƒYƒ€Ž–“T tree.c
+ï¿½Qï¿½lï¿½ï¿½ï¿½ï¿½ï¿½Fï¿½bï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½ÅVï¿½Aï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½T tree.c
 */
 
 #define DKUTIL_C_2TREE_C
@@ -137,9 +137,9 @@ DKC_2TREE_ROOT * WINAPI
 	if(NULL==root->sentinel){
 		goto Error;
 	}
-	//”Ô•º‚ð“ü‚ê‚Ä‚¨‚­
+	//ï¿½Ô•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
 	root->root = root->sentinel;
-	//–³ŒÀƒ‹[ƒv‚É‚È‚ç‚È‚¢‚æ‚¤‚ÉƒR[ƒfƒBƒ“ƒO‚µ‚È‚­‚Ä‚Í¥¥¥
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½vï¿½É‚È‚ï¿½È‚ï¿½ï¿½æ‚¤ï¿½ÉƒRï¿½[ï¿½fï¿½Bï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½È‚ï¿½ï¿½Ä‚Í¥ï¿½ï¿½
 	root->sentinel->left = root->sentinel->right = root->sentinel;
 	return root;
 Error:
@@ -201,10 +201,10 @@ DKC_INLINE int dkcFree2TreeWithVector(DKC_2TREE_ROOT *ptr){
 
 
 #ifdef _MSC_VER
-//stack overflow Œx
+//stack overflow ï¿½xï¿½ï¿½
 #	pragma warning(disable:4717)
 #endif
-///pp‚©‚ç¶A‰E‚É‚Â‚¢‚½—t‚ðíœ
+///ppï¿½ï¿½ï¿½ç¶ï¿½Aï¿½Eï¿½É‚Â‚ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½íœ
 void dkcFree2TreeReflexive(DKC_2TREE_ROOT *ptr,DKC_2TREE_NODE **pp)
 {
 
@@ -240,7 +240,7 @@ int dkcFree2TreeReflexiveBegin(DKC_2TREE_ROOT *ptr){
 	if(ptr->sentinel==ptr->root){
 		goto End;
 	}
-	//root‚©‚ç¶A‰E‚É‚Â‚¢‚½—t‚ðíœ
+	//rootï¿½ï¿½ï¿½ç¶ï¿½Aï¿½Eï¿½É‚Â‚ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½íœ
 	dkcFree2TreeReflexive(ptr,&(ptr->root));
 	erase_tree_with_node(ptr,&(ptr->root));
 End:
@@ -299,11 +299,11 @@ int WINAPI dkc2TreeInsert(DKC_2TREE_ROOT *ptr,
 
 	p = &(ptr->root);
 
-	//”Ô•º
+	//ï¿½Ô•ï¿½
 	memcpy(ptr->sentinel->key,Key,ptr->key_size);
 
 	for(;;){
-		cmp = compare(Key, (*p)->key);
+		cmp = compare(Key, (*p)->key, ptr->key_size);
 		if(0==cmp){
 			break;
 		}
@@ -315,7 +315,7 @@ int WINAPI dkc2TreeInsert(DKC_2TREE_ROOT *ptr,
 	}
 		
 	if (*p != ptr->sentinel)
-	{//“o˜^Ï‚Ý
+	{//ï¿½oï¿½^ï¿½Ï‚ï¿½
 		return edk_FAILED;
 	}
 
@@ -393,12 +393,12 @@ int WINAPI dkc2TreeEraseFromKey(DKC_2TREE_ROOT *ptr,const void *Key)
 		return edk_FAILED;
 	}
 
-	//”Ô•º
+	//ï¿½Ô•ï¿½
 	memcpy(ptr->sentinel->key,Key,ptr->key_size);
 
 	for(;;){
-		tr = compare(Key,(*p)->key);
-		if(0==tr){//“¯‚¶ƒL[‚ª‚ ‚é
+		tr = compare(Key,(*p)->key, ptr->key_size);
+		if(0==tr){//ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			break;
 		}
 		if(tr < 0){
@@ -408,7 +408,7 @@ int WINAPI dkc2TreeEraseFromKey(DKC_2TREE_ROOT *ptr,const void *Key)
 		}
 	}
 	if(*p == ptr->sentinel)
-	{//Œ©‚Â‚©‚ç‚¸
+	{//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ç‚¸
 		return edk_FAILED;
 	}
 
@@ -432,7 +432,7 @@ DKC_2TREE_NODE * WINAPI dkc2TreeSearchWithStack(DKC_2TREE_NODE *ptr,DKC_STACK *p
 
 #if 1
 
-///@return 0Œ©‚Â‚©‚ç‚È‚¢ 1Œ©‚Â‚©‚Á‚½ 
+///@return 0ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ 1ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ 
 static int WINAPI tree_exist_reflexive(DKC_2TREE_ROOT *ptr,
 																			 DKC_2TREE_NODE *node,DKC_2TREE_NODE **leaf_ptr,
 																			const DKC_2TREE_NODE *target,DKC_2TREE_NODE *parent,
@@ -452,19 +452,19 @@ static int WINAPI tree_exist_reflexive(DKC_2TREE_ROOT *ptr,
 	if(parent == NULL){
 		parent = node;
 	}
-	//¶
+	//ï¿½ï¿½
 	t = tree_exist_reflexive(ptr,node->left,&(node->left),target,node,re);
 	if(t != 0){
 		return t;
 	}
 
-	//‰E
+	//ï¿½E
 	t = tree_exist_reflexive(ptr,node->right,&(node->right),target,node,re);
 	if(t != 0){
 		return t;
 	}
 
-	//Œ©‚Â‚©‚ç‚È‚¢¥¥¥B
+	//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½B
 	return 0;
 }
 
@@ -479,7 +479,7 @@ DKC_2TREE_EXIST WINAPI dkc2TreeExist(DKC_2TREE_ROOT *ptr,const DKC_2TREE_NODE *n
 	re.node = ptr->sentinel;
 	re.parent = re.node;
 
-	if(ptr->root == ptr->sentinel){//’†‚É‚Í‰½‚à–³‚µ¥¥¥
+	if(ptr->root == ptr->sentinel){//ï¿½ï¿½ï¿½É‚Í‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		goto End;
 	}
 	if(ptr->root == node){
@@ -490,14 +490,14 @@ DKC_2TREE_EXIST WINAPI dkc2TreeExist(DKC_2TREE_ROOT *ptr,const DKC_2TREE_NODE *n
 		goto End;
 	}
 
-	//¶
+	//ï¿½ï¿½
 	t = tree_exist_reflexive(ptr,root->left,&(root->left),node,
 		NULL,&re);
 	if(t != 0){
 		goto End;
 	}
 
-	//‰E
+	//ï¿½E
 	tree_exist_reflexive(ptr,root->right,&(root->right),node,
 		NULL,&re);
 	
@@ -509,7 +509,7 @@ End:
 
 #elif 0
 
-///0ˆÈŠO‚¾‚Á‚½‚çŒÄ‚Ño‚µŒ³‚Í‚»‚Ì’l‚ðreturn‚·‚é‚æ‚¤‚É‚·‚éB
+///0ï¿½ÈŠOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½Ì’lï¿½ï¿½returnï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½B
 static DKC_INLINE int exist_check(int t,DKC_2TREE_NODE *node,DKC_2TREE_NODE **leaf_ptr,
 																	DKC_2TREE_EXIST *re){
 	switch(t){
@@ -519,13 +519,13 @@ static DKC_INLINE int exist_check(int t,DKC_2TREE_NODE *node,DKC_2TREE_NODE **le
 		re->parent = node;
 		re->leaf_ptr = leaf_ptr;
 		return 2;
-	//jump table‚ðì¬‚³‚¹‚é‚½‚ß‚É default‚ÍŽg‚í‚È‚¢
+	//jump tableï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ß‚ï¿½ defaultï¿½ÍŽgï¿½ï¿½È‚ï¿½
 	}
 	return 0;
 }
 
 
-///@return 0Œ©‚Â‚©‚ç‚È‚¢ 1Œ©‚Â‚©‚Á‚½ 2Œ‹‰Ê‚ð‚·‚×‚Ä•Ô‚µ‚½B
+///@return 0ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ 1ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½ï¿½×‚Ä•Ô‚ï¿½ï¿½ï¿½ï¿½B
 static int WINAPI tree_exist_reflexive(DKC_2TREE_ROOT *ptr,DKC_2TREE_NODE *node,
 																				DKC_2TREE_NODE *target,DKC_2TREE_EXIST *re)
 {
@@ -539,21 +539,21 @@ static int WINAPI tree_exist_reflexive(DKC_2TREE_ROOT *ptr,DKC_2TREE_NODE *node,
 		re->node = node;
 		return 1;
 	}
-	//¶
+	//ï¿½ï¿½
 	t = tree_exist_reflexive(ptr,node->left,target,re);
 	t = exist_check(t,node,&(node->left),re);
 	if(t != 0){
 		return t;
 	}
 
-	//‰E
+	//ï¿½E
 	t = tree_exist_reflexive(ptr,node->right,target,re);
 	t = exist_check(t,node,&(node->right),re);
 	if(t != 0){
 		return t;
 	}
 
-	//Œ©‚Â‚©‚ç‚È‚¢¥¥¥B
+	//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½B
 	return 0;
 }
 
@@ -570,17 +570,17 @@ DKC_2TREE_EXIST WINAPI dkc2TreeExist(DKC_2TREE_ROOT *ptr,DKC_2TREE_NODE *node)
 
 
 
-	//¶
+	//ï¿½ï¿½
 	t = tree_exist_reflexive(ptr,tp->left,node,&re);
 	t = exist_check(t,tp,&(tp->left),&re);
 	if(t != 0){
 		goto End;
 	}
 
-	//‰E
+	//ï¿½E
 	t = tree_exist_reflexive(ptr,tp->right,node,&re);
 	t = exist_check(t,tp,&(tp->right),&re);
-	if(t != 0){//–³‚­‚Ä‚à‚¢‚¢‚ª¥¥¥
+	if(t != 0){//ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		goto End;
 	}
@@ -608,7 +608,7 @@ DKC_2TREE_EXIST WINAPI dkc2TreeExist(DKC_2TREE_ROOT *ptr,const DKC_2TREE_NODE *n
 
 	
 	
-	//¶
+	//ï¿½ï¿½
 	for(;;){
 		
 		if(it1 == node){
@@ -642,11 +642,11 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindEqual(DKC_2TREE_ROOT *ptr,const void* Key)
 	
 	dkcmASSERT(compare);
 
-	//”Ô•º
+	//ï¿½Ô•ï¿½
 	memcpy(ptr->sentinel->key,Key,ptr->key_size);
 	for(;;){
 		
-		tr = compare(Key,it->key);
+		tr = compare(Key,it->key, ptr->key_size);
 		if(0==tr){
 			break;
 		}
@@ -657,7 +657,7 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindEqual(DKC_2TREE_ROOT *ptr,const void* Key)
 		}
 
 	}
-	if(it == ptr->sentinel){//Œ©‚Â‚©‚ç‚ñ
+	if(it == ptr->sentinel){//ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½
 		return NULL;
 	}
 	return it;
@@ -671,7 +671,7 @@ static DKC_2TREE_NODE *find_lg_base(DKC_2TREE_ROOT *ptr,const void* Key,BOOL isG
 	//*save;
 	DKC_COMPARE_TYPE compare = ptr->compare;
 	int tr;
-	//0 ‰Šú / 1 ‘O‚ªKey‚Ì•û‚ª¬‚³‚¢ƒL[ / 2 ‘O‚ªKey‚Ì•û‚ª‘å‚«‚¢ƒL[
+	//0 ï¿½ï¿½ï¿½ï¿½ / 1 ï¿½Oï¿½ï¿½Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ / 2 ï¿½Oï¿½ï¿½Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Lï¿½[
 	//
 	int state = 0;
 	
@@ -683,16 +683,16 @@ static DKC_2TREE_NODE *find_lg_base(DKC_2TREE_ROOT *ptr,const void* Key,BOOL isG
 			break;
 		}
 		if(isGreater){
-			tr = compare(Key,it->key);
+			tr = compare(Key,it->key, ptr->key_size);
 		}else{
-			tr = compare(it->key,Key);
+			tr = compare(it->key,Key, ptr->key_size);
 		}
 		
-		if(tr==0){//“¯‚¶‚ÌŒ©‚Â‚©‚Á‚½‚çŽŸ‚ÉƒfƒJƒC‚Ì‚Í‰E
+		if(tr==0){//ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŽŸï¿½Éƒfï¿½Jï¿½Cï¿½Ì‚Í‰E
 			return it->right;
 		}
 	
-		if(tr > 0){//Key‚Ì•û‚ª‘å‚«‚¢
+		if(tr > 0){//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½
 			/*if(1==state){
 				return it;
 			}else{
@@ -704,10 +704,10 @@ static DKC_2TREE_NODE *find_lg_base(DKC_2TREE_ROOT *ptr,const void* Key,BOOL isG
 				break;
 			}
 			save = it;
-			//Key‚Ì•û‚ª‘å‚«‚¢‚©‚çit‚Í‚æ‚è‘å‚«‚¢‚Ì‚ð’²‚×‚é
+			//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½itï¿½Í‚ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Ì‚ð’²‚×‚ï¿½
 			it = it->right;
 			
-		}else{//Key‚Ì•û‚ª‚¿‚Á‚±‚¢
+		}else{//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			switch(state){
 			case 0:
 				state = 1;
@@ -721,7 +721,7 @@ static DKC_2TREE_NODE *find_lg_base(DKC_2TREE_ROOT *ptr,const void* Key,BOOL isG
 				state = 0;
 			}
 			save = it;
-			//‚¿‚Á‚±‚¢‚©‚ç‚Å‚©‚¢‚Ì‚ÉˆÚ‚é
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½Ì‚ÉˆÚ‚ï¿½
 			it = it->right;
 			
 		}
@@ -734,10 +734,10 @@ static DKC_2TREE_NODE *find_lg_base(DKC_2TREE_ROOT *ptr,const void* Key,BOOL isG
 
 /**
 @note
-ðŒ
-- “¯‚¶ƒL[‚ªŒ©‚Â‚©‚Á‚½‚çŽŸ‚ª‘ÎÛ
-- ‘å‚«‚¢ƒL[ -> ¬‚³‚¢ƒL[ ‚¾‚Á‚½‚ç ‚»‚Ì‚Æ‚«‚Ì‚ª‘ÎÛ
-- Å‰‚©‚ç¬‚³‚©‚Á‚½‚ç‘å‚«‚¢‚Ì‚©‚çÄ’Tõ
+ï¿½ï¿½ï¿½ï¿½
+- ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŽŸï¿½ï¿½ï¿½Îï¿½
+- ï¿½å‚«ï¿½ï¿½ï¿½Lï¿½[ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì‚Æ‚ï¿½ï¿½Ì‚ï¿½ï¿½Îï¿½
+- ï¿½Åï¿½ï¿½ï¿½ï¿½ç¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½Ä’Tï¿½ï¿½
 */
 DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* Key)
 {
@@ -747,7 +747,7 @@ DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* K
 	//*save;
 	DKC_COMPARE_TYPE compare = ptr->compare;
 	int tr;
-	///0 ‰Šú ‘O‚ª‘å‚«‚¢ƒL[ 1
+	///0 ï¿½ï¿½ï¿½ï¿½ ï¿½Oï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Lï¿½[ 1
 	int state = 0;
 	
 	dkcmASSERT(compare);
@@ -756,7 +756,7 @@ DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* K
 
 		if(it == st){
 			dkcmNOT_ASSERT(NULL==it);
-			if(NULL==it){//‚ÆA‚¢‚¤‚©‚ ‚è‚¦‚È‚¢¥¥¥
+			if(NULL==it){//ï¿½ÆAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½ï¿½ï¿½
 				break;
 			}
 			switch(state){
@@ -769,16 +769,16 @@ DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* K
 			break;
 		}
 		
-		tr = compare(Key,it->key);
+		tr = compare(Key,it->key, ptr->key_size);
 	
-		if(tr==0){//“¯‚¶‚ÌŒ©‚Â‚©‚Á‚½‚çŽŸ‚É¶
-			if(it->left == st){//‚Â[‚©AI‚í‚è‚Å‚µ‚½‚©‚ç¥¥¥
+		if(tr==0){//ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŽŸï¿½Éï¿½
+			if(it->left == st){//ï¿½Â[ï¿½ï¿½ï¿½Aï¿½Iï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç¥¥ï¿½
 				return NULL;
 			}
 			return it->left;
 		}
 
-		if(tr > 0){//Key‚Ì•û‚ª‘å‚«‚¢
+		if(tr > 0){//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½
 			switch(state){
 			case 0:
 				state = 1;
@@ -796,7 +796,7 @@ DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* K
 			it = it->left;
 			
 			
-		}else{//Key‚Ì•û‚ª‚¿‚Á‚±‚¢
+		}else{//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			switch(state){
 			case 0:
 				state = 2;
@@ -817,10 +817,10 @@ DKC_2TREE_NODE *WINAPI dkc2TreeFindMaximumLess(DKC_2TREE_ROOT *ptr,const void* K
 }
 /**
 @note
-MinimalGreater‚ÌðŒ
-- “¯‚¶ƒL[‚ªŒ©‚Â‚©‚Á‚½‚çŽŸ‚ª‘ÎÛ
-- ¬‚³‚¢ƒL[ -> ‘å‚«‚¢ƒL[ ‚¾‚Á‚½‚ç ‚»‚Ì‚Æ‚«‚Ì‚ª‘ÎÛ
-- Å‰‚©‚ç‘å‚«‚©‚Á‚½‚ç¬‚³‚¢‚Ì‚©‚çÄ’Tõ
+MinimalGreaterï¿½Ìï¿½ï¿½ï¿½
+- ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŽŸï¿½ï¿½ï¿½Îï¿½
+- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ -> ï¿½å‚«ï¿½ï¿½ï¿½Lï¿½[ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì‚Æ‚ï¿½ï¿½Ì‚ï¿½ï¿½Îï¿½
+- ï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç¬ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½Ä’Tï¿½ï¿½
 */
 DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const void* Key)
 {
@@ -830,7 +830,7 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const voi
 	//*save;
 	DKC_COMPARE_TYPE compare = ptr->compare;
 	int tr;
-	//0 ‰Šú / 1 ‘O‚ªKey‚Ì•û‚ª¬‚³‚¢ƒL[ / 2 ‘O‚ªKey‚Ì•û‚ª‘å‚«‚¢ƒL[
+	//0 ï¿½ï¿½ï¿½ï¿½ / 1 ï¿½Oï¿½ï¿½Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ / 2 ï¿½Oï¿½ï¿½Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Lï¿½[
 	//
 	int state = 0;
 	
@@ -839,7 +839,7 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const voi
 	for(;;){
 		if(it == st){
 			dkcmNOT_ASSERT(NULL==it);
-			if(NULL==it){//‚ÆA‚¢‚¤‚©‚ ‚è‚¦‚È‚¢¥¥¥
+			if(NULL==it){//ï¿½ÆAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚¦ï¿½È‚ï¿½ï¿½ï¿½ï¿½
 				break;
 			}
 			switch(state){
@@ -851,18 +851,18 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const voi
 			it = NULL;
 			break;
 		}
-		tr = compare(Key,it->key);
+		tr = compare(Key,it->key, ptr->key_size);
 		
 		
-		if(tr==0){//“¯‚¶‚ÌŒ©‚Â‚©‚Á‚½‚çŽŸ‚ÉƒfƒJƒC‚Ì‚Í‰E
-			if(it->right == st){//‚Â[‚©AI‚í‚è‚Å‚µ‚½‚©‚ç¥¥¥
+		if(tr==0){//ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½çŽŸï¿½Éƒfï¿½Jï¿½Cï¿½Ì‚Í‰E
+			if(it->right == st){//ï¿½Â[ï¿½ï¿½ï¿½Aï¿½Iï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç¥¥ï¿½
 				return NULL;
 			}
 			return it->right;
 		}
 	
 
-		if(tr > 0){//Key‚Ì•û‚ª‘å‚«‚¢
+		if(tr > 0){//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½
 			
 			switch(state){
 			case 0:
@@ -870,10 +870,10 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const voi
 				break;
 			}
 			save = it;
-			//Key‚Ì•û‚ª‘å‚«‚¢‚©‚çit‚Í‚æ‚è‘å‚«‚¢‚Ì‚ð’²‚×‚é
+			//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½itï¿½Í‚ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Ì‚ð’²‚×‚ï¿½
 			it = it->right;
 			
-		}else{//Key‚Ì•û‚ª‚¿‚Á‚±‚¢
+		}else{//Keyï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			switch(state){
 			case 0:
 				state = 1;
@@ -887,7 +887,7 @@ DKC_2TREE_NODE * WINAPI dkc2TreeFindMinimalGreater(DKC_2TREE_ROOT *ptr,const voi
 				state = 0;
 			}
 			save = it;
-			//‚¿‚Á‚±‚¢‚©‚ç‚Å‚©‚¢‚Ì‚ÉˆÚ‚é
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½Ì‚ÉˆÚ‚ï¿½
 			it = it->right;
 			
 		}

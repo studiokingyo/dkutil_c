@@ -81,7 +81,7 @@ static int btree_find_key_index(DKC_BTREE_ROOT *root,DKC_BTREE_NODE *node,
 	const void *key)
 {
 	int i = 0;
-	while(i < node->num_keys && root->compare(key, node->keys[i]) > 0){
+	while(i < node->num_keys && root->compare(key, node->keys[i], root->key_size) > 0){
 		i++;
 	}
 	return i;
@@ -153,7 +153,7 @@ static int btree_insert_nonfull(DKC_BTREE_ROOT *root,
 		/* find position and shift right */
 		i = node->num_keys - 1;
 		while(i >= 0){
-			cmp = root->compare(key, node->keys[i]);
+			cmp = root->compare(key, node->keys[i], root->key_size);
 			if(0 == cmp) return edk_FAILED; /* duplicate */
 			if(cmp > 0) break;
 			node->keys[i + 1] = node->keys[i];
@@ -190,12 +190,12 @@ static int btree_insert_nonfull(DKC_BTREE_ROOT *root,
 	else{
 		/* find child to descend into */
 		i = node->num_keys - 1;
-		while(i >= 0 && root->compare(key, node->keys[i]) < 0){
+		while(i >= 0 && root->compare(key, node->keys[i], root->key_size) < 0){
 			i--;
 		}
 
 		/* check for duplicate in current node */
-		if(i >= 0 && 0 == root->compare(key, node->keys[i])){
+		if(i >= 0 && 0 == root->compare(key, node->keys[i], root->key_size)){
 			return edk_FAILED; /* duplicate */
 		}
 
@@ -204,7 +204,7 @@ static int btree_insert_nonfull(DKC_BTREE_ROOT *root,
 		/* split child if full */
 		if(node->children[i]->num_keys == 2 * root->min_degree - 1){
 			btree_split_child(root, node, i);
-			cmp = root->compare(key, node->keys[i]);
+			cmp = root->compare(key, node->keys[i], root->key_size);
 			if(0 == cmp) return edk_FAILED; /* duplicate (the median) */
 			if(cmp > 0) i++;
 		}
@@ -403,7 +403,7 @@ static int btree_delete_from_node(DKC_BTREE_ROOT *root,
 
 	idx = btree_find_key_index(root, node, key);
 
-	if(idx < node->num_keys && 0 == root->compare(key, node->keys[idx])){
+	if(idx < node->num_keys && 0 == root->compare(key, node->keys[idx], root->key_size)){
 		/* key found in this node */
 		if(node->is_leaf){
 			/* Case 1: key is in a leaf - simply remove */
@@ -576,7 +576,7 @@ static void *btree_find_minimal_greater(DKC_BTREE_ROOT *root,
 	if(NULL == node) return candidate;
 
 	for(i = 0; i < node->num_keys; i++){
-		cmp = root->compare(node->keys[i], key);
+		cmp = root->compare(node->keys[i], key, root->key_size);
 		if(cmp > 0){
 			candidate = node->keys[i];
 			/* search left subtree for potentially smaller candidate */
@@ -605,7 +605,7 @@ static void *btree_find_maximum_less(DKC_BTREE_ROOT *root,
 	if(NULL == node) return candidate;
 
 	for(i = node->num_keys - 1; i >= 0; i--){
-		cmp = root->compare(node->keys[i], key);
+		cmp = root->compare(node->keys[i], key, root->key_size);
 		if(cmp < 0){
 			candidate = node->keys[i];
 			/* search right subtree for potentially larger candidate */
@@ -743,7 +743,7 @@ DKC_BTREE_SEARCH_RESULT WINAPI dkcBTreeFind(
 	while(node != NULL){
 		i = 0;
 		while(i < node->num_keys){
-			cmp = ptr->compare(key, node->keys[i]);
+			cmp = ptr->compare(key, node->keys[i], ptr->key_size);
 			if(0 == cmp){
 				result.node = node;
 				result.index = i;

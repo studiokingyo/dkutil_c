@@ -193,7 +193,7 @@ DKC_EXTERN int WINAPI dkcTreapInsert(DKC_TREAP_ROOT *ptr,
 	x = ptr->root;
 	while(x != ptr->sentinel){
 		parent = x;
-		cmp = ptr->compare(key, x->key);
+		cmp = ptr->compare(key, x->key, ptr->key_size);
 		if(cmp < 0){
 			x = x->left;
 		}else if(cmp > 0){
@@ -216,7 +216,7 @@ DKC_EXTERN int WINAPI dkcTreapInsert(DKC_TREAP_ROOT *ptr,
 	node->parent = parent;
 	if(parent == ptr->sentinel){
 		ptr->root = node;
-	}else if(ptr->compare(key, parent->key) < 0){
+	}else if(ptr->compare(key, parent->key, ptr->key_size) < 0){
 		parent->left = node;
 	}else{
 		parent->right = node;
@@ -245,7 +245,7 @@ DKC_EXTERN int WINAPI dkcTreapErase(DKC_TREAP_ROOT *ptr, const void *key)
 	/* Find node */
 	node = ptr->root;
 	while(node != ptr->sentinel){
-		cmp = ptr->compare(key, node->key);
+		cmp = ptr->compare(key, node->key, ptr->key_size);
 		if(cmp < 0) node = node->left;
 		else if(cmp > 0) node = node->right;
 		else break;
@@ -290,7 +290,7 @@ DKC_EXTERN DKC_TREAP_NODE * WINAPI dkcTreapFind(
 
 	x = ptr->root;
 	while(x != ptr->sentinel){
-		cmp = ptr->compare(key, x->key);
+		cmp = ptr->compare(key, x->key, ptr->key_size);
 		if(cmp < 0) x = x->left;
 		else if(cmp > 0) x = x->right;
 		else return x;

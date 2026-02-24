@@ -38,7 +38,7 @@ void WINAPI dkcShellSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TY
 				j >= 0 ; /*a[j * width] > x*/
 				j -= h)
 			{
-				if(compare(&a[j * width],x) > 0)
+				if(compare(&a[j * width],x, width) > 0)
 				{
 					//a[(j + h) * width] = a[j * width];
 					dkcSwap(&a[(j + h) * width] , &a[j * width],width);
@@ -63,7 +63,7 @@ void WINAPI dkcBubbleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_T
 
   for(i=0; i<num-1; i++){
     for(j=num-1; j>i; j--){
-      if(compare(&b[(j-1) * width],&b[j*width]) > 0/* *(b+j-1) > *(b+j) */)
+      if(compare(&b[(j-1) * width],&b[j*width], width) > 0/* *(b+j-1) > *(b+j) */)
 			{
          dkcSwap(&b[(j-1) * width],&b[j*width],width);
       }
@@ -103,7 +103,7 @@ void WINAPI dkcCombSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYP
           j != num;
           ++i, ++j) {
       //if ( b[j] < b[i] ) {
-			if(compare(&b[i*width],&b[j*width]) > 0)
+			if(compare(&b[i*width],&b[j*width], width) > 0)
 			{
 				dkcSwap(&b[j*width],&b[i*width],width);
         swapped = TRUE;
@@ -116,7 +116,7 @@ void WINAPI dkcCombSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYP
 
 void WINAPI dkcQuickSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare)
 {
-	qsort(base,num,width,compare);
+	//qsort(base,num,width,compare);
 }
 
 
@@ -222,7 +222,7 @@ void WINAPI dkcInsertionSort( void *base,size_t num,size_t width,DKC_SORT_COMPAR
 	for(i = 1; i < num; i++){
 		memcpy(tmp, &a[i * width], width);
 		j = i;
-		while(j > 0 && compare(&a[(j - 1) * width], tmp) > 0){
+		while(j > 0 && compare(&a[(j - 1) * width], tmp, width) > 0){
 			memcpy(&a[j * width], &a[(j - 1) * width], width);
 			j--;
 		}
@@ -242,7 +242,7 @@ void WINAPI dkcSelectionSort( void *base,size_t num,size_t width,DKC_SORT_COMPAR
 	for(i = 0; i < num - 1; i++){
 		min_idx = i;
 		for(j = i + 1; j < num; j++){
-			if(compare(&a[j * width], &a[min_idx * width]) < 0){
+			if(compare(&a[j * width], &a[min_idx * width], width) < 0){
 				min_idx = j;
 			}
 		}
@@ -263,7 +263,7 @@ static void mergesort_merge(BYTE *a, BYTE *work, size_t left, size_t mid, size_t
 	j = mid;
 	k = left;
 	while(i < mid && j < right){
-		if(compare(&work[i * width], &work[j * width]) <= 0){
+		if(compare(&work[i * width], &work[j * width], width) <= 0){
 			memcpy(&a[k * width], &work[i * width], width);
 			i++;
 		}else{
@@ -312,10 +312,10 @@ static void heapsort_siftdown(BYTE *a, size_t start, size_t end, size_t width, D
 	while(root * 2 + 1 <= end){
 		child = root * 2 + 1;
 		swap_idx = root;
-		if(compare(&a[swap_idx * width], &a[child * width]) < 0){
+		if(compare(&a[swap_idx * width], &a[child * width], width) < 0){
 			swap_idx = child;
 		}
-		if(child + 1 <= end && compare(&a[swap_idx * width], &a[(child + 1) * width]) < 0){
+		if(child + 1 <= end && compare(&a[swap_idx * width], &a[(child + 1) * width], width) < 0){
 			swap_idx = child + 1;
 		}
 		if(swap_idx == root){
@@ -368,7 +368,7 @@ void WINAPI dkcCocktailSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE
 	while(swapped){
 		swapped = FALSE;
 		for(i = start; i < end; i++){
-			if(compare(&b[i * width], &b[(i + 1) * width]) > 0){
+			if(compare(&b[i * width], &b[(i + 1) * width], width) > 0){
 				dkcSwap(&b[i * width], &b[(i + 1) * width], width);
 				swapped = TRUE;
 			}
@@ -377,7 +377,7 @@ void WINAPI dkcCocktailSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE
 		swapped = FALSE;
 		end--;
 		for(i = end; i > start; i--){
-			if(compare(&b[(i - 1) * width], &b[i * width]) > 0){
+			if(compare(&b[(i - 1) * width], &b[i * width], width) > 0){
 				dkcSwap(&b[(i - 1) * width], &b[i * width], width);
 				swapped = TRUE;
 			}
@@ -396,7 +396,7 @@ void WINAPI dkcGnomeSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TY
 	if(num <= 1) return;
 	pos = 0;
 	while(pos < num){
-		if(pos == 0 || compare(&a[(pos - 1) * width], &a[pos * width]) <= 0){
+		if(pos == 0 || compare(&a[(pos - 1) * width], &a[pos * width], width) <= 0){
 			pos++;
 		}else{
 			dkcSwap(&a[(pos - 1) * width], &a[pos * width], width);
@@ -418,13 +418,13 @@ void WINAPI dkcOddEvenSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_
 	while(!sorted){
 		sorted = TRUE;
 		for(i = 1; i < num - 1; i += 2){
-			if(compare(&a[i * width], &a[(i + 1) * width]) > 0){
+			if(compare(&a[i * width], &a[(i + 1) * width], width) > 0){
 				dkcSwap(&a[i * width], &a[(i + 1) * width], width);
 				sorted = FALSE;
 			}
 		}
 		for(i = 0; i < num - 1; i += 2){
-			if(compare(&a[i * width], &a[(i + 1) * width]) > 0){
+			if(compare(&a[i * width], &a[(i + 1) * width], width) > 0){
 				dkcSwap(&a[i * width], &a[(i + 1) * width], width);
 				sorted = FALSE;
 			}
@@ -452,7 +452,7 @@ void WINAPI dkcPancakeSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_
 	for(curr_size = num; curr_size > 1; curr_size--){
 		max_idx = 0;
 		for(i = 1; i < curr_size; i++){
-			if(compare(&a[i * width], &a[max_idx * width]) > 0){
+			if(compare(&a[i * width], &a[max_idx * width], width) > 0){
 				max_idx = i;
 			}
 		}
@@ -486,12 +486,12 @@ void WINAPI dkcCycleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TY
 		memcpy(item, &a[cycle_start * width], width);
 		pos = cycle_start;
 		for(i = cycle_start + 1; i < num; i++){
-			if(compare(&a[i * width], item) < 0){
+			if(compare(&a[i * width], item, width) < 0){
 				pos++;
 			}
 		}
 		if(pos == cycle_start) continue;
-		while(compare(&a[pos * width], item) == 0){
+		while(compare(&a[pos * width], item, width) == 0){
 			pos++;
 		}
 		if(pos != cycle_start){
@@ -502,14 +502,14 @@ void WINAPI dkcCycleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TY
 		while(pos != cycle_start){
 			pos = cycle_start;
 			for(i = cycle_start + 1; i < num; i++){
-				if(compare(&a[i * width], item) < 0){
+				if(compare(&a[i * width], item, width) < 0){
 					pos++;
 				}
 			}
-			while(compare(&a[pos * width], item) == 0){
+			while(compare(&a[pos * width], item, width) == 0){
 				pos++;
 			}
-			if(compare(item, &a[pos * width]) != 0){
+			if(compare(item, &a[pos * width], width) != 0){
 				memcpy(tmp, &a[pos * width], width);
 				memcpy(&a[pos * width], item, width);
 				memcpy(item, tmp, width);
@@ -525,7 +525,7 @@ void WINAPI dkcCycleSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TY
  * ======================================== */
 static void bitonic_compare_swap(BYTE *a, size_t i, size_t j, int dir, size_t width, DKC_SORT_COMPARE_TYPE compare)
 {
-	if(dir == (compare(&a[i * width], &a[j * width]) > 0)){
+	if(dir == (compare(&a[i * width], &a[j * width], width) > 0)){
 		dkcSwap(&a[i * width], &a[j * width], width);
 	}
 }
@@ -574,18 +574,18 @@ static void multipartition_sort_impl(BYTE *a, int lo, int hi, size_t width, DKC_
 	pivot = (BYTE *)malloc(width);
 	if(pivot == NULL) return;
 	mid = lo + (hi - lo) / 2;
-	if(compare(&a[lo * width], &a[mid * width]) > 0)
+	if(compare(&a[lo * width], &a[mid * width], width) > 0)
 		dkcSwap(&a[lo * width], &a[mid * width], width);
-	if(compare(&a[lo * width], &a[hi * width]) > 0)
+	if(compare(&a[lo * width], &a[hi * width], width) > 0)
 		dkcSwap(&a[lo * width], &a[hi * width], width);
-	if(compare(&a[mid * width], &a[hi * width]) > 0)
+	if(compare(&a[mid * width], &a[hi * width], width) > 0)
 		dkcSwap(&a[mid * width], &a[hi * width], width);
 	memcpy(pivot, &a[mid * width], width);
 	lt = lo;
 	gt = hi;
 	i = lo;
 	while(i <= gt){
-		cmp = compare(&a[i * width], pivot);
+		cmp = compare(&a[i * width], pivot, width);
 		if(cmp < 0){
 			dkcSwap(&a[lt * width], &a[i * width], width);
 			lt++;
@@ -637,18 +637,18 @@ static void introsort_impl(BYTE *a, size_t lo, size_t hi, int depth_limit, size_
 	pivot = (BYTE *)malloc(width);
 	if(pivot == NULL) return;
 	mid = lo + size / 2;
-	if(compare(&a[lo * width], &a[mid * width]) > 0)
+	if(compare(&a[lo * width], &a[mid * width], width) > 0)
 		dkcSwap(&a[lo * width], &a[mid * width], width);
-	if(compare(&a[lo * width], &a[(hi - 1) * width]) > 0)
+	if(compare(&a[lo * width], &a[(hi - 1) * width], width) > 0)
 		dkcSwap(&a[lo * width], &a[(hi - 1) * width], width);
-	if(compare(&a[mid * width], &a[(hi - 1) * width]) > 0)
+	if(compare(&a[mid * width], &a[(hi - 1) * width], width) > 0)
 		dkcSwap(&a[mid * width], &a[(hi - 1) * width], width);
 	memcpy(pivot, &a[mid * width], width);
 	i = lo;
 	j = hi - 1;
 	for(;;){
-		while(compare(&a[i * width], pivot) < 0) i++;
-		while(compare(&a[j * width], pivot) > 0) j--;
+		while(compare(&a[i * width], pivot, width) < 0) i++;
+		while(compare(&a[j * width], pivot, width) > 0) j--;
 		if(i >= j) break;
 		dkcSwap(&a[i * width], &a[j * width], width);
 		i++;
@@ -690,7 +690,7 @@ static void timsort_insertion_sort(BYTE *a, size_t lo, size_t hi, size_t width, 
 	for(i = lo + 1; i < hi; i++){
 		memcpy(tmp, &a[i * width], width);
 		j = i;
-		while(j > lo && compare(&a[(j - 1) * width], tmp) > 0){
+		while(j > lo && compare(&a[(j - 1) * width], tmp, width) > 0){
 			memcpy(&a[j * width], &a[(j - 1) * width], width);
 			j--;
 		}
@@ -703,9 +703,9 @@ static size_t timsort_gallop_right(BYTE *key, BYTE *a, size_t base_idx, size_t l
 	size_t last_ofs, ofs, max_ofs, m;
 	last_ofs = 0;
 	ofs = 1;
-	if(compare(key, &a[(base_idx + hint) * width]) < 0){
+	if(compare(key, &a[(base_idx + hint) * width], width) < 0){
 		max_ofs = hint + 1;
-		while(ofs < max_ofs && compare(key, &a[(base_idx + hint - ofs) * width]) < 0){
+		while(ofs < max_ofs && compare(key, &a[(base_idx + hint - ofs) * width], width) < 0){
 			last_ofs = ofs;
 			ofs = (ofs << 1) + 1;
 			if(ofs > max_ofs) ofs = max_ofs;
@@ -713,7 +713,7 @@ static size_t timsort_gallop_right(BYTE *key, BYTE *a, size_t base_idx, size_t l
 		{ size_t temp = last_ofs; last_ofs = hint - ofs; ofs = hint - temp; }
 	}else{
 		max_ofs = len - hint;
-		while(ofs < max_ofs && compare(key, &a[(base_idx + hint + ofs) * width]) >= 0){
+		while(ofs < max_ofs && compare(key, &a[(base_idx + hint + ofs) * width], width) >= 0){
 			last_ofs = ofs;
 			ofs = (ofs << 1) + 1;
 			if(ofs > max_ofs) ofs = max_ofs;
@@ -724,7 +724,7 @@ static size_t timsort_gallop_right(BYTE *key, BYTE *a, size_t base_idx, size_t l
 	last_ofs++;
 	while(last_ofs < ofs){
 		m = last_ofs + (ofs - last_ofs) / 2;
-		if(compare(key, &a[(base_idx + m) * width]) < 0)
+		if(compare(key, &a[(base_idx + m) * width], width) < 0)
 			ofs = m;
 		else
 			last_ofs = m + 1;
@@ -737,9 +737,9 @@ static size_t timsort_gallop_left(BYTE *key, BYTE *a, size_t base_idx, size_t le
 	size_t last_ofs, ofs, max_ofs, m;
 	last_ofs = 0;
 	ofs = 1;
-	if(compare(key, &a[(base_idx + hint) * width]) > 0){
+	if(compare(key, &a[(base_idx + hint) * width], width) > 0){
 		max_ofs = len - hint;
-		while(ofs < max_ofs && compare(key, &a[(base_idx + hint + ofs) * width]) > 0){
+		while(ofs < max_ofs && compare(key, &a[(base_idx + hint + ofs) * width], width) > 0){
 			last_ofs = ofs;
 			ofs = (ofs << 1) + 1;
 			if(ofs > max_ofs) ofs = max_ofs;
@@ -748,7 +748,7 @@ static size_t timsort_gallop_left(BYTE *key, BYTE *a, size_t base_idx, size_t le
 		ofs += hint;
 	}else{
 		max_ofs = hint + 1;
-		while(ofs < max_ofs && compare(key, &a[(base_idx + hint - ofs) * width]) <= 0){
+		while(ofs < max_ofs && compare(key, &a[(base_idx + hint - ofs) * width], width) <= 0){
 			last_ofs = ofs;
 			ofs = (ofs << 1) + 1;
 			if(ofs > max_ofs) ofs = max_ofs;
@@ -758,7 +758,7 @@ static size_t timsort_gallop_left(BYTE *key, BYTE *a, size_t base_idx, size_t le
 	last_ofs++;
 	while(last_ofs < ofs){
 		m = last_ofs + (ofs - last_ofs) / 2;
-		if(compare(key, &a[(base_idx + m) * width]) > 0)
+		if(compare(key, &a[(base_idx + m) * width], width) > 0)
 			last_ofs = m + 1;
 		else
 			ofs = m;
@@ -776,7 +776,7 @@ static void timsort_merge_lo(BYTE *a, size_t base1, size_t len1, size_t base2, s
 	dest = base1;
 	min_gallop = TIMSORT_MIN_GALLOP;
 	while(len1 > 0 && len2 > 0){
-		if(compare(&a[cursor2 * width], &work[cursor1 * width]) < 0){
+		if(compare(&a[cursor2 * width], &work[cursor1 * width], width) < 0){
 			memcpy(&a[dest * width], &a[cursor2 * width], width);
 			cursor2++;
 			len2--;
@@ -801,7 +801,7 @@ static void timsort_merge_hi(BYTE *a, size_t base1, size_t len1, size_t base2, s
 	cursor2 = len2 - 1;
 	dest = base2 + len2 - 1;
 	while(len1 > 0 && len2 > 0){
-		if(compare(&work[cursor2 * width], &a[cursor1 * width]) >= 0){
+		if(compare(&work[cursor2 * width], &a[cursor1 * width], width) >= 0){
 			memcpy(&a[dest * width], &work[cursor2 * width], width);
 			if(cursor2 == 0){ len2--; break; }
 			cursor2--;
@@ -879,8 +879,8 @@ void WINAPI dkcTimSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE
 	while(remaining > 0){
 		run_len_val = 1;
 		if(remaining > 1){
-			if(compare(&a[lo * width], &a[(lo + 1) * width]) > 0){
-				while(run_len_val < remaining - 1 && compare(&a[(lo + run_len_val) * width], &a[(lo + run_len_val + 1) * width]) > 0){
+			if(compare(&a[lo * width], &a[(lo + 1) * width], width) > 0){
+				while(run_len_val < remaining - 1 && compare(&a[(lo + run_len_val) * width], &a[(lo + run_len_val + 1) * width], width) > 0){
 					run_len_val++;
 				}
 				run_len_val++;
@@ -894,7 +894,7 @@ void WINAPI dkcTimSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE
 					}
 				}
 			}else{
-				while(run_len_val < remaining - 1 && compare(&a[(lo + run_len_val) * width], &a[(lo + run_len_val + 1) * width]) <= 0){
+				while(run_len_val < remaining - 1 && compare(&a[(lo + run_len_val) * width], &a[(lo + run_len_val + 1) * width], width) <= 0){
 					run_len_val++;
 				}
 				run_len_val++;

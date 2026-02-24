@@ -236,7 +236,7 @@ static DKC_AVLTREE_NODE *insert_recursive(DKC_AVLTREE_ROOT *root, DKC_AVLTREE_NO
 		return new_node;
 	}
 
-	cmp = root->compare(new_node->key, node->key);
+	cmp = root->compare(new_node->key, node->key, root->key_size);
 
 	if(cmp < 0){
 		node->left = insert_recursive(root, node->left, new_node);
@@ -295,7 +295,7 @@ static DKC_AVLTREE_NODE *delete_recursive(DKC_AVLTREE_ROOT *root, DKC_AVLTREE_NO
 		return node;
 	}
 
-	cmp = root->compare(key, node->key);
+	cmp = root->compare(key, node->key, root->key_size);
 
 	if(cmp < 0){
 		node->left = delete_recursive(root, node->left, key, deleted);
@@ -606,7 +606,7 @@ DKC_EXTERN DKC_AVLTREE_NODE * WINAPI dkcAVLTreeFindEqual(
 	current = ptr->root;
 
 	while(current != ptr->sentinel){
-		cmp = ptr->compare(Key, current->key);
+		cmp = ptr->compare(Key, current->key, ptr->key_size);
 
 		if(cmp < 0){
 			current = current->left;
@@ -637,7 +637,7 @@ DKC_EXTERN DKC_AVLTREE_NODE * WINAPI dkcAVLTreeFindMinimalGreater(
 	current = ptr->root;
 
 	while(current != ptr->sentinel){
-		cmp = ptr->compare(Key, current->key);
+		cmp = ptr->compare(Key, current->key, ptr->key_size);
 
 		if(cmp < 0){
 			result = current;
@@ -666,7 +666,7 @@ DKC_EXTERN DKC_AVLTREE_NODE * WINAPI dkcAVLTreeFindMaximumLess(
 	current = ptr->root;
 
 	while(current != ptr->sentinel){
-		cmp = ptr->compare(Key, current->key);
+		cmp = ptr->compare(Key, current->key, ptr->key_size);
 
 		if(cmp > 0){
 			result = current;

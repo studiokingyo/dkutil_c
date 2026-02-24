@@ -19,6 +19,7 @@ void WINAPI dkcSHO_MD2Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = MD2_STR_BUFFER_SIZE;
 	p->digest_binary_size = MD2_BIN_BUFFER_SIZE;
+	p->block_size = 16;
 
 	p->mObj = dkcAllocMD2();
 
@@ -35,6 +36,7 @@ void WINAPI dkcSHO_MD4Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = MD4_STR_BUFFER_SIZE;
 	p->digest_binary_size = MD4_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 
 	p->mObj = dkcAllocMD4();
 
@@ -52,6 +54,7 @@ void WINAPI dkcSHO_MD5Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = MD5_STR_BUFFER_SIZE;
 	p->digest_binary_size = MD5_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 
 	p->mObj = dkcAllocMD5();
 }
@@ -67,6 +70,7 @@ void WINAPI dkcSHO_SHA1Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA1_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA1_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 
 	p->mObj = dkcAllocSHA1();
 }
@@ -82,6 +86,7 @@ void WINAPI dkcSHO_SHA256Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA256_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA256_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 
 	p->mObj = dkcAllocSHA256();
 }
@@ -97,6 +102,7 @@ void WINAPI dkcSHO_SHA384Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA384_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA384_BIN_BUFFER_SIZE;
+	p->block_size = 128;
 
 	p->mObj = dkcAllocSHA384();
 }
@@ -112,6 +118,7 @@ void WINAPI dkcSHO_SHA3_224Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA3_224_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA3_224_BIN_BUFFER_SIZE;
+	p->block_size = 144; /* rate = 1152 bits = 144 bytes */
 
 	p->mObj = dkcAllocSHA3_224();
 }
@@ -126,6 +133,7 @@ void WINAPI dkcSHO_SHA3_256Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA3_256_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA3_256_BIN_BUFFER_SIZE;
+	p->block_size = 136; /* rate = 1088 bits = 136 bytes */
 
 	p->mObj = dkcAllocSHA3_256();
 }
@@ -140,6 +148,7 @@ void WINAPI dkcSHO_SHA3_384Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA3_384_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA3_384_BIN_BUFFER_SIZE;
+	p->block_size = 104; /* rate = 832 bits = 104 bytes */
 
 	p->mObj = dkcAllocSHA3_384();
 }
@@ -154,6 +163,7 @@ void WINAPI dkcSHO_SHA3_512Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA3_512_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA3_512_BIN_BUFFER_SIZE;
+	p->block_size = 72; /* rate = 576 bits = 72 bytes */
 
 	p->mObj = dkcAllocSHA3_512();
 }
@@ -166,6 +176,7 @@ void WINAPI dkcSHO_BLAKE224Init(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE224Digest;
 	p->digest_string_size = BLAKE224_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE224_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 	p->mObj = dkcAllocBLAKE224();
 }
 
@@ -177,6 +188,7 @@ void WINAPI dkcSHO_BLAKE256Init(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE256Digest;
 	p->digest_string_size = BLAKE256_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE256_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 	p->mObj = dkcAllocBLAKE256();
 }
 
@@ -188,6 +200,7 @@ void WINAPI dkcSHO_BLAKE384Init(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE384Digest;
 	p->digest_string_size = BLAKE384_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE384_BIN_BUFFER_SIZE;
+	p->block_size = 128;
 	p->mObj = dkcAllocBLAKE384();
 }
 
@@ -199,6 +212,7 @@ void WINAPI dkcSHO_BLAKE512Init(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE512Digest;
 	p->digest_string_size = BLAKE512_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE512_BIN_BUFFER_SIZE;
+	p->block_size = 128;
 	p->mObj = dkcAllocBLAKE512();
 }
 
@@ -210,6 +224,7 @@ void WINAPI dkcSHO_BLAKE2sInit(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2sDigest;
 	p->digest_string_size = BLAKE2S_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE2S_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 	p->mObj = dkcAllocBLAKE2s();
 }
 
@@ -221,6 +236,7 @@ void WINAPI dkcSHO_BLAKE2bInit(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE2bDigest;
 	p->digest_string_size = BLAKE2B_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE2B_BIN_BUFFER_SIZE;
+	p->block_size = 128;
 	p->mObj = dkcAllocBLAKE2b();
 }
 
@@ -232,6 +248,7 @@ void WINAPI dkcSHO_BLAKE3Init(DKC_SECURE_HASH_OBJECT *p){
 	p->Digest = (DKC_WINAPI_PROC_F_TYPE)dkcBLAKE3Digest;
 	p->digest_string_size = BLAKE3_STR_BUFFER_SIZE;
 	p->digest_binary_size = BLAKE3_BIN_BUFFER_SIZE;
+	p->block_size = 64;
 	p->mObj = dkcAllocBLAKE3();
 }
 
@@ -246,6 +263,7 @@ void WINAPI dkcSHO_SHA512Init(DKC_SECURE_HASH_OBJECT *p){
 
 	p->digest_string_size = SHA512_STR_BUFFER_SIZE;
 	p->digest_binary_size = SHA512_BIN_BUFFER_SIZE;
+	p->block_size = 128;
 
 	p->mObj = dkcAllocSHA512();
 

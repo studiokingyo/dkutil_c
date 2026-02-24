@@ -101,13 +101,13 @@ static void splay(DKC_SPLAYTREE_ROOT *root, const void *key)
 	t = root->root;
 
 	for(;;){
-		cmp = root->compare(key, t->key);
+		cmp = root->compare(key, t->key, root->key_size);
 
 		if(cmp < 0){
 			if(t->left == root->sentinel) break;
 
 			/* Zig-Zig: 左の左 → 右回転 */
-			if(root->compare(key, t->left->key) < 0){
+			if(root->compare(key, t->left->key, root->key_size) < 0){
 				/* 右回転 */
 				y = t->left;
 				t->left = y->right;
@@ -129,7 +129,7 @@ static void splay(DKC_SPLAYTREE_ROOT *root, const void *key)
 			if(t->right == root->sentinel) break;
 
 			/* Zig-Zig: 右の右 → 左回転 */
-			if(root->compare(key, t->right->key) > 0){
+			if(root->compare(key, t->right->key, root->key_size) > 0){
 				/* 左回転 */
 				y = t->right;
 				t->right = y->left;
@@ -388,7 +388,7 @@ DKC_EXTERN int WINAPI dkcSplayTreeInsert(DKC_SPLAYTREE_ROOT *ptr,
 	/* splay操作で最も近いノードをルートに持ってくる */
 	splay(ptr, Key);
 
-	cmp = ptr->compare(Key, ptr->root->key);
+	cmp = ptr->compare(Key, ptr->root->key, ptr->key_size);
 
 	if(cmp == 0){
 		/* 既存キー: データを更新 */
@@ -467,7 +467,7 @@ DKC_EXTERN int WINAPI dkcSplayTreeEraseFromKey(DKC_SPLAYTREE_ROOT *ptr, const vo
 	splay(ptr, Key);
 
 	/* ルートが目的のキーか確認 */
-	if(ptr->compare(Key, ptr->root->key) != 0){
+	if(ptr->compare(Key, ptr->root->key, ptr->key_size) != 0){
 		return edk_Not_Found;
 	}
 
@@ -516,7 +516,7 @@ DKC_EXTERN DKC_SPLAYTREE_NODE * WINAPI dkcSplayTreeFind(
 
 	splay(ptr, Key);
 
-	if(ptr->compare(Key, ptr->root->key) == 0){
+	if(ptr->compare(Key, ptr->root->key, ptr->key_size) == 0){
 		return ptr->root;
 	}
 

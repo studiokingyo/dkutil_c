@@ -10,6 +10,7 @@ the table is rehashed to double the bucket count.
 #define DKUTIL_C_HASHMAP_C
 #include "dkcHashMap.h"
 #include "dkcStdio.h"
+#include <string.h>
 
 
 /* ------------------------------------------------------------ */
@@ -56,7 +57,7 @@ static DKC_INLINE DKC_HASHMAP_NODE *hashmap_find_node(
 {
 	DKC_HASHMAP_NODE *node = ptr->buckets[bucket];
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			return node;
 		}
 		node = node->next;
@@ -242,7 +243,7 @@ int WINAPI dkcHashMapErase(DKC_HASHMAP *ptr, const void *key)
 	prev = NULL;
 
 	while(node != NULL){
-		if(ptr->compare(node->key, key) == 0){
+		if(ptr->compare(node->key, key, ptr->key_size) == 0){
 			if(prev != NULL){
 				prev->next = node->next;
 			}else{
