@@ -1,8 +1,8 @@
 /*!
 @file dkcBit.h
-@brief bit‰‰ZŠÖ˜A
-@author written and edited by d‹à‹›
-@see dkc.h‚ÉDKUTIL_C_USE_BIT_TABLE‚Ìg‚¢•û‚ª‘‚¢‚Ä‚¢‚Ü‚·B
+@brief bitï¿½ï¿½ï¿½Zï¿½Ö˜A
+@author written and edited by dï¿½ï¿½ï¿½ï¿½
+@see dkc.hï¿½ï¿½DKUTIL_C_USE_BIT_TABLEï¿½Ìgï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
 
 */
 #ifndef DKUTIL_C_BIT_H
@@ -16,22 +16,22 @@
 
 /**
 @warning
-sizeof(uint32) * 2 == sizeof(double)‚Æ‚·‚é
+sizeof(uint32) * 2 == sizeof(double)ï¿½Æ‚ï¿½ï¿½ï¿½
 */
 union dkc_NLZ8Byte{
 	uint32 asINT_[2];
 	double asDouble_;
 };
 /**
-@warning sizeof(uint32) == sizeof(float)‚Æ‚·‚é
+@warning sizeof(uint32) == sizeof(float)ï¿½Æ‚ï¿½ï¿½ï¿½
 */
 union dkc_NLZ4Byte{
 	uint32 asINT_;
 	float asFloat;
 };
 
-///‚±‚ê‚É‚Í‹Á‚« @ref [Henry] p.86
-//ƒnƒbƒJ[‚ÌŠy‚µ‚İ p.86 }5-12‚æ‚è 	
+///ï¿½ï¿½ï¿½ï¿½É‚Í‹ï¿½ï¿½ï¿½ @ref [Henry] p.86
+//ï¿½nï¿½bï¿½Jï¿½[ï¿½ÌŠyï¿½ï¿½ï¿½ï¿½ p.86 ï¿½}5-12ï¿½ï¿½ï¿½ 	
 //NumberOfLeadingZeros
 DKC_FORCE_INLINE size_t dkcNLZ_IEEE(uint32 arg){
 	union dkc_NLZ8Byte t;
@@ -60,6 +60,11 @@ DKC_FORCE_INLINE size_t /*dkcNLZ(unsigned x){/*/dkcNLZ(uint32 x){
 	n = n + m;
 	x = x << m;
 
+	y = x - 0x4000;
+	m = (y >> 16) & 2;
+	n = n + m;
+	x = x << m;
+
 	y = x >> 14;
 	m = y & ~(y >> 1);
 	return n + 2 - m;
@@ -67,9 +72,9 @@ DKC_FORCE_INLINE size_t /*dkcNLZ(unsigned x){/*/dkcNLZ(uint32 x){
 
 
 /**
-@param ’²‚×‚½‚¢32bit•Ï” @note Hacker's Delight ‚æ‚è
+@param ï¿½ï¿½ï¿½×‚ï¿½ï¿½ï¿½32bitï¿½Ïï¿½ @note Hacker's Delight ï¿½ï¿½ï¿½
 */
-/// bits‚É“ü‚ê‚½ƒrƒbƒg‚Ì”‚ğ”‚¦‚é population count
+/// bitsï¿½É“ï¿½ï¿½ê‚½ï¿½rï¿½bï¿½gï¿½Ìï¿½ï¿½ğ”‚ï¿½ï¿½ï¿½ population count
 
 DKC_FORCE_INLINE size_t dkcPOP(uint32 /*bits/*/x){
 	/*
@@ -106,16 +111,16 @@ DKUTIL_EXTERN const uint64 dkccvBitTable64[64]
 
 
 enum edkcBitMemoryStream{
-	///¡‚ÌˆÊ’u‚©‚çƒV[ƒN
+	///ï¿½ï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
 	edkcBitMemoryStreamSeekCurrent = edkcSeekCurrent,
-	///ÅŒã‚ÌˆÊ’u‚©‚çƒV[ƒN
+	///ï¿½ÅŒï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
 	edkcBitMemoryStreamSeekEnd = edkcSeekEnd,
-	///Å‰‚ÌˆÊ’u‚©‚çƒV[ƒN
+	///ï¿½Åï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
 	edkcBitMemoryStreamSeekSet = edkcSeekSet,
 };
 
 
-///ƒrƒbƒg‚ğo—Í‚·‚éƒƒ‚ƒŠƒXƒgƒŠ[ƒ€
+///ï¿½rï¿½bï¿½gï¿½ï¿½ï¿½oï¿½Í‚ï¿½ï¿½éƒï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½
 typedef struct dkc_BitMemoryStream{
 	int read_count;
 	size_t read_buff;
@@ -147,7 +152,7 @@ DKC_INLINE int dkcFreeBitMemoryStream(DKC_BIT_MEMORYSTREAM **p)
 	return dkcFree((void **)p);	
 }
 /**
-@param n[in] ƒrƒbƒg”
+@param n[in] ï¿½rï¿½bï¿½gï¿½ï¿½
 */
 DKC_INLINE int dkcBitMemoryStreamWrite(DKC_BIT_MEMORYSTREAM *p,void *target_arg,int n)
 {
@@ -171,7 +176,7 @@ DKC_INLINE int dkcBitMemoryStreamWrite(DKC_BIT_MEMORYSTREAM *p,void *target_arg,
 		if( !wc ){
 			if( DKUTIL_FAILED(dkcMemoryStreamDynamicWrite(p->pms, &wb,1 )) )
 			{
-				//Œ³‚Ìó‘Ô‚É–ß‚·
+				//ï¿½ï¿½ï¿½Ìï¿½Ô‚É–ß‚ï¿½
 				dkcMemoryStreamSeek(p->pms,sp,edkcMemoryStreamSeekSet);
 				return edk_FAILED;
 			}
@@ -182,7 +187,7 @@ DKC_INLINE int dkcBitMemoryStreamWrite(DKC_BIT_MEMORYSTREAM *p,void *target_arg,
 	/*if( !wc ){
 		if( DKUTIL_FAILED(dkcMemoryStreamDynamicWrite(p->pms, &wb,1 )) )
 		{
-			//Œ³‚Ìó‘Ô‚É–ß‚·
+			//ï¿½ï¿½ï¿½Ìï¿½Ô‚É–ß‚ï¿½
 			dkcMemoryStreamSeek(p->pms,sp,edkcMemoryStreamSeekSet);
 			return edk_FAILED;
 		}
@@ -201,7 +206,7 @@ DKC_INLINE int dkcBitMemoryStreamWriteLast(DKC_BIT_MEMORYSTREAM *p){
 	int r = dkcMemoryStreamDynamicWrite(p->pms, &p->write_buff,1 );
 	if( DKUTIL_FAILED(r) )
 	{
-		//Œ³‚Ìó‘Ô‚É–ß‚·
+		//ï¿½ï¿½ï¿½Ìï¿½Ô‚É–ß‚ï¿½
 		dkcMemoryStreamSeek(p->pms,sp,edkcMemoryStreamSeekSet);
 		return r;
 	}
@@ -213,9 +218,9 @@ DKC_INLINE int dkcBitMemoryStreamWriteLast(DKC_BIT_MEMORYSTREAM *p){
 #if 0
 
 /**
-@param n[in] ƒrƒbƒg”
+@param n[in] ï¿½rï¿½bï¿½gï¿½ï¿½
 */
-//#error unsigned‚È‚Ì‚Å--rc‚Æ‚©‚ÍƒGƒ‰[ write read —¼•û‚ğŠm”F
+//#error unsignedï¿½È‚Ì‚ï¿½--rcï¿½Æ‚ï¿½ï¿½ÍƒGï¿½ï¿½ï¿½[ write read ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½F
 DKC_INLINE int dkcBitMemoryStreamRead(DKC_BIT_MEMORYSTREAM *p,void *res_arg,int n)
 {
 	int rc = p->read_count;
@@ -231,7 +236,7 @@ DKC_INLINE int dkcBitMemoryStreamRead(DKC_BIT_MEMORYSTREAM *p,void *res_arg,int 
 			
 			//if( DKUTIL_FAILED(dkcMemoryStreamRead(p->pms,&rb,1,&rs)) ){
 			if( DKUTIL_FAILED(dkcMemoryStreamGet8(p->pms,(uint8 *)&rb))){
-				//Œ³‚Ìó‘Ô‚É–ß‚·
+				//ï¿½ï¿½ï¿½Ìï¿½Ô‚É–ß‚ï¿½
 				dkcMemoryStreamSeek(p->pms,sp,edkcMemoryStreamSeekSet);
 				return edk_FAILED;
 			}
@@ -275,9 +280,9 @@ DKC_INLINE int dkcBitMemoryStreamReadBase(DKC_BIT_MEMORYSTREAM *p,void *res_arg,
 				
 				//if( DKUTIL_FAILED(dkcMemoryStreamRead(p->pms,&rb,1,&rs)) ){
 				if( DKUTIL_FAILED(dkcMemoryStreamGet8(p->pms,(uint8 *)&rb))){
-					if(as_possible_as_much)//‚ª‚ñ‚Î‚Á‚Äo—ˆ‚é‚¾‚¯“Ç‚İ‚ñ‚¾‚æB
+					if(as_possible_as_much)//ï¿½ï¿½ï¿½ï¿½Î‚ï¿½ï¿½Äoï¿½ï¿½ï¿½é‚¾ï¿½ï¿½ï¿½Ç‚İï¿½ï¿½ñ‚¾‚ï¿½B
 						goto End;
-					//Œ³‚Ìó‘Ô‚É–ß‚·
+					//ï¿½ï¿½ï¿½Ìï¿½Ô‚É–ß‚ï¿½
 					dkcMemoryStreamSeek(p->pms,sp,edkcMemoryStreamSeekSet);
 					return edk_FAILED;
 				}
@@ -309,11 +314,11 @@ DKC_INLINE int dkcBitMemoryStreamRead(DKC_BIT_MEMORYSTREAM *p,void *res_arg,int 
 
 #endif
 
-///ƒoƒbƒtƒ@“à‚ÉÅŒã‚Éc‚Á‚Ä‚¢‚éƒrƒbƒg‚ğo—Í‚·‚é
+///ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½ÉÅŒï¿½Écï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½rï¿½bï¿½gï¿½ï¿½ï¿½oï¿½Í‚ï¿½ï¿½ï¿½
 DKC_INLINE int WINAPI dkcBitMemoryStreamReadLast(DKC_BIT_MEMORYSTREAM *p,uint32 *res,int *ressize)
 {
 	if(p->read_count <= 0){
-		///o—ˆ‚é‚¾‚¯“Ç‚İ‚Ş
+		///ï¿½oï¿½ï¿½ï¿½é‚¾ï¿½ï¿½ï¿½Ç‚İï¿½ï¿½ï¿½
 		return dkcBitMemoryStreamReadBase(p,
 			res,32,TRUE,ressize);
 	}
@@ -326,7 +331,7 @@ DKC_INLINE int WINAPI dkcBitMemoryStreamReadLast(DKC_BIT_MEMORYSTREAM *p,uint32 
 /*DKC_FORCE_INLINE void WINAPI dkcBitMemoryStreamInit(DKC_BIT_MEMORYSTREAM *ptr){
 }*/
 #define dkcBitMemoryStreamGetMemoryStreamObj(p) p->pms
-///ƒoƒCƒg’PˆÊ‚ÅƒV[ƒN‚·‚é ƒV[ƒN‚µ‚½ê‡A\‘¢‘Ì“à•”‚ÌƒXƒe[ƒg‚¨‚æ‚Ñƒoƒbƒtƒ@‚É’~‚¦‚Ä‚¢‚éƒrƒbƒg‚Í”jŠü‚³‚ê‚é @see dkcMemoryStreamSeek()
+///ï¿½oï¿½Cï¿½gï¿½Pï¿½Ê‚ÅƒVï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½ ï¿½Vï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½\ï¿½ï¿½ï¿½Ì“ï¿½ï¿½ï¿½ï¿½ÌƒXï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½Ñƒoï¿½bï¿½tï¿½@ï¿½É’~ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½rï¿½bï¿½gï¿½Í”jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ @see dkcMemoryStreamSeek()
 DKC_INLINE int WINAPI dkcBitMemoryStreamSeekByte(DKC_BIT_MEMORYSTREAM *ptr,int offset,int origin)
 {
 	ptr->read_count =	ptr->read_buff = ptr->write_buff = 0;
@@ -335,7 +340,7 @@ DKC_INLINE int WINAPI dkcBitMemoryStreamSeekByte(DKC_BIT_MEMORYSTREAM *ptr,int o
 	return dkcMemoryStreamSeek(ptr->pms,offset,origin);
 }
 //#define dkcBitMemoryStreamSeekByte(ptr,offset,origin) dkcMemoryStreamSeek(ptr->pms,offset,origin)
-///ƒoƒCƒg’PˆÊ‚Å¡‚ÌƒV[ƒNˆÊ’uiƒIƒtƒZƒbƒgj‚ğæ“¾‚·‚é @see dkcMemoryStreamTell() 
+///ï¿½oï¿½Cï¿½gï¿½Pï¿½Ê‚Åï¿½ï¿½ÌƒVï¿½[ï¿½Nï¿½Ê’uï¿½iï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½jï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½ @see dkcMemoryStreamTell() 
 #define dkcBitMemoryStreamTellByte(ptr) dkcMemoryStreamTell(ptr->pms)
 
 DKC_INLINE int WINAPI dkcBitMemoryStreamTellBitCheck(DKC_BIT_MEMORYSTREAM *ptr){
@@ -345,7 +350,7 @@ DKC_INLINE int WINAPI dkcBitMemoryStreamTellBitCheck(DKC_BIT_MEMORYSTREAM *ptr){
 	}
 	return edk_SUCCEEDED;
 }
-///ƒrƒbƒg’PˆÊ‚Å¡‚ÌƒV[ƒNˆÊ’uiƒIƒtƒZƒbƒgj‚ğæ“¾‚·‚é
+///ï¿½rï¿½bï¿½gï¿½Pï¿½Ê‚Åï¿½ï¿½ÌƒVï¿½[ï¿½Nï¿½Ê’uï¿½iï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½jï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
 DKC_INLINE size_t WINAPI dkcBitMemoryStreamTellBit(DKC_BIT_MEMORYSTREAM *ptr,size_t *bit)
 {
 	size_t t = dkcBitMemoryStreamTellByte(ptr);
@@ -354,7 +359,7 @@ DKC_INLINE size_t WINAPI dkcBitMemoryStreamTellBit(DKC_BIT_MEMORYSTREAM *ptr,siz
 }
 ///@see dkcMemoryStreamWriteToMemory()
 #define dkcBitMemoryStreamWriteToMemory(ptr,dest,size,flag) dkcMemoryStreamWriteToMemory(ptr->pms,dest,size,flag)
-///dkcBitMemoryStreamWriteLast() ‚ğ‚µ‚Ä‚©‚çdkcBitMemoryStreamWriteToMemory()‚ğ‚·‚éB
+///dkcBitMemoryStreamWriteLast() ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½dkcBitMemoryStreamWriteToMemory()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 #define dkcBitMemoryStreamWriteToMemoryLast(ptr,dest,size,flag) dkcBitMemoryStreamWriteLast(ptr);dkcBitMemoryStreamWriteToMemory(ptr,dest,size,flag)
 ///@see dkcMemoryStreamDump()
 #define dkcBitMemoryStreamDump(ptr,filename,flag) dkcMemoryStreamDump(ptr->pms,filename,flag)
@@ -376,14 +381,14 @@ DKC_FORCE_INLINE int dkcBitMemoryStreamLoadFormMemory(DKC_BIT_MEMORYSTREAM *ptr,
 
 
 /*
-@param flag[in] edkcStreamBufferAll ‚Ü‚½‚Í edkcStreamBufferFirst
+@param flag[in] edkcStreamBufferAll ï¿½Ü‚ï¿½ï¿½ï¿½ edkcStreamBufferFirst
 */
 /*
 DKC_FORCE_INLINE int dkcBitMemoryStreamLoadFromFile(DKC_BIT_MEMORYSTREAM *ptr,const char *filename,size_t permit_size,UINT flag){
 	
 
 	size_t size;
-	//‹–—eƒTƒCƒY‚æ‚èƒtƒ@ƒCƒ‹ƒTƒCƒY‚ª‘å‚«‚¢ğŒ‚ÌŒ‹‰Ê‚ğc1‚É“ü‚ê‚é
+	//ï¿½ï¿½ï¿½eï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½Ê‚ï¿½c1ï¿½É“ï¿½ï¿½ï¿½ï¿½
 	int c1 ;
 	int r = edk_FAILED;
 	size_t readsize = 0;

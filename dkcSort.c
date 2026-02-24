@@ -114,9 +114,85 @@ void WINAPI dkcCombSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYP
 
 
 
+/* ========================================
+ * QuickSort
+ * C言語によるアルゴリズム辞典 (奥村晴彦) 方式
+ *   - 3点メジアン法によるピボット選択
+ *   - 小配列 (n <= QUICK_M) は挿入ソートに切替
+ *   - 小さい方のパーティションに再帰し、大きい方はループで処理
+ *     (末尾再帰除去によりスタック深さを O(log n) に抑える)
+ * ======================================== */
+#define QUICK_M 9
+
+static void qs_insert(BYTE *a, size_t n, size_t width,
+                      DKC_SORT_COMPARE_TYPE compare, BYTE *tmp)
+{
+	size_t i;
+	int j;
+	for(i = 1; i < n; i++){
+		memcpy(tmp, a + i * width, width);
+		for(j = (int)i - 1; j >= 0 && compare(a + (size_t)j * width, tmp, width) > 0; j--){
+			memcpy(a + (size_t)(j + 1) * width, a + (size_t)j * width, width);
+		}
+		memcpy(a + (size_t)(j + 1) * width, tmp, width);
+	}
+}
+
+static void qs_impl(BYTE *a, size_t n, size_t width,
+                    DKC_SORT_COMPARE_TYPE compare, BYTE *tmp)
+{
+	BYTE *lo, *mid, *hi;
+	size_t i, j;
+
+	while(n > QUICK_M){
+		/* --- 3点メジアン法: a[0], a[n/2], a[n-1] をソートして中央値をピボットに --- */
+		lo  = a;
+		mid = a + (n / 2) * width;
+		hi  = a + (n - 1) * width;
+		if(compare(lo, mid, width) > 0) dkcSwap(lo, mid, width);
+		if(compare(mid, hi, width) > 0) dkcSwap(mid, hi, width);
+		if(compare(lo, mid, width) > 0) dkcSwap(lo, mid, width);
+		/* 中央値 (mid) をピボットとして a[0] へ移動 */
+		dkcSwap(a, mid, width);
+
+		/* --- ピボット a[0] を基準にパーティション --- */
+		/* a[n-1] >= pivot が保証されるため i の上限越えはなし    */
+		/* a[n/2] <= pivot が保証されるため j の下限越えはなし    */
+		i = 1;
+		j = n - 1;
+		for(;;){
+			while(compare(a + i * width, a, width) < 0) i++;
+			while(compare(a + j * width, a, width) > 0) j--;
+			if(i >= j) break;
+			dkcSwap(a + i * width, a + j * width, width);
+			i++;
+			j--;
+		}
+		/* ピボットを確定位置 j へ配置 */
+		dkcSwap(a, a + j * width, width);
+
+		/* --- 末尾再帰除去: 小さい方に再帰し、大きい方をループで処理 --- */
+		if(j < n - 1 - j){
+			qs_impl(a, j, width, compare, tmp);
+			a += (j + 1) * width;
+			n -= j + 1;
+		} else {
+			qs_impl(a + (j + 1) * width, n - j - 1, width, compare, tmp);
+			n = j;
+		}
+	}
+	/* 小配列は挿入ソートで仕上げ */
+	qs_insert(a, n, width, compare, tmp);
+}
+
 void WINAPI dkcQuickSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare)
 {
-	//qsort(base,num,width,compare);
+	BYTE *tmp;
+	if(num <= 1) return;
+	tmp = (BYTE *)malloc(width);
+	if(tmp == NULL) return;
+	qs_impl((BYTE *)base, num, width, compare, tmp);
+	free(tmp);
 }
 
 
@@ -558,8 +634,44 @@ static void bitonic_sort_impl(BYTE *a, size_t lo, size_t cnt, int dir, size_t wi
 
 void WINAPI dkcBitonicSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare)
 {
+	BYTE *a = (BYTE *)base;
+	size_t n_padded;
+	BYTE *padded;
+	BYTE *max_elem;
+	size_t i;
+
 	if(num <= 1) return;
-	bitonic_sort_impl((BYTE *)base, 0, num, 1, width, compare);
+
+	/* 次の2の冪を求める */
+	n_padded = 1;
+	while(n_padded < num) n_padded <<= 1;
+
+	if(n_padded == num){
+		/* 既に2の冪ならそのままソート */
+		bitonic_sort_impl(a, 0, num, 1, width, compare);
+		return;
+	}
+
+	/* 2の冪でない場合: 最大値を番兵として次の2の冪サイズへパディング */
+	max_elem = a;
+	for(i = 1; i < num; i++){
+		if(compare(&a[i * width], max_elem, width) > 0){
+			max_elem = &a[i * width];
+		}
+	}
+
+	padded = (BYTE *)malloc(n_padded * width);
+	if(padded == NULL) return;
+
+	memcpy(padded, a, num * width);
+	for(i = num; i < n_padded; i++){
+		memcpy(&padded[i * width], max_elem, width);
+	}
+
+	bitonic_sort_impl(padded, 0, n_padded, 1, width, compare);
+
+	memcpy(a, padded, num * width);
+	free(padded);
 }
 
 /* ========================================
