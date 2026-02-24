@@ -2,7 +2,7 @@
 /*!
 @file dkcRegex.c
 @brief		Regex
-@author		d‹à‹›
+@author		dï¿½ï¿½ï¿½ï¿½
 @since		2004/09/01
 */
 
@@ -12,13 +12,13 @@
 
 #include "dkcStack.h"
 
-// •Ï”‚ÌƒTƒCƒY‚ğ–¾¦“I‚Éw¦‚·‚é‚Æ‚«‚Ég‚¤–¼‘O
+// ï¿½Ïï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½ğ–¾ï¿½ï¿½Iï¿½Éwï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½Égï¿½ï¿½ï¿½ï¿½ï¿½O
 typedef unsigned char  byte;
 typedef unsigned short dbyte;
 typedef unsigned long  qbyte;
 typedef DKC_UNICODE unicode;
 
-// unsigned ‚Á‚Ä–ˆ‰ñ‘Å‚Â‚Ì–Ê“|
+// unsigned ï¿½ï¿½ï¿½Ä–ï¿½ï¿½ï¿½Å‚Â‚Ì–Ê“|
 typedef unsigned char  uchar;
 typedef unsigned short ushort;
 typedef unsigned int   uint;
@@ -26,11 +26,11 @@ typedef unsigned long  ulong;
 
 
 #define my_lstrlenW dkcstd_wcslen
-///BOF‚Ì‰Â”\«‚ ‚è
+///BOFï¿½Ì‰Â”\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 #define my_lstrcpyW dkcstd_wcsncpy
 
 /*
-//@{ ‘å•¶š¬•¶š‚ğ‹æ•Ê‚·‚éƒ|ƒŠƒV[ //@}
+//@{ ï¿½å•¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½|ï¿½ï¿½ï¿½Vï¿½[ //@}
 struct CaseSensitive
 {
 	static unicode map( unicode c )
@@ -39,7 +39,7 @@ struct CaseSensitive
 		{ return c1!=c2; }
 };
 
-//@{ ‘å•¶š¬•¶š‚ğ‹æ•Ê‚µ‚È‚¢ƒ|ƒŠƒV[ //@}
+//@{ ï¿½å•¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½È‚ï¿½ï¿½|ï¿½ï¿½ï¿½Vï¿½[ //@}
 struct IgnoreCase
 {
 	static unicode map( unicode c )
@@ -108,7 +108,7 @@ int WINAPI dkcReplaceRun(	 const BYTE *src,size_t srcsize,
 /*
 @param
 @note
-target_data_size < replace_data_size‚Ì‚ÍƒGƒ‰[
+target_data_size < replace_data_sizeï¿½Ìï¿½ï¿½ÍƒGï¿½ï¿½ï¿½[
 */
 /*
 DKC_EXTERN int WINAPI dkcDataReplaceStuff(BYTE *dest,size_t destsize,
@@ -125,7 +125,7 @@ DKC_EXTERN int WINAPI dkcDataReplaceStuff(BYTE *dest,size_t destsize,
 
 
 
-	//‚Ü‚¸‚Í’uŠ·êŠ‚ğ’T‚·
+	//ï¿½Ü‚ï¿½ï¿½Í’uï¿½ï¿½ï¿½êŠï¿½ï¿½Tï¿½ï¿½
 	for(i=0;i<srcsize;i++){
 		memcmp(&src[i],
 
@@ -138,9 +138,9 @@ DKC_EXTERN int WINAPI dkcDataReplaceStuff(BYTE *dest,size_t destsize,
 
 
 /**
-ƒg[ƒNƒ“‚É•ª‰ğ
+ï¿½gï¿½[ï¿½Nï¿½ï¿½ï¿½É•ï¿½ï¿½ï¿½
 
-s“ª‚ğ•\‚·^‚Æs––‚ğ•\‚·$‚É‚Â‚¢‚Ä‚ÍãˆÊ‘w‚ÅŠæ’£‚é
+ï¿½sï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½^ï¿½Æsï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½$ï¿½É‚Â‚ï¿½ï¿½Ä‚Íï¿½Ê‘wï¿½ÅŠæ’£ï¿½ï¿½
 */
 typedef struct RegLexer_
 {
@@ -230,7 +230,7 @@ End:
 int RegLexerGetToken(RegLexer *p)
 {
 	return RegLexerGetTokenImpl(p);
-	//d‹à‹›‰üF‚±‚±‚ğCŒ¾Œê‚Å•\Œ»‚·‚é‚Ì‚Íœ‚ªÜ‚ê‚éc
+	//dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½Å•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Íï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½c
 	//const wchar_t*& x = (*p->sub_ ? p->sub_ : p->pat_);
 	/*
 	const wchar_t* x = (*p->sub_ ? p->sub_ : p->pat_);
@@ -307,13 +307,13 @@ void free_RegClass(RegClass *p){
 
 typedef struct RegNode_
 {
-//	/*edkcRegType*/int           type; // ‚±‚Ìƒm[ƒh‚Ìí—Ş
+//	/*edkcRegType*/int           type; // ï¿½ï¿½ï¿½Ìƒmï¿½[ï¿½hï¿½Ìï¿½ï¿½
 	int						type;
-	wchar_t       ch; // •¶š
-	RegClass*     cls; // •¶šW‡
-	BOOL          cmpcls; // ª•âW‡‚©‚Ç‚¤‚©
-	struct RegNode_*			left; // ¶‚Ìq
-	struct RegNode_*			right; // ‰E‚Ìq
+	wchar_t       ch; // ï¿½ï¿½ï¿½ï¿½
+	RegClass*     cls; // ï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½
+	BOOL          cmpcls; // ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½
+	struct RegNode_*			left; // ï¿½ï¿½ï¿½Ìq
+	struct RegNode_*			right; // ï¿½Eï¿½Ìq
 }RegNode;
 
 RegNode *alloc_RegNode(){
@@ -333,7 +333,7 @@ void free_RegNode(RegNode *p){
 }
 //**********************************************************
 
-///\•¶–Øì¬
+///ï¿½\ï¿½ï¿½ï¿½Øì¬
 typedef struct RegParser_
 {
 	BOOL    err_;
@@ -365,11 +365,11 @@ BOOL RegParser_isTailType(RegParser *p) { return p->isTailType_; }
 
 //=========================================================================
 //@{
-//	\•¶–Øì¬FÀ‘•
+//	ï¿½\ï¿½ï¿½ï¿½Øì¬ï¿½Fï¿½ï¿½ï¿½ï¿½
 //@}
 //=========================================================================
 
-///non thread safe ›|P|Q
+///non thread safe ï¿½ï¿½|ï¿½P|ï¿½Q
 static int tmp; 
 
 
@@ -594,15 +594,15 @@ RegNode* RegParser_expr(RegParser *p)
 
 
 
-///ó‘Ô‘JˆÚ
+///ï¿½ï¿½Ô‘Jï¿½ï¿½
 typedef struct RegTrans_
 {
-	//aptr<RegClass>  cls; // ‚±‚Ì•¶šW‡
+	//aptr<RegClass>  cls; // ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½
 	RegClass *cls;
-	                     // orEpsilon ‚ª—ˆ‚½‚ç
+	                     // orEpsilon ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	BOOL         cmpcls;
-	int              to; // ó‘Ô”Ô†to‚Ìó‘Ô‚Ö‘JˆÚ
-	//aptr<RegTrans> next; // ˜AŒ‹ƒŠƒXƒg
+	int              to; // ï¿½ï¿½Ô”Ôï¿½toï¿½Ìï¿½Ô‚Ö‘Jï¿½ï¿½
+	//aptr<RegTrans> next; // ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½g
 	struct RegTrans_ *next;
 	
 	int type;
@@ -618,7 +618,7 @@ enum {
 	eChar,
 };
 
-//RegClass *‚ÆRegTrans *ŒİŠ·«‚ª–³‚¢‚æ›|P|Q
+//RegClass *ï¿½ï¿½RegTrans *ï¿½İŠï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ›|ï¿½P|ï¿½Q
 BOOL RegTrans_match_c(RegTrans *pt, wchar_t c )
 {
 	RegClass* p = pt->cls;
@@ -647,7 +647,7 @@ BOOL RegTrans_match(RegTrans *pt, wchar_t c, BOOL caseS )
 
 //**********************************************************
 
-///	\•¶–Ø->NFA•ÏŠ·
+///	ï¿½\ï¿½ï¿½ï¿½ï¿½->NFAï¿½ÏŠï¿½
 
 typedef struct RegNFA_
 {
@@ -694,7 +694,7 @@ BOOL RegNFA_isTailType(RegNFA *p) {
 	return RegParser_isTailType(&p->parser); 
 }
 
-// ƒ}ƒbƒ`ƒ“ƒOˆ—
+// ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½
 void RegNFA_match_a3(RegNFA *, int curSt, int pos );
 int RegNFA_match_a4(RegNFA *, const wchar_t* str, int len, BOOL caseS );
 
@@ -745,7 +745,7 @@ void RegNFA_Destruct(RegNFA *p)
 	ulong i=0;
 	ulong e = dkcStackSize(p->st);
 
-	for(;i<e;i++){//‚±‚±‚ÉƒoƒO‚ª‚ ‚é‚©‚àH
+	for(;i<e;i++){//ï¿½ï¿½ï¿½ï¿½ï¿½Éƒoï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½é‚©ï¿½ï¿½ï¿½H
 		dkcStackTop(p->st,(void *)&t);
 		free_RegTrans(t);
 		dkcStackPop(p->st);
@@ -870,7 +870,7 @@ void RegNFA_gen_nfa(RegNFA *p, int entry, RegNode* t, int exit )
 
 //=========================================================================
 //@{
-//	ƒ}ƒbƒ`ƒ“ƒO
+//	ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½O
 //@}
 //=========================================================================
 
@@ -917,27 +917,27 @@ int RegNFA_match_a4(RegNFA *p, const wchar_t* str, int len, BOOL caseS )
 {
 
 	if( RegParser_err(&p->parser) )
-		return -1; // ƒGƒ‰[
+		return -1; // ï¿½Gï¿½ï¿½ï¿½[
 
 	p->matchpos_ = -1;
 	p->caseS_ = caseS;
 	p->str_ = str;
-	p->len_ = len; // ì‹Æ•Ï”‚ÉƒRƒs[
+	p->len_ = len; // ï¿½ï¿½Æ•Ïï¿½ï¿½ÉƒRï¿½sï¿½[
 
 	{
 		st_ele nw = {0,0};
 		dkcStackDynamicPush(p->pstack, &nw );
-		RegNFA_match_a3(p, 0, 0 ); // 0:nó‘Ô
+		RegNFA_match_a3(p, 0, 0 ); // 0:ï¿½nï¿½ï¿½ï¿½
 	}
 	return p->matchpos_ ;
 }
 
-// b’è
+// ï¿½bï¿½ï¿½
 void RegNFA_match_a3(RegNFA *p, int curSt, int pos )
 {
-	if( curSt == 1 ) // 1==Ió‘Ô
+	if( curSt == 1 ) // 1==ï¿½Iï¿½ï¿½ï¿½
 	{
-		// ƒ}ƒbƒ`¬Œ÷‚ğ‹L˜^
+		// ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½^
 		if( p->matchpos_ < pos )
 			p->matchpos_ = pos;
 	}
@@ -953,7 +953,7 @@ void RegNFA_match_a3(RegNFA *p, int curSt, int pos )
 		{
 			if( tr->type == eEpsilon )
 			{
-				// ƒÃ–³ŒÀƒ‹[ƒv‚ğ–h~ôB“¯‚¶ó‘Ô‚É‚Í–ß‚ç‚È‚¢‚æ‚¤‚Éc
+				// ï¿½Ã–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½hï¿½~ï¿½ï¿½Bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚É‚Í–ß‚ï¿½È‚ï¿½ï¿½æ‚¤ï¿½Éc
 				if( RegNFA_check_and_push_stack(p,tr->to, pos) )
 				{
 					RegNFA_match_a3(p, tr->to, pos );
@@ -975,7 +975,7 @@ void RegNFA_match_a3(RegNFA *p, int curSt, int pos )
 
 //=========================================================================
 //@{
-//	GreenPad—pŒŸõƒIƒuƒWƒFƒNƒg
+//	GreenPadï¿½pï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½g
 //@}
 //=========================================================================
 
@@ -983,8 +983,12 @@ DKC_REGEX *WINAPI dkcAllocRegex( const unicode* key, BOOL caseS, BOOL down )
 {
 	DKC_REGEX *p = dkcAllocate(sizeof(DKC_REGEX));
 	p->re_ = alloc_RegNFA(key);
-	p->caseS_ = caseS;
-	p->down_ = down;
+	/* public API: caseS=FALSE means case-sensitive, caseS=TRUE means ignore-case.
+	   internal NFA: caseS_=TRUE means case-sensitive. Negate at boundary. */
+	p->caseS_ = !caseS;
+	/* public API: down=FALSE means forward search, down=TRUE means backward.
+	   internal: down_=TRUE means forward (d=+1). Negate at boundary. */
+	p->down_ = !down;
 	return p;
 }
 
@@ -1067,7 +1071,7 @@ BOOL WINAPI dkcRegularExpressionMatch( const DKC_UNICODE* pat, const wchar_t* st
 	if(FALSE==RegNFA_Construct(&re,pat))
 		return FALSE;
 	
-	r = (len == RegNFA_match_a4(&re, str, len, caseS ));
+	r = (len == RegNFA_match_a4(&re, str, len, !caseS ));
 
 	RegNFA_Destruct(&re);
 

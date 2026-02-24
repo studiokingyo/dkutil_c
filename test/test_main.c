@@ -2154,9 +2154,10 @@ void Test_RLE_PackBits(void)
 
     TEST_BEGIN("dkcRLE (PackBits) Test");
 
+    /* === 基本テスト: ランと非ランが混在するデータ (count=3) === */
     memset(&header, 0, sizeof(header));
     result = dkcRLEPackBitsEncode(&header, compressed, sizeof(compressed),
-                                   original, sizeof(original), 2);
+                                   original, sizeof(original), 3);
     TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode");
 
     if (result == edk_SUCCEEDED) {
@@ -2167,6 +2168,136 @@ void Test_RLE_PackBits(void)
                                        compressed, header.mCompressedSize);
         TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode");
         TEST_ASSERT(memcmp(original, decompressed, sizeof(original)) == 0, "Matches original");
+    }
+
+    /* === 全同一バイト: 最大圧縮ケース === */
+    {
+        BYTE all_same[8];
+        BYTE comp2[32];
+        BYTE decomp2[16];
+        DKC_RLE_PACKBITS_HEADER hdr2;
+
+        memset(all_same, 0xCC, sizeof(all_same));
+        memset(&hdr2, 0, sizeof(hdr2));
+        result = dkcRLEPackBitsEncode(&hdr2, comp2, sizeof(comp2),
+                                       all_same, sizeof(all_same), 3);
+        TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode all-same bytes");
+        TEST_ASSERT(hdr2.mCompressedSize < hdr2.mOriginSize,
+                    "PackBits all-same: compressed smaller than original");
+        if (result == edk_SUCCEEDED) {
+            memset(decomp2, 0, sizeof(decomp2));
+            result = dkcRLEPackBitsDecode(&hdr2, decomp2, sizeof(decomp2),
+                                           comp2, hdr2.mCompressedSize);
+            TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode all-same bytes");
+            TEST_ASSERT(memcmp(all_same, decomp2, sizeof(all_same)) == 0,
+                        "PackBits all-same round-trip");
+        }
+    }
+
+    /* === 非圧縮データ: 全バイト異なる === */
+    {
+        BYTE no_run[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+        BYTE comp3[32];
+        BYTE decomp3[16];
+        DKC_RLE_PACKBITS_HEADER hdr3;
+
+        memset(&hdr3, 0, sizeof(hdr3));
+        result = dkcRLEPackBitsEncode(&hdr3, comp3, sizeof(comp3),
+                                       no_run, sizeof(no_run), 3);
+        TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode non-compressible");
+        if (result == edk_SUCCEEDED) {
+            memset(decomp3, 0, sizeof(decomp3));
+            result = dkcRLEPackBitsDecode(&hdr3, decomp3, sizeof(decomp3),
+                                           comp3, hdr3.mCompressedSize);
+            TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode non-compressible");
+            TEST_ASSERT(memcmp(no_run, decomp3, sizeof(no_run)) == 0,
+                        "PackBits non-compressible round-trip");
+        }
+    }
+
+    /* === 閾値ちょうどのラン (count=3, 3バイト連続 => 圧縮される) === */
+    {
+        BYTE at_thresh[] = {0xAA, 0xAA, 0xAA, 0x11, 0x22, 0x33};
+        BYTE comp4[32];
+        BYTE decomp4[16];
+        DKC_RLE_PACKBITS_HEADER hdr4;
+
+        memset(&hdr4, 0, sizeof(hdr4));
+        result = dkcRLEPackBitsEncode(&hdr4, comp4, sizeof(comp4),
+                                       at_thresh, sizeof(at_thresh), 3);
+        TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode at-threshold run");
+        if (result == edk_SUCCEEDED) {
+            memset(decomp4, 0, sizeof(decomp4));
+            result = dkcRLEPackBitsDecode(&hdr4, decomp4, sizeof(decomp4),
+                                           comp4, hdr4.mCompressedSize);
+            TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode at-threshold run");
+            TEST_ASSERT(memcmp(at_thresh, decomp4, sizeof(at_thresh)) == 0,
+                        "PackBits at-threshold run round-trip");
+        }
+    }
+
+    /* === 閾値未満のラン (count=3, 2バイト連続 => 圧縮されない) === */
+    {
+        BYTE below_thresh[] = {0xBB, 0xBB, 0x01, 0x02, 0x03, 0x04};
+        BYTE comp5[32];
+        BYTE decomp5[16];
+        DKC_RLE_PACKBITS_HEADER hdr5;
+
+        memset(&hdr5, 0, sizeof(hdr5));
+        result = dkcRLEPackBitsEncode(&hdr5, comp5, sizeof(comp5),
+                                       below_thresh, sizeof(below_thresh), 3);
+        TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode below-threshold run");
+        if (result == edk_SUCCEEDED) {
+            memset(decomp5, 0, sizeof(decomp5));
+            result = dkcRLEPackBitsDecode(&hdr5, decomp5, sizeof(decomp5),
+                                           comp5, hdr5.mCompressedSize);
+            TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode below-threshold run");
+            TEST_ASSERT(memcmp(below_thresh, decomp5, sizeof(below_thresh)) == 0,
+                        "PackBits below-threshold run round-trip");
+        }
+    }
+
+    /* === 大きなラン: count=3 で 20バイト同一 === */
+    {
+        BYTE big_run[20];
+        BYTE comp6[64];
+        BYTE decomp6[32];
+        DKC_RLE_PACKBITS_HEADER hdr6;
+
+        memset(big_run, 0xEE, sizeof(big_run));
+        memset(&hdr6, 0, sizeof(hdr6));
+        result = dkcRLEPackBitsEncode(&hdr6, comp6, sizeof(comp6),
+                                       big_run, sizeof(big_run), 3);
+        TEST_ASSERT(result == edk_SUCCEEDED, "PackBits encode large run");
+        TEST_ASSERT(hdr6.mCompressedSize == 2, "PackBits large run: 20 bytes -> 2 bytes");
+        if (result == edk_SUCCEEDED) {
+            memset(decomp6, 0, sizeof(decomp6));
+            result = dkcRLEPackBitsDecode(&hdr6, decomp6, sizeof(decomp6),
+                                           comp6, hdr6.mCompressedSize);
+            TEST_ASSERT(result == edk_SUCCEEDED, "PackBits decode large run");
+            TEST_ASSERT(memcmp(big_run, decomp6, sizeof(big_run)) == 0,
+                        "PackBits large run round-trip");
+        }
+    }
+
+    /* === エラーケース === */
+    {
+        BYTE dummy[] = {0x01, 0x02, 0x03, 0x04, 0x05};
+        BYTE buf[64];
+        BYTE small_buf[4]; /* ssize*2=10 より小さい */
+        DKC_RLE_PACKBITS_HEADER err_hdr;
+
+        memset(&err_hdr, 0, sizeof(err_hdr));
+
+        /* count=2 は無効 (有効範囲: 3以上CHAR_MAX以下) */
+        result = dkcRLEPackBitsEncode(&err_hdr, buf, sizeof(buf),
+                                       dummy, sizeof(dummy), 2);
+        TEST_ASSERT(result != edk_SUCCEEDED, "PackBits rejects count=2 (invalid)");
+
+        /* destバッファが ssize*2 未満 */
+        result = dkcRLEPackBitsEncode(&err_hdr, small_buf, sizeof(small_buf),
+                                       dummy, sizeof(dummy), 3);
+        TEST_ASSERT(result != edk_SUCCEEDED, "PackBits rejects dest too small");
     }
 
     TEST_END();
@@ -2724,7 +2855,7 @@ void Test_Math(void)
 void Test_String(void)
 {
     const char *test_str = "test\\path";
-    size_t pos;
+    int pos;
 
     TEST_BEGIN("dkcString Test");
 
@@ -2733,7 +2864,7 @@ void Test_String(void)
     TEST_ASSERT(pos == 4, "SJIS_StrChrSearch finds backslash");
 
     pos = dkcSJIS_StrChrSearch(test_str, 'z');
-    TEST_ASSERT(pos == strlen(test_str), "SJIS_StrChrSearch returns length for not found");
+    TEST_ASSERT(pos == -1, "SJIS_StrChrSearch returns -1 for not found");
 
     TEST_END();
 }

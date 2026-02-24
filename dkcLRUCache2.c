@@ -123,6 +123,7 @@ static DKC_DOUBLELIST* lru2_move_to_front(DKC_LRU_CACHE2 *cache, DKC_DOUBLELIST 
 */
 static void lru2_evict_oldest(DKC_LRU_CACHE2 *cache)
 {
+	DKC_DOUBLELIST *sentinel_node;
 	DKC_DOUBLELIST *tail_node;
 	DKC_LRU2_NODE_DATA *data;
 	const void *key;
@@ -131,7 +132,11 @@ static void lru2_evict_oldest(DKC_LRU_CACHE2 *cache)
 		return;
 	}
 
-	tail_node = cache->list->tail(cache->list);
+	/* mTail は常にセンチネルノード（番兵）。
+	   実際の最古エントリはセンチネルの1つ前のノード。 */
+	sentinel_node = cache->list->tail(cache->list);
+	if (!sentinel_node) return;
+	tail_node = sentinel_node->mPrev;
 	if (!tail_node) return;
 
 	data = lru2_get_node_data(tail_node);
@@ -300,8 +305,9 @@ DKC_EXTERN int WINAPI dkcLRUCache2Put(DKC_LRU_CACHE2 *cache,
 		return edk_SUCCEEDED;
 	}
 
-	/* 容量チェック: 満杯なら最古を削除 */
-	while (cache->list->size(cache->list) >= cache->capacity) {
+	/* 容量チェック: 満杯なら最古を削除
+	   (size() はセンチネル込みなので「実エントリ数 >= capacity」= size() > capacity) */
+	while (cache->list->size(cache->list) > cache->capacity) {
 		lru2_evict_oldest(cache);
 	}
 
@@ -429,8 +435,12 @@ DKC_EXTERN void WINAPI dkcLRUCache2Clear(DKC_LRU_CACHE2 *cache)
 
 DKC_EXTERN size_t WINAPI dkcLRUCache2Count(const DKC_LRU_CACHE2 *cache)
 {
+	size_t sz;
 	if (!cache || !cache->list) return 0;
-	return cache->list->size((DKC_DOUBLELIST_OBJECT*)cache->list);
+	/* DKC_DOUBLELIST_OBJECT は常にセンチネルノード1個で初期化されるため
+	   mCount は「実エントリ数 + 1」になる。実エントリ数を返す。 */
+	sz = cache->list->size((DKC_DOUBLELIST_OBJECT*)cache->list);
+	return (sz > 0) ? sz - 1 : 0;
 }
 
 DKC_EXTERN size_t WINAPI dkcLRUCache2Capacity(const DKC_LRU_CACHE2 *cache)
