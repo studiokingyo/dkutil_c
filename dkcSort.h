@@ -71,6 +71,34 @@ DKC_EXTERN void WINAPI dkcIntroSort( void *base,size_t num,size_t width,DKC_SORT
 
 DKC_EXTERN void WINAPI dkcTimSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
+/*!
+PowerSort (Munro & Wild, ESA 2018).
+Nearly-optimal adaptive natural merge sort.
+Best O(n), worst O(n log n).
+@see https://doi.org/10.4230/LIPIcs.ESA.2018.63
+*/
+DKC_EXTERN void WINAPI dkcPowerSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+/*!
+JesseSort (Jesse Lew, 2025).
+Dual Patience Sort with k-way merge.
+Best O(n), worst O(n log n).
+@see https://www.researchgate.net/publication/388955884_JesseSort
+*/
+DKC_EXTERN void WINAPI dkcJesseSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
+/*!
+OraSort (Mark Callaghan / Oracle, patent US7680791B2, expired Jan 2026).
+Common Prefix Skipping + MSD Radix Sort hybrid.
+Best O(n), worst O(n * width).
+@warning Uses memcmp (byte comparison). The compare parameter is ignored.
+         Correct for: byte strings, unsigned integers (big-endian), any
+         lexicographically byte-comparable data.
+         NOT correct for: little-endian signed integers, floats, etc.
+@see https://patents.google.com/patent/US7680791
+*/
+DKC_EXTERN void WINAPI dkcOraSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
 DKC_EXTERN int WINAPI dkcRadixSortInt(size_t num, int *data);
 
 DKC_EXTERN int WINAPI dkcRadixSortUInt(size_t num, unsigned int *data);

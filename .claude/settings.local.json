@@ -15,7 +15,10 @@
       "WebFetch(domain:www.blake2.net)",
       "WebFetch(domain:datatracker.ietf.org)",
       "WebFetch(domain:www.ietf.org)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebFetch(domain:www.researchgate.net)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:grokipedia.com)"
     ]
   }
 }

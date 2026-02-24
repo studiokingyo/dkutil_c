@@ -1130,6 +1130,492 @@ int WINAPI dkcRadixSortUInt(size_t num, unsigned int *data)
 	return edk_SUCCEEDED;
 }
 
+/* ========================================
+ * PowerSort
+ * Munro & Wild, "Nearly-Optimal Mergesorts: Fast, Practical Sorting Methods
+ * That Optimally Adapt to Existing Runs", ESA 2018.
+ * https://doi.org/10.4230/LIPIcs.ESA.2018.63
+ * Node power determines which postponed merges to execute.
+ * Best O(n), worst O(n log n), nearly-optimal merge cost.
+ * ======================================== */
+#define POWERSORT_MIN_RUN   24
+#define POWERSORT_MAX_STACK 64
+
+/*
+ * Return smallest p such that floor(a*2^p) != floor(b*2^p),
+ * where a = (s1 + n1/2) / n  and  b = (s2 + n2/2) / n.
+ * Integer computation: a_num = 2*s1+n1, b_num = 2*s2+n2, denom = 2*n.
+ */
+static unsigned int ps_node_power(size_t s1, size_t n1, size_t s2, size_t n2, size_t n)
+{
+	size_t a = 2u * s1 + n1;
+	size_t b = 2u * s2 + n2;
+	size_t denom = 2u * n;
+	unsigned int p = 0u;
+	int bit_a, bit_b;
+	do {
+		p++;
+		a <<= 1; bit_a = (a >= denom) ? 1 : 0; if(bit_a) a -= denom;
+		b <<= 1; bit_b = (b >= denom) ? 1 : 0; if(bit_b) b -= denom;
+	} while(bit_a == bit_b);
+	return p;
+}
+
+/* Extend natural run at lo; reverse if descending; pad to POWERSORT_MIN_RUN. */
+static size_t ps_extend_run(BYTE *a, size_t lo, size_t total, size_t width,
+                             DKC_SORT_COMPARE_TYPE compare, BYTE *tmp)
+{
+	size_t hi, l, r, run_len, force;
+	if(lo + 1u >= total) return 1u;
+	hi = lo + 1u;
+	if(compare(&a[lo * width], &a[hi * width], width) > 0) {
+		while(hi + 1u < total && compare(&a[hi*width], &a[(hi+1u)*width], width) > 0)
+			hi++;
+		hi++;
+		l = lo; r = hi - 1u;
+		while(l < r) { dkcSwap(&a[l*width], &a[r*width], width); l++; r--; }
+	} else {
+		while(hi + 1u < total && compare(&a[hi*width], &a[(hi+1u)*width], width) <= 0)
+			hi++;
+		hi++;
+	}
+	run_len = hi - lo;
+	if(run_len < (size_t)POWERSORT_MIN_RUN) {
+		force = (lo + (size_t)POWERSORT_MIN_RUN <= total) ? lo + (size_t)POWERSORT_MIN_RUN : total;
+		timsort_insertion_sort(a, lo, force, width, compare, tmp);
+		run_len = force - lo;
+	}
+	return run_len;
+}
+
+/* Merge two adjacent sorted runs [lo,mid) and [mid,hi). */
+static void ps_merge(BYTE *a, size_t lo, size_t mid, size_t hi, size_t width,
+                     DKC_SORT_COMPARE_TYPE compare, BYTE *work)
+{
+	size_t len1 = mid - lo, len2 = hi - mid;
+	if(len1 <= len2)
+		timsort_merge_lo(a, lo, len1, mid, len2, width, compare, work);
+	else
+		timsort_merge_hi(a, lo, len1, mid, len2, width, compare, work);
+}
+
+void WINAPI dkcPowerSort(void *base, size_t num, size_t width, DKC_SORT_COMPARE_TYPE compare)
+{
+	BYTE *a = (BYTE *)base;
+	BYTE *work, *tmp;
+	size_t run_base[POWERSORT_MAX_STACK];
+	size_t run_len [POWERSORT_MAX_STACK];
+	unsigned int power_stk[POWERSORT_MAX_STACK];
+	int stack_size;
+	size_t s1, n1, s2, n2, ts, tn;
+	unsigned int p;
+
+	if(num <= 1u) return;
+	if(num < (size_t)POWERSORT_MIN_RUN) {
+		tmp = (BYTE *)malloc(width);
+		if(!tmp) return;
+		timsort_insertion_sort(a, 0u, num, width, compare, tmp);
+		free(tmp);
+		return;
+	}
+	work = (BYTE *)malloc(num * width);
+	tmp  = (BYTE *)malloc(width);
+	if(!work || !tmp) { if(work) free(work); if(tmp) free(tmp); return; }
+
+	stack_size = 0;
+	s1 = 0u;
+	n1 = ps_extend_run(a, 0u, num, width, compare, tmp);
+
+	while(s1 + n1 < num) {
+		s2 = s1 + n1;
+		n2 = ps_extend_run(a, s2, num, width, compare, tmp);
+		p  = ps_node_power(s1, n1, s2, n2, num);
+
+		/* Merge all stack entries whose power > p (higher power = merge earlier). */
+		while(stack_size > 0 && power_stk[stack_size - 1] > p) {
+			ts = run_base[stack_size - 1];
+			tn = run_len [stack_size - 1];
+			stack_size--;
+			ps_merge(a, ts, ts + tn, ts + tn + n1, width, compare, work);
+			s1 = ts;
+			n1 = tn + n1;
+		}
+		run_base [stack_size] = s1;
+		run_len  [stack_size] = n1;
+		power_stk[stack_size] = p;
+		stack_size++;
+		s1 = s2;
+		n1 = n2;
+	}
+
+	/* Final cleanup: merge all remaining stack entries with the last run. */
+	while(stack_size > 0) {
+		ts = run_base[stack_size - 1];
+		tn = run_len [stack_size - 1];
+		stack_size--;
+		ps_merge(a, ts, ts + tn, ts + tn + n1, width, compare, work);
+		s1 = ts;
+		n1 = tn + n1;
+	}
+
+	free(work);
+	free(tmp);
+}
+
+/* ========================================
+ * OraSort
+ * Mark Callaghan / Oracle Corporation.
+ * Patent US7680791B2 (expired January 2026).
+ * https://patents.google.com/patent/US7680791
+ *
+ * Core techniques:
+ *   1. Common Prefix Skipping (CPS): tracks how many leading bytes are
+ *      identical across all elements in a partition; skips those bytes
+ *      in subsequent comparisons.
+ *   2. Adaptive sorting: switches between MSD Radix Sort and insertion sort
+ *      based on partition size.
+ *   3. Key Substring Caching: byte-level access to keys (implicit in using
+ *      the key pointer directly as a byte array).
+ *
+ * Algorithm: MSD (Most Significant Digit) Radix Sort with CPS.
+ *   - At byte position cp, partition n elements into at most 256 buckets
+ *     using counting sort (scatter to tmp[], then copy back).
+ *   - If all elements share byte cp (1 distinct value), skip to cp+1
+ *     without the scatter overhead (this IS the common prefix skip).
+ *   - Recurse on each non-trivial bucket with cp+1.
+ *   - Base case: insertion sort (from byte cp) for small partitions.
+ *
+ * The compare function parameter is IGNORED.
+ * Uses memcmp for all comparisons (byte-string / big-endian key model).
+ * Correct for big-endian keys, byte strings, unsigned char arrays.
+ *
+ * Best O(n), worst O(n * width).
+ * ======================================== */
+#define ORASORT_SMALL 16u
+
+static void orasort_insert_from(BYTE *a, size_t n, size_t width, size_t cp, BYTE *tmp)
+{
+	size_t i, cmplen;
+	int j;
+	cmplen = width - cp;
+	for(i = 1u; i < n; i++) {
+		memcpy(tmp, a + i * width, width);
+		j = (int)i - 1;
+		while(j >= 0 && memcmp(a + (size_t)j * width + cp, tmp + cp, cmplen) > 0) {
+			memcpy(a + ((size_t)j + 1u) * width, a + (size_t)j * width, width);
+			j--;
+		}
+		memcpy(a + ((size_t)j + 1u) * width, tmp, width);
+	}
+}
+
+static void orasort_impl(BYTE *a, size_t n, size_t width, size_t cp, BYTE *tmp)
+{
+	size_t cnt[256];
+	size_t pos[256];
+	size_t cur_pos[256];
+	size_t i, b, start, n_distinct;
+
+	if(n <= 1u || cp >= width) return;
+
+	if(n <= ORASORT_SMALL) {
+		orasort_insert_from(a, n, width, cp, tmp);
+		return;
+	}
+
+	/* Count how many elements have each byte value at position cp. */
+	memset(cnt, 0, sizeof(cnt));
+	for(i = 0u; i < n; i++)
+		cnt[(unsigned char)a[i * width + cp]]++;
+
+	/* Count distinct values. If only 1, all elements share byte cp:
+	 * skip directly to cp+1 without the scatter/gather overhead.
+	 * This is the Common Prefix Skipping optimization. */
+	n_distinct = 0u;
+	for(b = 0u; b < 256u; b++) {
+		if(cnt[b]) {
+			n_distinct++;
+			if(n_distinct > 1u) break;
+		}
+	}
+	if(n_distinct == 1u) {
+		orasort_impl(a, n, width, cp + 1u, tmp);
+		return;
+	}
+
+	/* Compute bucket start positions (prefix sums). */
+	pos[0] = 0u;
+	for(b = 1u; b < 256u; b++)
+		pos[b] = pos[b - 1u] + cnt[b - 1u];
+
+	/* Scatter elements into tmp[] grouped by byte value at cp. */
+	memcpy(cur_pos, pos, sizeof(pos));
+	for(i = 0u; i < n; i++) {
+		b = (unsigned char)a[i * width + cp];
+		memcpy(tmp + cur_pos[b] * width, a + i * width, width);
+		cur_pos[b]++;
+	}
+	/* Copy sorted-by-cp-byte groups back into a[]. */
+	memcpy(a, tmp, n * width);
+
+	/* Recurse on each non-trivial bucket with cp+1.
+	 * All elements in bucket b share byte value b at position cp,
+	 * so the next recursive call advances cp by 1 automatically.
+	 * Long shared prefixes cause a chain of cp+1 recursions,
+	 * each skipping one more identical byte. */
+	start = 0u;
+	for(b = 0u; b < 256u; b++) {
+		if(cnt[b] > 1u)
+			orasort_impl(a + start * width, cnt[b], width, cp + 1u, tmp);
+		start += cnt[b];
+	}
+}
+
+void WINAPI dkcOraSort(void *base, size_t num, size_t width, DKC_SORT_COMPARE_TYPE compare)
+{
+	BYTE *a = (BYTE *)base;
+	BYTE *tmp;
+	(void)compare; /* OraSort uses memcmp (byte comparison); compare is ignored. */
+	if(num <= 1u) return;
+	tmp = (BYTE *)malloc(num * width);
+	if(!tmp) return;
+	orasort_impl(a, num, width, 0u, tmp);
+	free(tmp);
+}
+
+/* ========================================
+ * JesseSort
+ * Jesse Lew, "JesseSort", ResearchGate, 2025.
+ * https://www.researchgate.net/publication/388955884_JesseSort
+ *
+ * Two concurrent Patience Sort games:
+ *   Game 1 (descending stacks): pile tops non-decreasing; top >= new element.
+ *   Game 2 (ascending  stacks): pile tops non-increasing; top <= new element.
+ * Each element is routed to Game 1 (if in a descending run) or Game 2 (ascending run).
+ * After building, all piles from both games are merged via k-way merge.
+ *
+ * Game 1 piles store elements large-to-small (top = min = last element).
+ * Game 2 piles store elements small-to-large (bottom = min = first element).
+ * Both therefore yield an ascending sequence when read from their minimum end.
+ *
+ * Best O(n), worst O(n log n).
+ * ======================================== */
+#define JESSE_PILE_INIT_CAP   8u
+#define JESSE_GAME_INIT_PILES 16u
+
+typedef struct jesse_pile_s {
+	BYTE  *data;
+	size_t size;
+	size_t cap;
+} JESSE_PILE;
+
+typedef struct jesse_game_s {
+	JESSE_PILE *piles;
+	size_t      n_piles;
+	size_t      cap_piles;
+} JESSE_GAME;
+
+static int jesse_pile_push(JESSE_PILE *p, const BYTE *elem, size_t width)
+{
+	BYTE *nd;
+	if(p->size >= p->cap) {
+		nd = (BYTE *)realloc(p->data, p->cap * 2u * width);
+		if(!nd) return 0;
+		p->data = nd;
+		p->cap *= 2u;
+	}
+	memcpy(p->data + p->size * width, elem, width);
+	p->size++;
+	return 1;
+}
+
+static int jesse_game_init(JESSE_GAME *g)
+{
+	g->piles = (JESSE_PILE *)malloc(JESSE_GAME_INIT_PILES * sizeof(JESSE_PILE));
+	if(!g->piles) return 0;
+	g->n_piles   = 0u;
+	g->cap_piles = JESSE_GAME_INIT_PILES;
+	return 1;
+}
+
+static int jesse_game_new_pile(JESSE_GAME *g, const BYTE *elem, size_t width)
+{
+	JESSE_PILE *np;
+	if(g->n_piles >= g->cap_piles) {
+		np = (JESSE_PILE *)realloc(g->piles, g->cap_piles * 2u * sizeof(JESSE_PILE));
+		if(!np) return 0;
+		g->piles = np;
+		g->cap_piles *= 2u;
+	}
+	g->piles[g->n_piles].data = (BYTE *)malloc(JESSE_PILE_INIT_CAP * width);
+	if(!g->piles[g->n_piles].data) return 0;
+	g->piles[g->n_piles].size = 0u;
+	g->piles[g->n_piles].cap  = JESSE_PILE_INIT_CAP;
+	jesse_pile_push(&g->piles[g->n_piles], elem, width);
+	g->n_piles++;
+	return 1;
+}
+
+static void jesse_game_free(JESSE_GAME *g)
+{
+	size_t i;
+	for(i = 0u; i < g->n_piles; i++)
+		free(g->piles[i].data);
+	free(g->piles);   /* free(NULL) is safe */
+	g->piles     = NULL;
+	g->n_piles   = 0u;
+	g->cap_piles = 0u;
+}
+
+/*
+ * Game 1 (descending stacks): pile tops are non-decreasing left-to-right.
+ * Find leftmost pile index whose top >= x.
+ * Returns n_piles if no pile qualifies (caller should create new pile).
+ */
+static size_t jesse_g1_find(JESSE_GAME *g, const BYTE *x, size_t width,
+                             DKC_SORT_COMPARE_TYPE compare)
+{
+	size_t lo = 0u, hi = g->n_piles, mid;
+	BYTE *top;
+	while(lo < hi) {
+		mid = lo + (hi - lo) / 2u;
+		top = g->piles[mid].data + (g->piles[mid].size - 1u) * width;
+		if(compare(top, x, width) < 0)   /* top < x: look right */
+			lo = mid + 1u;
+		else
+			hi = mid;
+	}
+	return lo;
+}
+
+/*
+ * Game 2 (ascending stacks): pile tops are non-increasing left-to-right.
+ * Find leftmost pile index whose top <= x.
+ * Returns n_piles if no pile qualifies (caller should create new pile).
+ */
+static size_t jesse_g2_find(JESSE_GAME *g, const BYTE *x, size_t width,
+                             DKC_SORT_COMPARE_TYPE compare)
+{
+	size_t lo = 0u, hi = g->n_piles, mid;
+	BYTE *top;
+	while(lo < hi) {
+		mid = lo + (hi - lo) / 2u;
+		top = g->piles[mid].data + (g->piles[mid].size - 1u) * width;
+		if(compare(top, x, width) > 0)   /* top > x: look right */
+			lo = mid + 1u;
+		else
+			hi = mid;
+	}
+	return lo;
+}
+
+void WINAPI dkcJesseSort(void *base, size_t num, size_t width, DKC_SORT_COMPARE_TYPE compare)
+{
+	BYTE       *a;
+	JESSE_GAME  g1, g2;
+	/*
+	 * Per-pile reader arrays for the k-way merge.
+	 *   rd_data[r] : pointer to pile data buffer
+	 *   rd_size[r] : total elements in pile
+	 *   rd_cons[r] : elements already consumed
+	 *   rd_ftop[r] : 1 = Game1 (read top-down, index = size-1-consumed)
+	 *                0 = Game2 (read bottom-up, index = consumed)
+	 */
+	BYTE  **rd_data;
+	size_t *rd_size;
+	size_t *rd_cons;
+	int    *rd_ftop;
+	size_t  n_readers, i, r, out_pos, min_idx, cur_idx;
+	BYTE   *min_elem, *cur_elem, *x;
+	size_t  pile_idx;
+	int     ascending, ok;
+
+	a  = (BYTE *)base;
+	ok = 1;
+	g1.piles = NULL;  g1.n_piles = 0u;  g1.cap_piles = 0u;
+	g2.piles = NULL;  g2.n_piles = 0u;  g2.cap_piles = 0u;
+	rd_data  = NULL;  rd_size = NULL;  rd_cons = NULL;  rd_ftop = NULL;
+
+	if(num <= 1u) return;
+
+	if(!jesse_game_init(&g1)) return;
+	if(!jesse_game_init(&g2)) { jesse_game_free(&g1); return; }
+
+	/* ---- Phase 1: Insert every element into the appropriate game ---- */
+	for(i = 0u; ok && i < num; i++) {
+		x = a + i * width;
+		/* Determine direction of the current run:
+		 *   ascending  (a[i-1] <= a[i]) -> Game 2 (ascending stacks)
+		 *   descending (a[i-1]  > a[i]) -> Game 1 (descending stacks) */
+		if(i == 0u)
+			ascending = (num < 2u || compare(x, a + width, width) <= 0);
+		else
+			ascending = (compare(a + (i - 1u) * width, x, width) <= 0);
+
+		if(ascending) {
+			pile_idx = jesse_g2_find(&g2, x, width, compare);
+			if(pile_idx >= g2.n_piles)
+				ok = jesse_game_new_pile(&g2, x, width);
+			else
+				ok = jesse_pile_push(&g2.piles[pile_idx], x, width);
+		} else {
+			pile_idx = jesse_g1_find(&g1, x, width, compare);
+			if(pile_idx >= g1.n_piles)
+				ok = jesse_game_new_pile(&g1, x, width);
+			else
+				ok = jesse_pile_push(&g1.piles[pile_idx], x, width);
+		}
+	}
+	if(!ok) goto done;
+
+	/* ---- Phase 2: K-way merge of all piles back into a[] ---- */
+	n_readers = g1.n_piles + g2.n_piles;
+	rd_data = (BYTE  **)malloc(n_readers * sizeof(BYTE *));
+	rd_size = (size_t *)malloc(n_readers * sizeof(size_t));
+	rd_cons = (size_t *)malloc(n_readers * sizeof(size_t));
+	rd_ftop = (int    *)malloc(n_readers * sizeof(int));
+	if(!rd_data || !rd_size || !rd_cons || !rd_ftop) goto done;
+
+	for(i = 0u; i < g1.n_piles; i++) {
+		rd_data[i] = g1.piles[i].data;
+		rd_size[i] = g1.piles[i].size;
+		rd_cons[i] = 0u;
+		rd_ftop[i] = 1;  /* read from top (index = size-1-consumed) */
+	}
+	for(i = 0u; i < g2.n_piles; i++) {
+		r = g1.n_piles + i;
+		rd_data[r] = g2.piles[i].data;
+		rd_size[r] = g2.piles[i].size;
+		rd_cons[r] = 0u;
+		rd_ftop[r] = 0;  /* read from bottom (index = consumed) */
+	}
+
+	for(out_pos = 0u; out_pos < num; out_pos++) {
+		min_idx  = n_readers;
+		min_elem = NULL;
+		for(r = 0u; r < n_readers; r++) {
+			if(rd_cons[r] >= rd_size[r]) continue;
+			cur_idx  = rd_ftop[r] ? (rd_size[r] - 1u - rd_cons[r]) : rd_cons[r];
+			cur_elem = rd_data[r] + cur_idx * width;
+			if(!min_elem || compare(cur_elem, min_elem, width) < 0) {
+				min_idx  = r;
+				min_elem = cur_elem;
+			}
+		}
+		if(min_idx >= n_readers) break;
+		memcpy(a + out_pos * width, min_elem, width);
+		rd_cons[min_idx]++;
+	}
+
+done:
+	if(rd_data) free(rd_data);
+	if(rd_size) free(rd_size);
+	if(rd_cons) free(rd_cons);
+	if(rd_ftop) free(rd_ftop);
+	jesse_game_free(&g1);
+	jesse_game_free(&g2);
+}
+
 #if 0
 int WINAPI dkcDistCountSortShort(size_t num, const short *a, short *b,short Min_,short Max_)
 {

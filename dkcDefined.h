@@ -1,13 +1,13 @@
 
 /*!
-@author d‹à‹›
+@author dï¿½ï¿½ï¿½ï¿½
 @since 2003/9/13
-@brief ’è‹`ŒS
+@brief ï¿½ï¿½`ï¿½S
 @file dkcDefined.h
 @note
 C language only
 
-C++‚É‚Í‚±‚ñ‚ÈŠ´‚¶‚Ì’è‹`‚ğ‚·‚é‚à‚Ì‚É ios_base ‚Á‚Ä‚à‚Ì‚ªÅ‹ß‚ ‚é–‚ğ’m‚éB
+C++ï¿½É‚Í‚ï¿½ï¿½ï¿½ÈŠï¿½ï¿½ï¿½ï¿½Ì’ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ ios_base ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ì‚ï¿½ï¿½Å‹ß‚ï¿½ï¿½é–ï¿½ï¿½mï¿½ï¿½B
 */
 
 
@@ -20,30 +20,30 @@ C++‚É‚Í‚±‚ñ‚ÈŠ´‚¶‚Ì’è‹`‚ğ‚·‚é‚à‚Ì‚É ios_base ‚Á‚Ä‚à‚Ì‚ªÅ‹ß‚ ‚é–‚ğ’m‚éB
 #include "dkutil_cstd/define.h"
 
 //**********************************************************
-//‹¤’Ê‚Ì’è‹`
+//ï¿½ï¿½ï¿½Ê‚Ì’ï¿½`
 //**********************************************************
 
-///8bit‚Éû‚Ü‚é‘f” (unsigned)
+///8bitï¿½Éï¿½ï¿½Ü‚ï¿½fï¿½ï¿½ (unsigned)
 #define dkcdUNSIGNED_8BIT_PRIME_NUM 251 
-///8bit‚Éû‚Ü‚é‘f” (signed)
+///8bitï¿½Éï¿½ï¿½Ü‚ï¿½fï¿½ï¿½ (signed)
 #define dkcdSIGNED_8BIT_PRIME_NUM 127
 
-///16bit‚Éû‚Ü‚é‘f” (unsigned)
+///16bitï¿½Éï¿½ï¿½Ü‚ï¿½fï¿½ï¿½ (unsigned)
 #define dkcdUNSIGNED_16BIT_PRIME_NUM 65521
 
 #define dkcdSIGNED_16BIT_PRIME_NUM 32749
 
-///24bit‚Éû‚Ü‚é‘f” (unsigned)
+///24bitï¿½Éï¿½ï¿½Ü‚ï¿½fï¿½ï¿½ (unsigned)
 #define dkcdUNSIGNED_24BIT_PRIME_NUM 16777213
 
-///64bit‚Éû‚Ü‚éÅ‘å’l (unsigned)
+///64bitï¿½Éï¿½ï¿½Ü‚ï¿½Å‘ï¿½l (unsigned)
 #define dkcd64BIT_MAX DKINGYO_ULONGLONG_MAX
-///64bit‚Éû‚Ü‚éÅ¬’l (signed)
+///64bitï¿½Éï¿½ï¿½Ü‚ï¿½Åï¿½ï¿½l (signed)
 #define dkcd64BIT_MIN DKINGYO_LONGLONG_MIN
 
-///ƒƒ“ƒoŠÖ”‚ª’è‹`‚³‚ê‚Ä‚¢‚È‚¢‚É•Ô‚·•Ï”
+///ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½É•Ô‚ï¿½ï¿½Ïï¿½
 #define DKINGYO_NOT_MOUNTED -100
-///DKINGYO_NOT_MOUNTED‚Æ“¯‚¶
+///DKINGYO_NOT_MOUNTEDï¿½Æ“ï¿½ï¿½ï¿½
 #define DKINGYO_NO_DEFINED_FUNCTION DKINGYO_NOT_MOUNTED
 
 
@@ -51,41 +51,41 @@ C++‚É‚Í‚±‚ñ‚ÈŠ´‚¶‚Ì’è‹`‚ğ‚·‚é‚à‚Ì‚É ios_base ‚Á‚Ä‚à‚Ì‚ªÅ‹ß‚ ‚é–‚ğ’m‚éB
 
 
 //**********************************************************
-//¯•Ê‚·‚é‚½‚ß‚Ì’è‹`
+//ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½é‚½ï¿½ß‚Ì’ï¿½`
 //**********************************************************
 
 
 
 
-///‰æ‘œƒtƒ@ƒCƒ‹‚ğ‰ğÍ‚·‚é‚Ég‚¤OO
+///ï¿½æ‘œï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½éï¿½Égï¿½ï¿½ï¿½Oï¿½O
 enum{
 	enuDKINGYO_BMPFILEHEADER_ADR = 1,
 	enuDKINGYO_BMPCOREHEADER_ADR,
 	enuDKINGYO_BMPINFOHEADER_ADR,
 	enuDKINGYO_BMPPALLETE_ADR,
 	enuDKINGYO_BMPGRAPH_ADR,
-	///isBmpFile()‚Å‚Ìflag‚É‚Ô‚¿‚Ş¯•Êq Bitmapƒtƒ@ƒCƒ‹‚©‚Ç‚¤‚©³Šm‚Èƒ`ƒFƒbƒN‚ğs‚¤B
+	///isBmpFile()ï¿½Å‚ï¿½flagï¿½É‚Ô‚ï¿½ï¿½ï¿½ï¿½Şï¿½ï¿½Êq Bitmapï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½Èƒ`ï¿½Fï¿½bï¿½Nï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
 	enuDKINGYO_ISBMPFILE_EXACT_CHECK,
-	///isBmpFile()‚Å‚Ìflag‚É‚Ô‚¿‚Ş¯•Êq ‹U‘•ƒrƒbƒgƒ}ƒbƒv‚©‚Ç‚¤‚©’²‚×‚éB
+	///isBmpFile()ï¿½Å‚ï¿½flagï¿½É‚Ô‚ï¿½ï¿½ï¿½ï¿½Şï¿½ï¿½Êq ï¿½Uï¿½ï¿½ï¿½rï¿½bï¿½gï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×‚ï¿½B
 	enuDKINGYO_ISBMPFILE_CAMOUFLAGE_CHECK,
 };
 
 
 //**********************************************************
-//ƒfƒtƒHƒ‹ƒg”‚Ìİ’è—p’è”‚Ì’è‹`
+//ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ìİ’ï¿½pï¿½è”ï¿½Ì’ï¿½`
 //**********************************************************
 enum{
-	///Šg’£Œ^ˆø”‚Ìƒoƒbƒtƒ@‚Ì’Ç‰ÁƒTƒCƒY‚ğw’è‚·‚é
+	///ï¿½gï¿½ï¿½ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½Ì’Ç‰ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½wï¿½è‚·ï¿½ï¿½
 	enuExtendVaListLength = 256,
-	///ƒRƒ“ƒeƒiŒn‚Ìƒeƒ“ƒvƒŒ[ƒgƒNƒ‰ƒX‚Å‚Ç‚Ì‚­‚ç‚¢‚ÌƒTƒCƒYi‚Ü‚½‚Í”j‚ğŠm•Û‚·‚é‚©‚ğİ’è‚·‚é
+	///ï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½nï¿½Ìƒeï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[ï¿½gï¿½Nï¿½ï¿½ï¿½Xï¿½Å‚Ç‚Ì‚ï¿½ï¿½ç‚¢ï¿½ÌƒTï¿½Cï¿½Yï¿½iï¿½Ü‚ï¿½ï¿½Íï¿½ï¿½jï¿½ï¿½ï¿½mï¿½Û‚ï¿½ï¿½é‚©ï¿½ï¿½İ’è‚·ï¿½ï¿½
 	enuDefaultExpandSize = 100,
 };
 
 //**********************************************************
-//Œ^’è‹`
+//ï¿½^ï¿½ï¿½`
 //**********************************************************
 
-//‹¤’ÊŒ^
+//ï¿½ï¿½ï¿½ÊŒ^
 typedef void (*VOIDFUNC)(void); 
 typedef void (*VOIDARGFUNC)(void *);
 typedef void (*VOIDARGFUNCFLAG)(void *,int);
@@ -101,15 +101,15 @@ typedef struct dkc_Allocator{
 	
 
 //**********************************************************
-//dKingyoUtility2‚Æ“¯‚¶@ƒ}ƒNƒ‚Æ‚©
+//dKingyoUtility2ï¿½Æ“ï¿½ï¿½ï¿½ï¿½@ï¿½}ï¿½Nï¿½ï¿½ï¿½Æ‚ï¿½
 //**********************************************************
 
 
-/// MessageBox‚ğ•\¦
+/// MessageBoxï¿½ï¿½\ï¿½ï¿½
 #define MB(str) MessageBox(NULL,str,"Message",MB_OK)//MessageBox
-/// MessageBox‚ğ•\¦iƒ^ƒCƒgƒ‹w’è‰Â”\ƒo[ƒWƒ‡ƒ“j
+/// MessageBoxï¿½ï¿½\ï¿½ï¿½ï¿½iï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½wï¿½ï¿½Â”\ï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½j
 #define MB2(s,title) MessageBox(NULL,s,title,MB_OK);
-///OutputDebugString‚ğg—p
+///OutputDebugStringï¿½ï¿½ï¿½gï¿½p
 #define ODS(str) OutputDebugString(str)//OutputDebugString
 
 /**
@@ -118,26 +118,29 @@ typedef struct dkc_Allocator{
 */
 enum{
 	/**
-	@warning ’ˆÓFƒf[ƒ^‚ª‘‚«o‚³‚ê‚Ä‚¢‚È‚¢—Ìˆæ‚àw’è‚·‚é‚Ì‚Å’ˆÓB
-	—LŒøƒf[ƒ^‚Ì‚İ‚ğw’è‚·‚éê‡‚ÍedkcStreamBufferToNowOffset‚ğw’è‚·‚é‚±‚ÆB
+	@warning ï¿½ï¿½ï¿½ÓFï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½Ìˆï¿½ï¿½ï¿½wï¿½è‚·ï¿½ï¿½Ì‚Å’ï¿½ï¿½ÓB
+	ï¿½Lï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ì‚İ‚ï¿½ï¿½wï¿½è‚·ï¿½ï¿½ê‡ï¿½ï¿½edkcStreamBufferToNowOffsetï¿½ï¿½ï¿½wï¿½è‚·ï¿½é‚±ï¿½ÆB
 	*/
-	///ƒXƒgƒŠ[ƒ€ƒoƒbƒtƒ@‚Ì‚·‚×‚Ä‚ğw’è
+	///ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½Ì‚ï¿½ï¿½×‚Ä‚ï¿½ï¿½wï¿½ï¿½
 	edkcStreamBufferAll = 0,
-	///ƒXƒgƒŠ[ƒ€ƒoƒbƒtƒ@‚ÌÅ‰‚¾‚¯‚ğw’è
+	///ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÌÅï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½
 	edkcStreamBufferFirst = 1,
-	///ƒXƒgƒŠ[ƒ€ƒoƒbƒtƒ@‚ÌÅŒã‚¾‚¯‚ğw’è
+	///ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÌÅŒã‚¾ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½
 	//edkcStreamBufferLast = 2,
-	///¡w’è‚³‚ê‚Ä‚¢‚éƒIƒtƒZƒbƒg‚Ü‚Å‚ğw’è
+	///ï¿½ï¿½ï¿½wï¿½è‚³ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Ü‚Å‚ï¿½ï¿½wï¿½ï¿½
 	edkcStreamBufferToNowOffset = 3,
 
 	edkcSeekCurrent = SEEK_CUR,
-	///ÅŒã‚ÌˆÊ’u‚©‚çƒV[ƒN
+	///ï¿½ÅŒï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
 	edkcSeekEnd = SEEK_END,
-	///Å‰‚ÌˆÊ’u‚©‚çƒV[ƒN
+	///ï¿½Åï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
 	edkcSeekSet = SEEK_SET,
 };
 
 
+
+
+#ifdef WIN32
 #ifndef int32
 #	define int32 int  		
 #endif
@@ -147,13 +150,6 @@ enum{
 #ifndef int8
 #	define int8 char 		
 #endif
-
-#ifdef WIN32
-
-
-
-#else
-
 #ifndef uint32
 #	define uint32 unsigned int 		
 #endif
@@ -163,8 +159,55 @@ enum{
 #ifndef uint8
 #	define uint8 unsigned char
 #endif
+#else
+/*
+ * Non-WIN32: Linux, macOS, WIN64 (when WIN32 is not defined)
+ * Use <stdint.h> for exact-width types (C99 / GCC / Clang / MSVC 2010+).
+ */
+#if defined(__GNUC__) || defined(__clang__) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+ || defined(_MSC_VER)
+#  include <stdint.h>
+#  ifndef int8
+#    define int8   int8_t
+#  endif
+#  ifndef int16
+#    define int16  int16_t
+#  endif
+#  ifndef int32
+#    define int32  int32_t
+#  endif
+#  ifndef uint8
+#    define uint8  uint8_t
+#  endif
+#  ifndef uint16
+#    define uint16 uint16_t
+#  endif
+#  ifndef uint32
+#    define uint32 uint32_t
+#  endif
+#else
+/* Last-resort fallback for unknown platforms (LP64 / ILP32 assumed) */
+#  ifndef int8
+#    define int8   signed char
+#  endif
+#  ifndef int16
+#    define int16  short
+#  endif
+#  ifndef int32
+#    define int32  int
+#  endif
+#  ifndef uint8
+#    define uint8  unsigned char
+#  endif
+#  ifndef uint16
+#    define uint16 unsigned short
+#  endif
+#  ifndef uint32
+#    define uint32 unsigned int
+#  endif
+#endif /* compiler check */
 
-
-#endif
+#endif /* WIN32 */
 
 #endif // end of include once

@@ -2739,6 +2739,22 @@ void Test_Sort(void)
     int arr15[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int arr16[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int arr17[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    /* PowerSort: general random, reverse-sorted (tests run detection) */
+    int arr18[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr18r[] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    /* JesseSort: general random, alternating runs (tests dual-game routing) */
+    int arr19[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr19alt[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+    int sorted_alt[] = {1, 1, 2, 3, 3, 4, 5, 5, 6, 9};
+    /*
+     * OraSort uses memcmp (byte comparison), not the compare function.
+     * Values 0-9 as LE int are [v,0,0,0]: first byte IS the value,
+     * so memcmp agrees with integer order for single-digit non-negative ints.
+     */
+    int arr20[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    /* Prefix-skip test: 4-byte big-endian keys sharing a 3-byte common prefix. */
+    unsigned char orakeys[6][4];
+    unsigned char orakeys_sorted[6][4];
     int sorted[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     /* RadixSort test data (with negative values) */
@@ -2799,6 +2815,38 @@ void Test_Sort(void)
 
     dkcQuickSort(arr17, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr17, sorted, sizeof(sorted)) == 0, "QuickSort");
+
+    dkcPowerSort(arr18, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr18, sorted, sizeof(sorted)) == 0, "PowerSort");
+
+    dkcPowerSort(arr18r, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr18r, sorted, sizeof(sorted)) == 0, "PowerSort reverse");
+
+    dkcJesseSort(arr19, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr19, sorted, sizeof(sorted)) == 0, "JesseSort");
+
+    dkcJesseSort(arr19alt, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr19alt, sorted_alt, sizeof(sorted_alt)) == 0, "JesseSort alternating");
+
+    /* OraSort: values 0-9 as LE int work with memcmp (single-byte values) */
+    dkcOraSort(arr20, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr20, sorted, sizeof(sorted)) == 0, "OraSort");
+
+    /* OraSort prefix-skip test: 4-byte big-endian keys, 3-byte common prefix */
+    orakeys[0][0]=0xAA; orakeys[0][1]=0xBB; orakeys[0][2]=0xCC; orakeys[0][3]=0x06;
+    orakeys[1][0]=0xAA; orakeys[1][1]=0xBB; orakeys[1][2]=0xCC; orakeys[1][3]=0x02;
+    orakeys[2][0]=0xAA; orakeys[2][1]=0xBB; orakeys[2][2]=0xCC; orakeys[2][3]=0x09;
+    orakeys[3][0]=0xAA; orakeys[3][1]=0xBB; orakeys[3][2]=0xCC; orakeys[3][3]=0x01;
+    orakeys[4][0]=0xAA; orakeys[4][1]=0xBB; orakeys[4][2]=0xCC; orakeys[4][3]=0x07;
+    orakeys[5][0]=0xAA; orakeys[5][1]=0xBB; orakeys[5][2]=0xCC; orakeys[5][3]=0x03;
+    orakeys_sorted[0][0]=0xAA; orakeys_sorted[0][1]=0xBB; orakeys_sorted[0][2]=0xCC; orakeys_sorted[0][3]=0x01;
+    orakeys_sorted[1][0]=0xAA; orakeys_sorted[1][1]=0xBB; orakeys_sorted[1][2]=0xCC; orakeys_sorted[1][3]=0x02;
+    orakeys_sorted[2][0]=0xAA; orakeys_sorted[2][1]=0xBB; orakeys_sorted[2][2]=0xCC; orakeys_sorted[2][3]=0x03;
+    orakeys_sorted[3][0]=0xAA; orakeys_sorted[3][1]=0xBB; orakeys_sorted[3][2]=0xCC; orakeys_sorted[3][3]=0x06;
+    orakeys_sorted[4][0]=0xAA; orakeys_sorted[4][1]=0xBB; orakeys_sorted[4][2]=0xCC; orakeys_sorted[4][3]=0x07;
+    orakeys_sorted[5][0]=0xAA; orakeys_sorted[5][1]=0xBB; orakeys_sorted[5][2]=0xCC; orakeys_sorted[5][3]=0x09;
+    dkcOraSort(orakeys, 6, 4, NULL);
+    TEST_ASSERT(memcmp(orakeys, orakeys_sorted, sizeof(orakeys_sorted)) == 0, "OraSort prefix-skip");
 
     /* RadixSort tests */
     TEST_ASSERT(dkcRadixSortInt(10, rarr1) == edk_SUCCEEDED, "RadixSortInt return");

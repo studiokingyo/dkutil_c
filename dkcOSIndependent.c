@@ -46,6 +46,13 @@ Error:
 
 #pragma warning(default:4127)
 #else
+#if defined(__APPLE__)
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <mach/mach.h>
+#elif defined(__linux__)
+#include <sys/sysinfo.h>
+#endif
 int dkcDynamicCheckEnvironment(BOOL isForceExit){
 
 }
@@ -335,8 +342,46 @@ int WINAPI dkcGetMemorySize(uint64 *pTotalMemory,uint64 *pFreeMemory)
 	*pFreeMemory  = (uint64)ms.dwAvailPhys;
 	return edk_SUCCEEDED;
 #else
+	if (pTotalMemory == NULL || pFreeMemory == NULL)
+		return edk_FAILED;
 
+#if defined(__APPLE__)
+	{
+		int mib[2];
+		uint64 total;
+		size_t len;
+		vm_statistics64_data_t vm_stat;
+		mach_msg_type_number_t count;
+		vm_size_t page_size;
 
+		mib[0] = CTL_HW;
+		mib[1] = HW_MEMSIZE;
+		len = sizeof(total);
+		if (sysctl(mib, 2, &total, &len, NULL, 0) != 0)
+			return edk_FAILED;
+		*pTotalMemory = total;
+
+		if (host_page_size(mach_host_self(), &page_size) != KERN_SUCCESS)
+			return edk_FAILED;
+		count = HOST_VM_INFO64_COUNT;
+		if (host_statistics64(mach_host_self(), HOST_VM_INFO64,
+		                      (host_info64_t)&vm_stat, &count) != KERN_SUCCESS)
+			return edk_FAILED;
+		*pFreeMemory = (uint64)vm_stat.free_count * (uint64)page_size;
+		return edk_SUCCEEDED;
+	}
+#elif defined(__linux__)
+	{
+		struct sysinfo info;
+		if (sysinfo(&info) != 0)
+			return edk_FAILED;
+		*pTotalMemory = (uint64)info.totalram * (uint64)info.mem_unit;
+		*pFreeMemory  = (uint64)info.freeram  * (uint64)info.mem_unit;
+		return edk_SUCCEEDED;
+	}
+#else
+	return edk_FAILED;
+#endif
 #endif
 }
 
