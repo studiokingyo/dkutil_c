@@ -961,9 +961,9 @@ void Test_CRC(void)
 
     dkcFreeCRC(&crc);
 
-    /* Test CRC-CCITT */
-    crc = dkcAllocCRC_ccitt_right();
-    TEST_ASSERT(crc != NULL, "dkcAllocCRC_ccitt_right");
+    /* Test CRC-CCITT (CRC-16/CCITT-FALSE: poly=0x1021, init=0xFFFF, no reflection) */
+    crc = dkcAllocCRC_ccitt_left();
+    TEST_ASSERT(crc != NULL, "dkcAllocCRC_ccitt_left");
     dkcCRCLoad(crc, (const BYTE*)test_data, strlen(test_data));
     crc_value = dkcCRCFinal(crc);
     TEST_ASSERT(crc_value == 0x29B1, "CRC-CCITT('123456789') = 0x29B1");
@@ -1363,7 +1363,7 @@ void Test_BLAKE2(void)
     b2b = dkcAllocBLAKE2b();
     dkcBLAKE2bLoad(b2b, (const BYTE*)"abc", 3);
     dkcBLAKE2bFinalDigestStr(b2b, digest_b, sizeof(digest_b));
-    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6886a7e7907d2e2e7104f9f7ee592e723f044eef62cef1ee0b29649e2b5e72c6816e8ef1e2") == 0,
+    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923") == 0,
                 "BLAKE2b-512('abc') correct");
     dkcFreeBLAKE2b(&b2b);
 
@@ -1390,7 +1390,7 @@ void Test_BLAKE2(void)
     dkcBLAKE2bLoad(b2b, (const BYTE*)"b", 1);
     dkcBLAKE2bLoad(b2b, (const BYTE*)"c", 1);
     dkcBLAKE2bFinalDigestStr(b2b, digest_b, sizeof(digest_b));
-    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6886a7e7907d2e2e7104f9f7ee592e723f044eef62cef1ee0b29649e2b5e72c6816e8ef1e2") == 0,
+    TEST_ASSERT(strcmp(digest_b, "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923") == 0,
                 "BLAKE2b split input matches");
     dkcFreeBLAKE2b(&b2b);
 
@@ -6093,6 +6093,6 @@ int main(int argc, char *argv[])
         printf("  ALL TESTS PASSED!\n");
         
     }
-	system("PAUSE");
+	//system("PAUSE");
 	return 0;
 }

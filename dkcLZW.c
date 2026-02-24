@@ -621,11 +621,11 @@ DKC_INLINE int WINAPI dkcLZWDecode(DKC_LZW *ptr,DKC_LZW_HEADER *ph,
 		dkctLZW_DECODE func = decode_tst;
 		for(;;){//break for
 			
-			if((t & edkcLZW_Default)  || (t &edkcLZW_TST)){
+			if(t & edkcLZW_TST){
 				init_tst(ptr);
 				func = decode_tst;
 			}
-			if(t & edkcLZW_HASH){
+			if(t == edkcLZW_Default || (t & edkcLZW_HASH)){
 				int tr = init_hash(ptr);
 				if(DKUTIL_FAILED(tr)) return tr;
 				func = decode_hash;

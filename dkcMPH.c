@@ -248,9 +248,10 @@ static int mph_build_internal(DKC_MPH *mph, dkcMPHKeyFunc key_func,
 
 		seed2 = seed1 + MPH_SEED_INCREMENT;
 
-		/* バケットをリセット */
+		/* バケットをリセット（qsort後にbucket_idが変わるため毎回復元が必要） */
 		for (i = 0; i < num_buckets; i++) {
 			buckets[i].num_keys = 0;
+			buckets[i].bucket_id = i;
 		}
 		memset(occupied, 0, num_keys);
 
@@ -288,8 +289,9 @@ static int mph_build_internal(DKC_MPH *mph, dkcMPHKeyFunc key_func,
 			/* 変位値を探索 */
 			for (d = 0; d < num_keys * 2; d++) {
 				int collision = 0;
+				size_t k;
 
-				/* このdで衝突が起きるか確認 */
+				/* このdで衝突が起きるか確認（既存スロット＋バケット内衝突） */
 				for (j = 0; j < bucket->num_keys; j++) {
 					size_t key_idx = bucket->key_indices[j];
 					size_t slot = (h2_values[key_idx] + d) % num_keys;
@@ -297,6 +299,16 @@ static int mph_build_internal(DKC_MPH *mph, dkcMPHKeyFunc key_func,
 						collision = 1;
 						break;
 					}
+					/* 同一バケット内での衝突確認 */
+					for (k = 0; k < j; k++) {
+						size_t key_idx2 = bucket->key_indices[k];
+						size_t slot2 = (h2_values[key_idx2] + d) % num_keys;
+						if (slot == slot2) {
+							collision = 1;
+							break;
+						}
+					}
+					if (collision) break;
 				}
 
 				if (!collision) {
@@ -418,7 +430,7 @@ size_t WINAPI dkcMPHLookup(const DKC_MPH *mph, const void *key, size_t key_len)
 {
 	uint32 h1, h2, bucket_idx, d;
 
-	if (!mph || !mph->g || !key) return 0;
+	if (!mph || !mph->g || !key || mph->g_size == 0 || mph->num_keys == 0) return 0;
 
 	h1 = mph_hash(key, key_len, mph->seed1);
 	h2 = mph_hash(key, key_len, mph->seed2);

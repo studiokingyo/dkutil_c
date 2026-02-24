@@ -7,7 +7,14 @@
       "Bash(ls:*)",
       "Bash(make:*)",
       "Bash(where:*)",
-      "Bash(iconv:*)"
+      "Bash(iconv:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:www.rfc-editor.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.blake2.net)",
+      "WebFetch(domain:datatracker.ietf.org)",
+      "WebFetch(domain:www.ietf.org)"
     ]
   }
 }
