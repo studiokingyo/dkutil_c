@@ -111,6 +111,8 @@ dkc2Tree.c dkc2Tree.h�̓񕪖؂̈ꕔ�̏����̑��������
 #include "dkcLZSS.h"
 #include "dkcRLE.h"
 #include "dkcLZW.h"
+#include "dkcHuffman.h"
+#include "dkcRangeCoder.h"
 
 /* cryptograph */
 #include "dkcCryptoGraph.h"

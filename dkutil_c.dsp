@@ -1,26 +1,26 @@
 # Microsoft Developer Studio Project File - Name="dkutil_c" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
-# ** •ÒW‚µ‚È‚¢‚Å‚­‚¾‚³‚¢ **
+# ** ï¿½ÒWï¿½ï¿½ï¿½È‚ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ **
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
 CFG=dkutil_c - Win32 DebugMT
-!MESSAGE ‚±‚ê‚Í—LŒø‚ÈÒ²¸Ì§²Ù‚Å‚Í‚ ‚è‚Ü‚¹‚ñB ‚±‚ÌÌßÛ¼Şª¸Ä‚ğËŞÙÄŞ‚·‚é‚½‚ß‚É‚Í NMAKE ‚ğg—p‚µ‚Ä‚­‚¾‚³‚¢B
-!MESSAGE [Ò²¸Ì§²Ù‚Ì´¸½Îß°Ä] ºÏİÄŞ‚ğg—p‚µ‚ÄÀs‚µ‚Ä‚­‚¾‚³‚¢
+!MESSAGE ï¿½ï¿½ï¿½ï¿½Í—Lï¿½ï¿½ï¿½ï¿½Ò²ï¿½Ì§ï¿½Ù‚Å‚Í‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Û¼Şªï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½Ş‚ï¿½ï¿½é‚½ï¿½ß‚É‚ï¿½ NMAKE ï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+!MESSAGE [Ò²ï¿½Ì§ï¿½Ù‚Ì´ï¿½ï¿½ï¿½ß°ï¿½] ï¿½ï¿½ï¿½ï¿½Ş‚ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½Äï¿½ï¿½sï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 !MESSAGE 
 !MESSAGE NMAKE /f "dkutil_c.mak".
 !MESSAGE 
-!MESSAGE NMAKE ‚ÌÀs‚É\¬‚ğw’è‚Å‚«‚Ü‚·
-!MESSAGE ºÏİÄŞ ×²İã‚ÅÏ¸Û‚Ìİ’è‚ğ’è‹`‚µ‚Ü‚·B—á:
+!MESSAGE NMAKE ï¿½Ìï¿½ï¿½sï¿½ï¿½ï¿½É\ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½
+!MESSAGE ï¿½ï¿½ï¿½ï¿½ï¿½ ×²İï¿½ï¿½Ï¸Û‚Ìİ’ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½:
 !MESSAGE 
 !MESSAGE NMAKE /f "dkutil_c.mak" CFG="dkutil_c - Win32 DebugMT"
 !MESSAGE 
-!MESSAGE ‘I‘ğ‰Â”\‚ÈËŞÙÄŞ Ó°ÄŞ:
+!MESSAGE ï¿½Iï¿½ï¿½ï¿½Â”\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ó°ï¿½ï¿½:
 !MESSAGE 
-!MESSAGE "dkutil_c - Win32 Release" ("Win32 (x86) Static Library" —p)
-!MESSAGE "dkutil_c - Win32 Debug" ("Win32 (x86) Static Library" —p)
-!MESSAGE "dkutil_c - Win32 DebugMT" ("Win32 (x86) Static Library" —p)
-!MESSAGE "dkutil_c - Win32 ReleaseMT" ("Win32 (x86) Static Library" —p)
+!MESSAGE "dkutil_c - Win32 Release" ("Win32 (x86) Static Library" ï¿½p)
+!MESSAGE "dkutil_c - Win32 Debug" ("Win32 (x86) Static Library" ï¿½p)
+!MESSAGE "dkutil_c - Win32 DebugMT" ("Win32 (x86) Static Library" ï¿½p)
+!MESSAGE "dkutil_c - Win32 ReleaseMT" ("Win32 (x86) Static Library" ï¿½p)
 !MESSAGE 
 
 # Begin Project
@@ -530,6 +530,22 @@ SOURCE=.\dkcRLE.c
 # Begin Source File
 
 SOURCE=.\dkcRLE.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHuffman.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcHuffman.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcRangeCoder.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dkcRangeCoder.h
 # End Source File
 # End Group
 # Begin Group "cryptograph"

@@ -2304,6 +2304,128 @@ void Test_RLE_PackBits(void)
 }
 
 /*
+ * Test: dkcHuffman.c
+ */
+void Test_Huffman(void)
+{
+    DKC_HUFFMAN *huff;
+    DKC_HUFFMAN_HEADER header;
+    BYTE original[] = "AAAAAAAAAAAABBBBBBBBBBBBCCCCCCCCCCCCDDDDDDDDDDDD";
+    BYTE original2[] = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz";
+    BYTE compressed[1024];
+    BYTE decompressed[256];
+    int result;
+
+    TEST_BEGIN("dkcHuffman Test");
+
+    huff = dkcAllocHuffman();
+    TEST_ASSERT(huff != NULL, "dkcAllocHuffman");
+
+    /* --- repeated data: should compress well --- */
+    memset(&header, 0, sizeof(header));
+    result = dkcHuffmanEncode(huff, &header, compressed, sizeof(compressed),
+                              original, sizeof(original) - 1, dkcdHUFFMAN_SIGNATURE);
+    TEST_ASSERT(result == edk_SUCCEEDED || result == edk_NoValueToProcess, "Huffman encode (repeated)");
+
+    if (result == edk_SUCCEEDED) {
+        TEST_ASSERT(header.mSignature == dkcdHUFFMAN_SIGNATURE, "Signature correct");
+        TEST_ASSERT(header.mOriginSize == sizeof(original) - 1, "OriginSize correct");
+
+        memset(decompressed, 0, sizeof(decompressed));
+        result = dkcHuffmanDecode(huff, &header, decompressed, sizeof(decompressed),
+                                  compressed, header.mCompressedSize, dkcdHUFFMAN_SIGNATURE);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Huffman decode (repeated)");
+        TEST_ASSERT(memcmp(original, decompressed, sizeof(original) - 1) == 0, "Matches original (repeated)");
+    }
+
+    /* --- varied data --- */
+    memset(&header, 0, sizeof(header));
+    result = dkcHuffmanEncode(huff, &header, compressed, sizeof(compressed),
+                              original2, sizeof(original2) - 1, dkcdHUFFMAN_SIGNATURE);
+    TEST_ASSERT(result == edk_SUCCEEDED || result == edk_NoValueToProcess, "Huffman encode (varied)");
+
+    if (result == edk_SUCCEEDED) {
+        memset(decompressed, 0, sizeof(decompressed));
+        result = dkcHuffmanDecode(huff, &header, decompressed, sizeof(decompressed),
+                                  compressed, header.mCompressedSize, dkcdHUFFMAN_SIGNATURE);
+        TEST_ASSERT(result == edk_SUCCEEDED, "Huffman decode (varied)");
+        TEST_ASSERT(memcmp(original2, decompressed, sizeof(original2) - 1) == 0, "Matches original (varied)");
+    }
+
+    /* --- wrong signature: decode should fail --- */
+    if (header.mSignature == dkcdHUFFMAN_SIGNATURE) {
+        result = dkcHuffmanDecode(huff, &header, decompressed, sizeof(decompressed),
+                                  compressed, header.mCompressedSize, 0xDEADBEEFUL);
+        TEST_ASSERT(result != edk_SUCCEEDED, "Wrong signature rejected");
+    }
+
+    dkcFreeHuffman(&huff);
+    TEST_ASSERT(huff == NULL, "dkcFreeHuffman sets NULL");
+    TEST_END();
+}
+
+/*
+ * Test: dkcRangeCoder.c
+ */
+void Test_RangeCoder(void)
+{
+    DKC_RANGECODER *rc;
+    DKC_RANGECODER_HEADER header;
+    BYTE original[] = "AAAAAAAAAAAABBBBBBBBBBBBCCCCCCCCCCCCDDDDDDDDDDDD";
+    BYTE original2[] = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz";
+    BYTE compressed[1024];
+    BYTE decompressed[256];
+    int result;
+
+    TEST_BEGIN("dkcRangeCoder Test");
+
+    rc = dkcAllocRangeCoder();
+    TEST_ASSERT(rc != NULL, "dkcAllocRangeCoder");
+
+    /* --- repeated data --- */
+    memset(&header, 0, sizeof(header));
+    result = dkcRangeCoderEncode(rc, &header, compressed, sizeof(compressed),
+                                 original, sizeof(original) - 1, dkcdRANGECODER_SIGNATURE);
+    TEST_ASSERT(result == edk_SUCCEEDED || result == edk_NoValueToProcess, "RangeCoder encode (repeated)");
+
+    if (result == edk_SUCCEEDED) {
+        TEST_ASSERT(header.mSignature == dkcdRANGECODER_SIGNATURE, "Signature correct");
+        TEST_ASSERT(header.mOriginSize == sizeof(original) - 1, "OriginSize correct");
+
+        memset(decompressed, 0, sizeof(decompressed));
+        result = dkcRangeCoderDecode(rc, &header, decompressed, sizeof(decompressed),
+                                     compressed, header.mCompressedSize, dkcdRANGECODER_SIGNATURE);
+        TEST_ASSERT(result == edk_SUCCEEDED, "RangeCoder decode (repeated)");
+        TEST_ASSERT(memcmp(original, decompressed, sizeof(original) - 1) == 0, "Matches original (repeated)");
+    }
+
+    /* --- varied data --- */
+    memset(&header, 0, sizeof(header));
+    result = dkcRangeCoderEncode(rc, &header, compressed, sizeof(compressed),
+                                 original2, sizeof(original2) - 1, dkcdRANGECODER_SIGNATURE);
+    TEST_ASSERT(result == edk_SUCCEEDED || result == edk_NoValueToProcess, "RangeCoder encode (varied)");
+
+    if (result == edk_SUCCEEDED) {
+        memset(decompressed, 0, sizeof(decompressed));
+        result = dkcRangeCoderDecode(rc, &header, decompressed, sizeof(decompressed),
+                                     compressed, header.mCompressedSize, dkcdRANGECODER_SIGNATURE);
+        TEST_ASSERT(result == edk_SUCCEEDED, "RangeCoder decode (varied)");
+        TEST_ASSERT(memcmp(original2, decompressed, sizeof(original2) - 1) == 0, "Matches original (varied)");
+    }
+
+    /* --- wrong signature: decode should fail --- */
+    if (header.mSignature == dkcdRANGECODER_SIGNATURE) {
+        result = dkcRangeCoderDecode(rc, &header, decompressed, sizeof(decompressed),
+                                     compressed, header.mCompressedSize, 0xDEADBEEFUL);
+        TEST_ASSERT(result != edk_SUCCEEDED, "Wrong signature rejected");
+    }
+
+    dkcFreeRangeCoder(&rc);
+    TEST_ASSERT(rc == NULL, "dkcFreeRangeCoder sets NULL");
+    TEST_END();
+}
+
+/*
  * Test: dkcRegex.c (Regular Expression)
  */
 void Test_Regex(void)
@@ -6175,6 +6297,8 @@ int main(int argc, char *argv[])
     Test_LZSS();
     Test_LZW();
     Test_RLE_PackBits();
+    Test_Huffman();
+    Test_RangeCoder();
 
     Test_Camellia();
     Test_Twofish();
