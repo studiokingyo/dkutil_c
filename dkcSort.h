@@ -99,6 +99,15 @@ Best O(n), worst O(n * width).
 */
 DKC_EXTERN void WINAPI dkcOraSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
 
+/*!
+GlideSort (Orson Peters, 2023).
+Stable adaptive merge sort with binary insertion small-sort and
+branchless-compatible merge (both halves copied to buffer).
+Best O(n), worst O(n log n).
+@see https://github.com/orlp/glidesort
+*/
+DKC_EXTERN void WINAPI dkcGlideSort( void *base,size_t num,size_t width,DKC_SORT_COMPARE_TYPE compare);
+
 DKC_EXTERN int WINAPI dkcRadixSortInt(size_t num, int *data);
 
 DKC_EXTERN int WINAPI dkcRadixSortUInt(size_t num, unsigned int *data);

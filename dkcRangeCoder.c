@@ -5,8 +5,11 @@
 @brief Adaptive order-0 Range Coder (C89 / VC6 compatible)
 
 Implementation notes:
-  32-bit range coder (no carry, invariant: low + range <= 2^32 always).
-  RC_TOP = 2^24: renormalize when range < RC_TOP.
+  Subbotin-style carryless 32-bit range coder.
+  Two thresholds: RC_TOP (2^24) and RC_BOT (2^16).
+  Normalization emits a byte only when the top byte of low is determined
+  (low and low+range agree on top 8 bits), or forces range alignment
+  when range < RC_BOT to avoid indefinite stall.
   Model: uniform init (freq[s]=1, total=256), additive update with halving
   when cumulative total reaches RC_TOTAL.
 */
@@ -22,8 +25,8 @@ Implementation notes:
 /* -----------------------------------------------------------------------
    Constants
    ----------------------------------------------------------------------- */
-/* RC_TOP (2^24): renormalize when range < RC_TOP */
 #define RC_TOP    (1UL << 24)
+#define RC_BOT    (1UL << 16)
 #define RC_TOTAL  dkcdRC_TOTAL_FREQ   /* 16384 */
 
 /* -----------------------------------------------------------------------
@@ -37,7 +40,6 @@ static void rc_model_init(DKC_RANGECODER *m)
     m->cum_freq[0] = 0;
     for (i = 0; i < dkcdRC_SYMBOLS; i++)
         m->cum_freq[i + 1] = m->cum_freq[i] + m->freq[i];
-    /* initial total = 256 */
 }
 
 static void rc_rebuild_cum(DKC_RANGECODER *m)
@@ -78,9 +80,7 @@ static int rc_find_sym(const DKC_RANGECODER *m, unsigned long v)
 }
 
 /* -----------------------------------------------------------------------
-   Encoder
-   Invariant: low + range <= 2^32 is maintained throughout.
-   So 32-bit arithmetic never overflows (intermediate products are bounded).
+   Encoder  (Subbotin carryless)
    ----------------------------------------------------------------------- */
 typedef struct {
     BYTE         *out;
@@ -106,39 +106,65 @@ static int rce_write_byte(RC_ENC *e, BYTE b)
     return 0;
 }
 
+/*
+ * Subbotin carryless normalization (encoder).
+ *
+ * Condition 1: (low ^ (low + range)) < RC_TOP
+ *   Top 8 bits of low and low+range agree -> safe to emit top byte.
+ *
+ * Condition 2: range < RC_BOT
+ *   Range is too small and top bytes disagree -> force-align range to
+ *   the next RC_BOT boundary so the top byte becomes determined.
+ *   Small precision loss, but avoids indefinite carry ambiguity.
+ *
+ * If neither condition holds (top bytes disagree but range >= RC_BOT),
+ * we simply stop and let the next encode step shrink range further.
+ */
+static int rce_normalize(RC_ENC *e)
+{
+    while ((e->low ^ (e->low + e->range)) < RC_TOP ||
+           (e->range < RC_BOT &&
+            ((e->range = (0UL - e->low) & (RC_BOT - 1)), 1)))
+    {
+        if (rce_write_byte(e, (BYTE)(e->low >> 24)) != 0) return -1;
+        e->range <<= 8;
+        e->low   <<= 8;
+    }
+    return 0;
+}
+
 static int rce_encode(RC_ENC *e, const DKC_RANGECODER *m, int sym)
 {
     unsigned long total = m->cum_freq[dkcdRC_SYMBOLS];
     unsigned long step  = e->range / total;
     e->low   += step * m->cum_freq[sym];
     e->range  = step * m->freq[sym];
-    while (e->range < RC_TOP) {
-        if (rce_write_byte(e, (BYTE)(e->low >> 24)) != 0) return -1;
-        e->low   = (e->low << 8) & 0xFFFFFFFFUL;
-        e->range <<= 8;
-    }
-    return 0;
+    return rce_normalize(e);
 }
 
-/* Flush: emit the remaining 4 bytes of low */
+/* Flush: emit enough bytes to uniquely identify the final interval */
 static int rce_flush(RC_ENC *e)
 {
     int i;
     for (i = 0; i < 4; i++) {
         if (rce_write_byte(e, (BYTE)(e->low >> 24)) != 0) return -1;
-        e->low = (e->low << 8) & 0xFFFFFFFFUL;
+        e->low <<= 8;
     }
     return 0;
 }
 
 /* -----------------------------------------------------------------------
-   Decoder
-   Invariant mirrors encoder: code tracks low in the same way.
+   Decoder  (Subbotin carryless)
+
+   Tracks low/range in lockstep with the encoder.
+   code holds the actual bitstream value read so far.
+   Decoding uses (code - low) / step to recover the frequency bin.
    ----------------------------------------------------------------------- */
 typedef struct {
     const BYTE   *in;
     size_t        size;
     size_t        pos;
+    unsigned long low;
     unsigned long range;
     unsigned long code;
 } RC_DEC;
@@ -155,10 +181,23 @@ static void rcd_init(RC_DEC *d, const BYTE *in, size_t size)
     d->in    = in;
     d->size  = size;
     d->pos   = 0;
+    d->low   = 0;
     d->range = 0xFFFFFFFFUL;
     d->code  = 0;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
         d->code = (d->code << 8) | (unsigned long)rcd_read_byte(d);
+}
+
+/* Mirror of rce_normalize: same conditions, shifts code instead of emitting */
+static void rcd_normalize(RC_DEC *d)
+{
+    while ((d->low ^ (d->low + d->range)) < RC_TOP ||
+           (d->range < RC_BOT &&
+            ((d->range = (0UL - d->low) & (RC_BOT - 1)), 1)))
+    {
+        d->code = (d->code << 8) | (unsigned long)rcd_read_byte(d);
+        d->range <<= 8;
+        d->low   <<= 8;
     }
 }
 
@@ -166,19 +205,16 @@ static int rcd_decode(RC_DEC *d, DKC_RANGECODER *m, int *out_sym)
 {
     unsigned long total = m->cum_freq[dkcdRC_SYMBOLS];
     unsigned long step  = d->range / total;
-    unsigned long v     = d->code / step;
+    unsigned long v     = (d->code - d->low) / step;
     int sym;
 
     if (v >= total) v = total - 1;
     sym = rc_find_sym(m, v);
 
-    d->code  -= step * m->cum_freq[sym];
+    d->low   += step * m->cum_freq[sym];
     d->range  = step * m->freq[sym];
+    rcd_normalize(d);
 
-    while (d->range < RC_TOP) {
-        d->range <<= 8;
-        d->code   = (d->code << 8) | (unsigned long)rcd_read_byte(d);
-    }
     *out_sym = sym;
     return 0;
 }

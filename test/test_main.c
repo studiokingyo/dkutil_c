@@ -2868,6 +2868,10 @@ void Test_Sort(void)
     int arr19[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
     int arr19alt[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
     int sorted_alt[] = {1, 1, 2, 3, 3, 4, 5, 5, 6, 9};
+    /* GlideSort: random, reversed (tests run detection), already sorted */
+    int arr21[]  = {5, 2, 8, 1, 9, 3, 7, 4, 6, 0};
+    int arr21r[] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    int arr21s[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     /*
      * OraSort uses memcmp (byte comparison), not the compare function.
      * Values 0-9 as LE int are [v,0,0,0]: first byte IS the value,
@@ -2949,6 +2953,15 @@ void Test_Sort(void)
 
     dkcJesseSort(arr19alt, 10, sizeof(int), compare_int);
     TEST_ASSERT(memcmp(arr19alt, sorted_alt, sizeof(sorted_alt)) == 0, "JesseSort alternating");
+
+    dkcGlideSort(arr21,  10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr21,  sorted, sizeof(sorted)) == 0, "GlideSort");
+
+    dkcGlideSort(arr21r, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr21r, sorted, sizeof(sorted)) == 0, "GlideSort reverse");
+
+    dkcGlideSort(arr21s, 10, sizeof(int), compare_int);
+    TEST_ASSERT(memcmp(arr21s, sorted, sizeof(sorted)) == 0, "GlideSort sorted");
 
     /* OraSort: values 0-9 as LE int work with memcmp (single-byte values) */
     dkcOraSort(arr20, 10, sizeof(int), compare_int);

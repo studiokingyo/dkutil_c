@@ -1616,6 +1616,196 @@ done:
 	jesse_game_free(&g2);
 }
 
+/* ========================================
+ * GlideSort
+ * Orson Peters, 2023.
+ * https://github.com/orlp/glidesort
+ *
+ * Stable adaptive merge sort, O(n log n) worst case, O(n) on sorted input.
+ * Key differences from PowerSort (dkcPowerSort):
+ *   1. GLIDESORT_MIN_RUN = 16 (vs 24): finer natural-run granularity.
+ *   2. Binary insertion sort (O(n log n) comparisons) replaces linear
+ *      insertion sort (O(n^2) comparisons) for the small-run phase.
+ *   3. Branchless-compatible merge: copies BOTH halves into the work buffer
+ *      before merging, enabling a branch-free inner loop and preparing for
+ *      SIMD acceleration (the approach used in the original Rust code).
+ *      No galloping; simple linear scan through both halves.
+ *   4. Merge strategy: identical PowerSort node-power (reuses ps_node_power).
+ * ======================================== */
+#define GLIDESORT_MIN_RUN    16
+#define GLIDESORT_MAX_STACK  64
+
+/*
+ * Binary insertion sort for a[lo..hi).
+ * a[lo..start) is assumed already sorted; elements [start..hi) are inserted.
+ */
+static void gs_bisect_insert(BYTE *a, size_t lo, size_t start, size_t hi,
+                              size_t width, DKC_SORT_COMPARE_TYPE compare,
+                              BYTE *tmp)
+{
+    size_t i, left, right, mid;
+    for(i = start; i < hi; i++) {
+        memcpy(tmp, &a[i * width], width);
+        left  = lo;
+        right = i;
+        while(left < right) {
+            mid = left + (right - left) / 2u;
+            if(compare(&a[mid * width], tmp, width) > 0)
+                right = mid;
+            else
+                left = mid + 1u;
+        }
+        if(i > left)
+            memmove(&a[(left + 1u) * width], &a[left * width],
+                    (i - left) * width);
+        memcpy(&a[left * width], tmp, width);
+    }
+}
+
+/*
+ * Detect natural run starting at a[lo].  Reverse if strictly descending.
+ * Returns the raw (unpadded) run length.
+ */
+static size_t gs_find_run(BYTE *a, size_t lo, size_t total, size_t width,
+                           DKC_SORT_COMPARE_TYPE compare)
+{
+    size_t hi, l, r;
+    if(lo + 1u >= total) return 1u;
+    hi = lo + 1u;
+    if(compare(&a[lo * width], &a[hi * width], width) > 0) {
+        while(hi + 1u < total &&
+              compare(&a[hi * width], &a[(hi + 1u) * width], width) > 0)
+            hi++;
+        hi++;
+        l = lo; r = hi - 1u;
+        while(l < r) {
+            dkcSwap(&a[l * width], &a[r * width], width);
+            l++; r--;
+        }
+    } else {
+        while(hi + 1u < total &&
+              compare(&a[hi * width], &a[(hi + 1u) * width], width) <= 0)
+            hi++;
+        hi++;
+    }
+    return hi - lo;
+}
+
+/*
+ * Extend natural run at lo to at least GLIDESORT_MIN_RUN using binary
+ * insertion sort.  Returns the final run length.
+ */
+static size_t gs_extend_run(BYTE *a, size_t lo, size_t total, size_t width,
+                              DKC_SORT_COMPARE_TYPE compare, BYTE *tmp)
+{
+    size_t run_len = gs_find_run(a, lo, total, width, compare);
+    size_t force;
+    if(run_len < (size_t)GLIDESORT_MIN_RUN) {
+        force = (lo + (size_t)GLIDESORT_MIN_RUN <= total)
+                    ? lo + (size_t)GLIDESORT_MIN_RUN : total;
+        gs_bisect_insert(a, lo, lo + run_len, force, width, compare, tmp);
+        run_len = force - lo;
+    }
+    return run_len;
+}
+
+/*
+ * Branchless-compatible merge of a[lo..mid) and a[mid..hi).
+ * Copies BOTH halves to work[], then merges with a simple stable loop.
+ * work must be at least (hi - lo) * width bytes.
+ */
+static void gs_merge(BYTE *a, size_t lo, size_t mid, size_t hi, size_t width,
+                     DKC_SORT_COMPARE_TYPE compare, BYTE *work)
+{
+    size_t llen = mid - lo;
+    size_t rlen = hi - mid;
+    BYTE *L = work;
+    BYTE *R = work + llen * width;
+    size_t li, ri, di;
+
+    memcpy(L, &a[lo  * width], llen * width);
+    memcpy(R, &a[mid * width], rlen * width);
+
+    li = 0u; ri = 0u; di = lo;
+    while(li < llen && ri < rlen) {
+        if(compare(&L[li * width], &R[ri * width], width) <= 0) {
+            memcpy(&a[di * width], &L[li * width], width);
+            li++;
+        } else {
+            memcpy(&a[di * width], &R[ri * width], width);
+            ri++;
+        }
+        di++;
+    }
+    if(li < llen)
+        memcpy(&a[di * width], &L[li * width], (llen - li) * width);
+    else
+        memcpy(&a[di * width], &R[ri * width], (rlen - ri) * width);
+}
+
+void WINAPI dkcGlideSort(void *base, size_t num, size_t width,
+                          DKC_SORT_COMPARE_TYPE compare)
+{
+    BYTE *a = (BYTE *)base;
+    BYTE *work, *tmp;
+    size_t run_base[GLIDESORT_MAX_STACK];
+    size_t run_len [GLIDESORT_MAX_STACK];
+    unsigned int power_stk[GLIDESORT_MAX_STACK];
+    int stack_size;
+    size_t s1, n1, s2, n2, ts, tn;
+    unsigned int p;
+
+    if(num <= 1u) return;
+    if(num < (size_t)GLIDESORT_MIN_RUN) {
+        tmp = (BYTE *)malloc(width);
+        if(!tmp) return;
+        gs_bisect_insert(a, 0u, 1u, num, width, compare, tmp);
+        free(tmp);
+        return;
+    }
+
+    work = (BYTE *)malloc(num * width);
+    tmp  = (BYTE *)malloc(width);
+    if(!work || !tmp) { if(work) free(work); if(tmp) free(tmp); return; }
+
+    stack_size = 0;
+    s1 = 0u;
+    n1 = gs_extend_run(a, 0u, num, width, compare, tmp);
+
+    while(s1 + n1 < num) {
+        s2 = s1 + n1;
+        n2 = gs_extend_run(a, s2, num, width, compare, tmp);
+        p  = ps_node_power(s1, n1, s2, n2, num);
+
+        while(stack_size > 0 && power_stk[stack_size - 1] > p) {
+            ts = run_base[stack_size - 1];
+            tn = run_len [stack_size - 1];
+            stack_size--;
+            gs_merge(a, ts, ts + tn, ts + tn + n1, width, compare, work);
+            s1 = ts;
+            n1 = tn + n1;
+        }
+        run_base [stack_size] = s1;
+        run_len  [stack_size] = n1;
+        power_stk[stack_size] = p;
+        stack_size++;
+        s1 = s2;
+        n1 = n2;
+    }
+
+    while(stack_size > 0) {
+        ts = run_base[stack_size - 1];
+        tn = run_len [stack_size - 1];
+        stack_size--;
+        gs_merge(a, ts, ts + tn, ts + tn + n1, width, compare, work);
+        s1 = ts;
+        n1 = tn + n1;
+    }
+
+    free(work);
+    free(tmp);
+}
+
 #if 0
 int WINAPI dkcDistCountSortShort(size_t num, const short *a, short *b,short Min_,short Max_)
 {
